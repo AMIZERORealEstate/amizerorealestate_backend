@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Listings - AMIZERO Real Estate Ltd</title>
+    <link rel="icon" type="image/x-icon" href="images/android-chrome-512x512.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="listing.css">
+    <link rel="stylesheet" href="about.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div id="contact-info">
+            <h1 id="company-name">AMIZERO Real Estate Ltd</h1>
+            <div class="contact-item" id="contact-item">
+                <span class="icon">📞</span>
+                <div class="contact-text" id="contact-text">
+                    <span class="label">CALL:</span>
+                    <a style="text-decoration: none;" href="tel:+250725502317"><span class="value">+250 725 502 317</span></a>
+                </div>
+            </div>
+            <div class="contact-item" id="contact-item">
+                <span class="icon">⏰</span>
+                <div class="contact-text" id="contact-text">
+                    <span class="label">OPENING HOURS:</span>
+                    <span class="value">Mon - Fri 8:00AM - 5:00PM</span>
+                </div>
+            </div>
+        </div>
+
+        <nav>
+            <a href="index.html" class="logo"><img src="images/company_logo-removebg-preview - Copy.png" alt=""></a>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="listing.html" class="active">Listing</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li><a href="portfolio.html">Portfolio</a></li>
+                <li><a href="team.html">Team</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="close-menu">&times;</div>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+    <section class="main-container" id="listing">
+  
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1><i class="fas fa-home"></i> Property Listings</h1>
+            <p>Discover your perfect home or investment opportunity</p>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="filters-section">
+            <div class="filters-header">
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-type="all">All Properties</button>
+                    <button class="filter-tab" data-type="sale">For Sale</button>
+                    <button class="filter-tab" data-type="rent">For Rent</button>
+                </div>
+                <div class="results-count">
+                    <span id="resultsCount">24</span> properties found
+                </div>
+            </div>
+
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label for="location">Location</label>
+                    <select id="location">
+                        <option value="">All Locations</option>
+                        <option value="kigali">Kigali</option>
+                        <option value="nyarutarama">Nyarutarama</option>
+                        <option value="kimihurura">Kimihurura</option>
+                        <option value="gacuriro">Gacuriro</option>
+                        <option value="remera">Remera</option>
+                        <option value="kibagabaga">Kibagabaga</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="propertyType">Property Type</label>
+                    <select id="propertyType">
+                        <option value="">All Types</option>
+                        <option value="house">House</option>
+                        <option value="apartment">Apartment</option>
+                        <option value="villa">Villa</option>
+                        <option value="office">Office</option>
+                        <option value="land">Land</option>
+                        <option value="commercial">Commercial</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="bedrooms">Bedrooms</label>
+                    <select id="bedrooms">
+                        <option value="">Any</option>
+                        <option value="1">1+ Bedrooms</option>
+                        <option value="2">2+ Bedrooms</option>
+                        <option value="3">3+ Bedrooms</option>
+                        <option value="4">4+ Bedrooms</option>
+                        <option value="5">5+ Bedrooms</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Price Range (RWF)</label>
+                    <div class="price-range">
+                        <input type="number" id="minPrice" placeholder="Min" min="0">
+                        <span>-</span>
+                        <input type="number" id="maxPrice" placeholder="Max" min="0">
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-actions">
+                <button class="btn btn-primary" id="applyFilters">
+                    <i class="fas fa-search"></i> Search Properties
+                </button>
+                <button class="btn btn-secondary" id="clearFilters">
+                    <i class="fas fa-times"></i> Clear Filters
+                </button>
+            </div>
+        </div>
+
+        <div>
+        <!-- Properties Grid -->
+        <div class="properties-grid" id="propertiesGrid">
+            <!-- Properties will be dynamically loaded here -->
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading" id="loadingState" style="display: none;">
+            <div class="spinner"></div>
+        </div>
+
+        <!-- No Results -->
+        <div class="no-results" id="noResults" style="display: none;">
+            <i class="fas fa-search"></i>
+            <h3>No Properties Found</h3>
+            <p>We couldn't find any properties matching your criteria. Try adjusting your filters or search in a different location.</p>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="pagination">
+            <button id="prevPage" disabled><i class="fas fa-chevron-left"></i></button>
+            <button class="active">1</button>
+            <button>2</button>
+            <button>3</button>
+            <button id="nextPage"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+
+    </section>
+
+
+
+
+<!-- 
+  Modal contact agent
+    <div id="contact-agent-modal">
+        <div id="contact-agent-modal-content">
+            <span id="contact-agent-modal-close" onclick="closeContactModal()">&times;</span>
+            <h2 id="contact-agent-modal-title">Contact Agent</h2>
+            <p id="contact-agent-phone">Phone: +250 725 502 317</p>
+            <p id="contact-agent-email">Email: amizerorealestate@gmail.com</p>
+            <a id="contact-agent-whatsapp" href="https://wa.me/250725502317" target="_blank">
+                <img id="contact-agent-whatsapp-icon" src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" width="30">
+                Message on WhatsApp
+            </a>
+        </div>
+    </div> -->
+
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <!-- Quick Links -->
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="services.html">Services</a>
+                <a href="portfolio.html">Portfolio</a>
+                <a href="contact.html">Contact</a>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="footer-contact-info" style="display: flex; flex-direction: column; row-gap: 20px;">
+                <h3 class="contacth3f">Contact</h3>
+                <div class="contact-itemf" style="display: flex; flex-direction: row; align-items: center;">
+                    <div class="contact-icon" style="width: 30px; height: 30px;">
+                        <i class="fas fa-phone" style="width: 15px; height: 15px;"></i>
+                    </div>
+                    <div>
+                        <p>+250 725 502 317</p>
+                    </div>
+                </div>
+                <div class="contact-itemf" style="display: flex; flex-direction: row; align-items: center;">
+                    <div class="contact-icon" style="width: 30px; height: 30px;">
+                        <i class="fas fa-envelope" style="width: 15px; height: 15px;"></i>
+                    </div>
+                    <div>
+                        <p>amizerorealestate@gmail.com</p>
+                    </div>
+                </div>
+                <div class="contact-itemf" style="display: flex; flex-direction: row; align-items: center;">
+                    <div class="contact-icon" style="width: 30px; height: 30px;">
+                        <i class="fas fa-map-marker-alt" style="width: 15px; height: 15px;"></i>
+                    </div>
+                    <div>
+                        <p>Kigali, Rwanda</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social Media -->
+            <div class="footer-section">
+                <h3>Follow Us</h3>
+                <div class="social-links">
+                    <a href="#" style="width: 40px; height: 40px"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" style="width: 40px; height: 40px"><i class="fab fa-twitter"></i></a>
+                    <a href="#" style="width: 40px; height: 40px"><i class="fab fa-whatsapp"></i></a>
+                    <a href="#" style="width: 40px; height: 40px"><i class="fab fa-instagram"></i></a>
+                </div>
+                <p>Professional Real Estate Services in Rwanda</p>
+            </div>
+        </div>
+
+        <!-- Bottom -->
+        <div class="footer-bottom">
+            <p>&copy; <span id="year"></span> AMIZERO Real Estate Ltd. All rights reserved.</p>
+        </div>
+    </footer>
+
+
+     
+
+    <script>
+        document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+
+    <script src="properties.js"></script>
+    <script src="script.js"></script>
+
+
+    <script>
+        // Mobile Navigation Toggle
+document.addEventListener("DOMContentLoaded", () => {
+    const hamburger = document.querySelector('.hamburger');
+    const navMenu = document.querySelector('.nav-menu');
+    const closeMenu = document.querySelector('.close-menu');
+
+    if (hamburger && navMenu) {
+        // Toggle menu on hamburger click
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+        });
+    }
+
+    if (closeMenu) {
+        // Close menu on close icon click
+        closeMenu.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+        });
+    }
+
+    // Close menu when clicking a nav link
+    document.querySelectorAll('.nav-menu a').forEach(link => {
+        link.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+        });
+    });
+});
+
+    </script>
+</body>
+</html>

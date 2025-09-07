@@ -5,8 +5,15 @@ const express = require('express');
 const { MongoClient, ObjectId } = require('mongodb');
 const cors = require('cors');
 const path = require('path');
+const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+const fs = require('fs');
+const multer = require('multer');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('./cloudinary');
 
 const app = express();
 const PORT = process.env.PORT || 2000;
@@ -22,15 +29,55 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'frontend')));
+app.use(express.static('public'));
 
-// MongoDB Connection
+// MongoDB Connection Variables
 let db;
+let mongoClient;
+
+// Email Configuration
+const emailTransporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER || 'amizerorealestate@gmail.com',
+        pass: process.env.EMAIL_PASS
+    },
+    tls: {
+        rejectUnauthorized: false
+    }
+});
+
+// Cloudinary Storage Configuration
+const storage = new CloudinaryStorage({
+    cloudinary,
+    params: {
+        folder: 'properties',
+        allowed_formats: ['jpg', 'jpeg', 'png', 'webp']
+    }
+});
+
+const upload = multer({ storage });
+
+// Database Connection Function
 async function connectToMongoDB() {
     try {
-        const client = new MongoClient(mongoConfig.connectionString);
-        await client.connect();
-        console.log('✅ Connected to MongoDB');
-        db = client.db(mongoConfig.databaseName);
+        console.log('🔄 Connecting to MongoDB...');
+        
+        // Connect using MongoClient for direct DB operations
+        mongoClient = new MongoClient(mongoConfig.connectionString);
+        await mongoClient.connect();
+        console.log('✅ Connected to MongoDB via MongoClient');
+        db = mongoClient.db(mongoConfig.databaseName);
+        
+        // Also connect via Mongoose for schema-based operations
+        await mongoose.connect(mongoConfig.connectionString, {
+            dbName: mongoConfig.databaseName
+        });
+        console.log('✅ Connected to MongoDB via Mongoose');
+
+        // Create default admin if needed
+        await createDefaultAdmin();
+        
         return db;
     } catch (error) {
         console.error('❌ MongoDB connection error:', error);
@@ -38,34 +85,37 @@ async function connectToMongoDB() {
     }
 }
 
-// Email Configuration (for sending notifications)
-
-
-const emailTransporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.EMAIL_USER || 'amizerorealestate@gmail.com',
-        pass: process.env.EMAIL_PASS // App-specific password (not normal Gmail password)
-    },
-    tls: {
-        rejectUnauthorized: false // 👈 allows self-signed certs
+// Create default admin function
+async function createDefaultAdmin() {
+    try {
+        // This function should be implemented based on your admin schema
+        console.log('📝 Checking for default admin...');
+        // Add your admin creation logic here if needed
+    } catch (error) {
+        console.error('Error creating default admin:', error);
     }
-});
-
+}
 
 // Routes
 
-// Home route - serve the HTML file
+// Home route
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
 });
-
-// API Routes
 
 // Contact Form Submission
 app.post('/api/contact', async (req, res) => {
     try {
         const { name, email, phone, service, message } = req.body;
+
+        // Check database connection
+        if (!db) {
+            console.error('❌ Database not connected');
+            return res.status(500).json({
+                success: false,
+                error: 'Database connection not available'
+            });
+        }
 
         // Validate required fields
         if (!name || !email || !message) {
@@ -102,7 +152,7 @@ app.post('/api/contact', async (req, res) => {
         const collection = db.collection('contacts');
         const result = await collection.insertOne(contactData);
 
-        // Send notification email to admin
+        // Email content for admin
         const adminEmailContent = {
             from: process.env.EMAIL_USER,
             to: 'amizerorealestate@gmail.com',
@@ -134,7 +184,7 @@ app.post('/api/contact', async (req, res) => {
             `
         };
 
-        // Send auto-reply email to customer
+        // Email content for customer
         const customerEmailContent = {
             from: process.env.EMAIL_USER,
             to: email,
@@ -161,22 +211,13 @@ app.post('/api/contact', async (req, res) => {
                             <li>Email: amizerorealestate@gmail.com</li>
                         </ul>
                         
-                        <p style="margin-top: 30px;">Best regards,<br><strong> AMIZERO Real Estate Team</strong></p>
+                        <p style="margin-top: 30px;">Best regards,<br><strong>AMIZERO Real Estate Team</strong></p>
                     </div>
                 </div>
             `
         };
 
-        emailTransporter.verify((error, success) => {
-    if (error) {
-    console.error('❌ SMTP connection error:', error);
-  } else {
-    console.log('✅ SMTP server is ready to take our messages');
-  }
-});
-
-
-        // Send emails (don't wait for them to complete)
+        // Send emails (don't wait for completion)
         emailTransporter.sendMail(adminEmailContent).catch(err => 
             console.error('Admin email error:', err)
         );
@@ -186,7 +227,6 @@ app.post('/api/contact', async (req, res) => {
 
         res.json({
             success: true,
-            message: 'Thank you for your message! We will get back to you soon.',
             contactId: result.insertedId
         });
 
@@ -202,6 +242,13 @@ app.post('/api/contact', async (req, res) => {
 // Get all contacts (admin endpoint)
 app.get('/api/contacts', async (req, res) => {
     try {
+        if (!db) {
+            return res.status(500).json({
+                success: false,
+                error: 'Database connection not available'
+            });
+        }
+
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 20;
         const skip = (page - 1) * limit;
@@ -241,6 +288,13 @@ app.get('/api/contacts', async (req, res) => {
 // Update contact status
 app.put('/api/contacts/:id/status', async (req, res) => {
     try {
+        if (!db) {
+            return res.status(500).json({
+                success: false,
+                error: 'Database connection not available'
+            });
+        }
+
         const { id } = req.params;
         const { status } = req.body;
 
@@ -291,12 +345,79 @@ app.put('/api/contacts/:id/status', async (req, res) => {
     }
 });
 
+// Newsletter signup endpoint
+app.post('/api/newsletter', async (req, res) => {
+    try {
+        if (!db) {
+            return res.status(500).json({
+                success: false,
+                error: 'Database connection not available'
+            });
+        }
+
+        const { email, name } = req.body;
+
+        if (!email) {
+            return res.status(400).json({
+                success: false,
+                error: 'Email is required'
+            });
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({
+                success: false,
+                error: 'Please provide a valid email address'
+            });
+        }
+
+        const collection = db.collection('newsletter');
+        
+        const existing = await collection.findOne({ email: email.toLowerCase() });
+        if (existing) {
+            return res.status(400).json({
+                success: false,
+                error: 'Email is already subscribed to our newsletter'
+            });
+        }
+
+        const newsletterData = {
+            email: email.toLowerCase(),
+            name: name || null,
+            subscribedAt: new Date(),
+            status: 'active',
+            source: 'website'
+        };
+
+        await collection.insertOne(newsletterData);
+
+        res.json({
+            success: true,
+            message: 'Successfully subscribed to newsletter!'
+        });
+
+    } catch (error) {
+        console.error('Newsletter signup error:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to subscribe to newsletter'
+        });
+    }
+});
+
 // Analytics endpoint
 app.get('/api/analytics', async (req, res) => {
     try {
+        if (!db) {
+            return res.status(500).json({
+                success: false,
+                error: 'Database connection not available'
+            });
+        }
+
         const collection = db.collection('contacts');
         
-        // Get contact statistics
         const totalContacts = await collection.countDocuments();
         const newContacts = await collection.countDocuments({ status: 'new' });
         const thisMonth = new Date();
@@ -305,13 +426,11 @@ app.get('/api/analytics', async (req, res) => {
             timestamp: { $gte: thisMonth }
         });
 
-        // Get service distribution
         const serviceStats = await collection.aggregate([
             { $group: { _id: '$service', count: { $sum: 1 } } },
             { $sort: { count: -1 } }
         ]).toArray();
 
-        // Get monthly trend (last 6 months)
         const sixMonthsAgo = new Date();
         sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
         
@@ -349,78 +468,1306 @@ app.get('/api/analytics', async (req, res) => {
     }
 });
 
-// Newsletter signup endpoint
-app.post('/api/newsletter', async (req, res) => {
+// Health check endpoint
+app.get('/api/health', async (req, res) => {
+    const health = {
+        status: 'OK',
+        timestamp: new Date().toISOString(),
+        database: db ? 'Connected' : 'Disconnected',
+        email: 'Configured'
+    };
+    
+    res.json(health);
+});
+
+
+
+
+
+
+
+
+app.get('/admin/dashboard', (req, res) => {
+    res.sendFile(path.join(__dirname, 'frontend', 'Admin' , 'dashboard.html'));
+});
+
+
+// MongoDB Schemas
+
+const AdminSchema = new mongoose.Schema({
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    name: { type: String, required: true },
+    role: { type: String, default: 'admin' },
+    createdAt: { type: Date, default: Date.now }
+});
+
+
+const PropertySchema = new mongoose.Schema({
+    images: [{ type: String, required: true }], // Cloudinary URLs
+    title: { type: String, required: true },
+    location: { type: String, required: true },
+    price: { type: Number, required: true },
+    type: { type: String, enum: ['sale', 'rent'], required: true },
+    propertyType: { 
+        type: String, 
+        enum: ['house', 'apartment', 'villa', 'office', 'land', 'commercial'], 
+        required: true 
+    },
+    bedrooms: { type: Number, default: 0 },
+    bathrooms: { type: Number, default: 0 },
+    area: { type: Number, default: 0 },
+    description: { type: String },
+    status: { type: String, enum: ['active', 'inactive', 'sold', 'rented'], default: 'active' },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
+});
+
+
+const InquirySchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    email: { type: String, required: true },
+    phone: { type: String },
+    service: { type: String },
+    message: { type: String, required: true },
+    status: { type: String, enum: ['new', 'pending', 'completed', 'closed'], default: 'new' },
+    propertyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Property' },
+    createdAt: { type: Date, default: Date.now }
+});
+
+const TeamSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    position: { type: String, required: true },
+    email: { type: String, required: true },
+    phone: { type: String },
+    bio: { type: String },
+    image: { type: String },
+    skills: [{ type: String }],
+    socialLinks: {
+        linkedin: { type: String },
+        twitter: { type: String },
+        email: { type: String }
+    },
+    createdAt: { type: Date, default: Date.now }
+});
+
+const PortfolioSchema = new mongoose.Schema({
+    title: { type: String, required: true },
+    category: { 
+        type: String, 
+        enum: ['valuation', 'management', 'brokerage', 'survey'], 
+        required: true 
+    },
+    description: { type: String, required: true },
+    value: { type: String },
+    date: { type: Date, required: true },
+    client: { type: String },
+    location: { type: String },
+    duration: { type: String },
+    status: { 
+        type: String, 
+        enum: ['completed', 'ongoing', 'planned'], 
+        default: 'completed' 
+    },
+    images: [{ type: String }],  
+   
+    createdAt: { type: Date, default: Date.now }
+});
+
+
+const ActivitySchema = new mongoose.Schema({
+    action: { type: String, required: true },
+    description: { type: String, required: true },
+    type: { type: String, enum: ['property', 'inquiry', 'team', 'portfolio', 'admin'], required: true },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },
+    timestamp: { type: Date, default: Date.now }
+});
+
+// Models
+const Admin = mongoose.model('Admin', AdminSchema, 'admin'); 
+const Property = mongoose.model('Property', PropertySchema);
+const Inquiry = mongoose.model('Inquiry', InquirySchema);
+const Team = mongoose.model('Team', TeamSchema);
+const Portfolio = mongoose.model('Portfolio', PortfolioSchema);
+const Activity = mongoose.model('Activity', ActivitySchema);
+
+// Create default admin user
+async function createDefaultAdmin() {
     try {
-        const { email, name } = req.body;
-
-        if (!email) {
-            return res.status(400).json({
-                success: false,
-                error: 'Email is required'
+        const existingAdmin = await Admin.findOne({ email: 'amizerorealestate01@gmail.com' });
+        if (!existingAdmin) {
+            const hashedPassword = await bcrypt.hash('AMR123', 12);
+            const admin = new Admin({
+                email: 'amizerorealestate01@gmail.com',
+                password: hashedPassword,
+                name: 'AMIZERO ADMIN',
+                role: 'admin'
             });
+            await admin.save();
+            console.log('Default admin created successfully');
+            
+            // Log activity
+            await logActivity('Admin Created', 'Default admin account was created', 'admin');
+        }
+    } catch (error) {
+        console.error('Error creating default admin:', error);
+    }
+}
+
+// JWT Secret
+const JWT_SECRET = process.env.JWT_SECRET || 'amizero_jwt_secret_key_2024';
+
+// Authentication middleware
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({ message: 'Access token required' });
+    }
+
+    jwt.verify(token, JWT_SECRET, (err, admin) => {
+        if (err) {
+            return res.status(403).json({ message: 'Invalid or expired token' });
+        }
+        req.admin = admin;
+        next();
+    });
+};
+
+// Activity logging function
+async function logActivity(action, description, type, userId = null) {
+    try {
+        const activity = new Activity({
+            action,
+            description,
+            type,
+            userId
+        });
+        await activity.save();
+    } catch (error) {
+        console.error('Error logging activity:', error);
+    }
+}
+
+// Routes
+
+// Authentication Routes
+app.post('/api/auth/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Email and password are required' });
         }
 
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            return res.status(400).json({
-                success: false,
-                error: 'Please provide a valid email address'
-            });
+        // Find admin
+        const admin = await Admin.findOne({ email });
+        if (!admin) {
+            return res.status(401).json({ message: 'Invalid credentials' });
         }
 
-        const collection = db.collection('newsletter');
-        
-        // Check if email already exists
-        const existing = await collection.findOne({ email: email.toLowerCase() });
-        if (existing) {
-            return res.status(400).json({
-                success: false,
-                error: 'Email is already subscribed to our newsletter'
-            });
+        // Check password
+        const isValidPassword = await bcrypt.compare(password, admin.password);
+        if (!isValidPassword) {
+            return res.status(401).json({ message: 'Invalid credentials' });
         }
 
-        // Add to newsletter
-        const newsletterData = {
-            email: email.toLowerCase(),
-            name: name || null,
-            subscribedAt: new Date(),
-            status: 'active',
-            source: 'website'
-        };
+        // Generate JWT token
+        const token = jwt.sign(
+            { 
+                adminId: admin._id, 
+                email: admin.email, 
+                name: admin.name,
+                role: admin.role 
+            },
+            JWT_SECRET,
+            { expiresIn: '24h' }
+        );
 
-        await collection.insertOne(newsletterData);
+        // Log activity
+        await logActivity('Admin Login', `${admin.name} logged into the system`, 'admin', admin._id);
 
         res.json({
-            success: true,
-            message: 'Successfully subscribed to newsletter!'
+            token,
+            admin: {
+                id: admin._id,
+                name: admin.name,
+                email: admin.email,
+                role: admin.role
+            }
+        });
+    } catch (error) {
+        console.error('Login error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+app.get('/api/auth/verify', authenticateToken, async (req, res) => {
+    try {
+        const admin = await Admin.findById(req.admin.adminId).select('-password');
+        if (!admin) {
+            return res.status(404).json({ message: 'Admin not found' });
+        }
+        res.json({ admin });
+    } catch (error) {
+        console.error('Token verification error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// Dashboard Statistics Route
+app.get('/api/stats', authenticateToken, async (req, res) => {
+    try {
+        const [properties, inquiries, team, portfolio] = await Promise.all([
+            Property.countDocuments({ status: 'active' }),
+            Inquiry.countDocuments(),
+            Team.countDocuments(),
+            Portfolio.countDocuments()
+        ]);
+
+        res.json({
+            properties,
+            inquiries,
+            team,
+            portfolio
+        });
+    } catch (error) {
+        console.error('Stats error:', error);
+        res.status(500).json({ message: 'Error fetching statistics' });
+    }
+});
+
+// Properties Routes
+app.get('/api/properties', authenticateToken, async (req, res) => {
+    try {
+        const properties = await Property.find()
+            .sort({ createdAt: -1 })
+            .lean();
+        res.json(properties);
+    } catch (error) {
+        console.error('Properties fetch error:', error);
+        res.status(500).json({ message: 'Error fetching properties' });
+    }
+});
+
+
+// Public route for portfolio (no authentication)
+app.get("/api/public/properties", async (req, res) => {
+    try {
+        const { type, location, propertyType, bedrooms, minPrice, maxPrice, q } = req.query;
+
+        // Build dynamic query
+        let query = {};
+
+        // Type filter
+        if (type && type !== 'all') query.type = type;
+
+        // Location filter
+        if (location) query.location = { $regex: location, $options: 'i' };
+
+        // Property type filter
+        if (propertyType) query.propertyType = propertyType;
+
+        // Bedrooms filter (minimum)
+        if (bedrooms) query.bedrooms = { $gte: parseInt(bedrooms) };
+
+        // Price filter
+        if (minPrice || maxPrice) {
+            query.price = {};
+            if (minPrice) query.price.$gte = parseInt(minPrice);
+            if (maxPrice) query.price.$lte = parseInt(maxPrice);
+        }
+
+        // Search query (title, location, description)
+        if (q) {
+            const searchRegex = { $regex: q, $options: 'i' };
+            query.$or = [
+                { title: searchRegex },
+                { location: searchRegex },
+                { description: searchRegex }
+            ];
+        }
+
+        const properties = await Property.find(query).sort({ createdAt: -1 }).lean();
+
+        // Return only public fields
+        const publicProps = properties.map(p => ({
+            id: p._id,
+            title: p.title,
+            price: p.price,
+            type: p.type,
+            location: p.location,
+            bedrooms: p.bedrooms,
+            bathrooms: p.bathrooms,
+            area: p.area,
+            propertyType: p.propertyType,
+            description: p.description,
+            images: p.images || []
+        }));
+
+        res.json(publicProps);
+
+    } catch (err) {
+        console.error("Failed to fetch properties", err);
+        res.status(500).json({ error: "Failed to fetch properties" });
+    }
+});
+
+
+
+app.get('/api/properties/:id', authenticateToken, async (req, res) => {
+    try {
+        const property = await Property.findById(req.params.id);
+        if (!property) {
+            return res.status(404).json({ message: 'Property not found' });
+        }
+        res.json(property);
+    } catch (error) {
+        console.error('Property fetch error:', error);
+        res.status(500).json({ message: 'Error fetching property' });
+    }
+});
+
+app.post('/api/properties', authenticateToken, upload.array('images', 6), async (req, res) => {
+    try {
+    
+        const propertyData = { ...req.body };
+
+        if (req.files && req.files.length > 0) {
+            const newImages = req.files
+                .map(file => file.path)   // CloudinaryStorage puts URL in path
+                .filter(url => typeof url === 'string');
+
+            propertyData.images = newImages;
+        } else {
+            propertyData.images = [];
+        }
+
+        // Convert string numbers to actual numbers
+        if (propertyData.price) propertyData.price = parseFloat(propertyData.price);
+        if (propertyData.bedrooms) propertyData.bedrooms = parseInt(propertyData.bedrooms);
+        if (propertyData.bathrooms) propertyData.bathrooms = parseInt(propertyData.bathrooms);
+        if (propertyData.area) propertyData.area = parseFloat(propertyData.area);
+
+        // Save new property
+        const property = new Property(propertyData);
+        await property.save();
+
+        // Log activity
+        await logActivity(
+            'Property Created',
+            `New property "${property.title}" was added`,
+            'property',
+            req.admin.adminId
+        );
+
+        res.status(201).json(property);
+    } catch (error) {
+        console.error('Property creation error:', error);
+        res.status(400).json({ message: error.message || 'Error creating property' });
+    }
+});
+
+
+
+app.put('/api/properties/:id', authenticateToken, upload.array('images', 10), async (req, res) => {
+    try {
+        const propertyData = { ...req.body };
+        propertyData.updatedAt = new Date();
+
+        // Handle file uploads
+        if (req.files && req.files.length > 0) {
+            const newImages = req.files.map(file => `/uploads/${file.filename}`);
+            // If existing images, append new ones, otherwise use new ones
+            if (propertyData.existingImages) {
+                propertyData.images = [...JSON.parse(propertyData.existingImages), ...newImages];
+            } else {
+                propertyData.images = newImages;
+            }
+        }
+
+        // Convert string numbers to actual numbers
+        if (propertyData.price) propertyData.price = parseFloat(propertyData.price);
+        if (propertyData.bedrooms) propertyData.bedrooms = parseInt(propertyData.bedrooms);
+        if (propertyData.bathrooms) propertyData.bathrooms = parseInt(propertyData.bathrooms);
+        if (propertyData.area) propertyData.area = parseFloat(propertyData.area);
+
+        const property = await Property.findByIdAndUpdate(
+            req.params.id,
+            propertyData,
+            { new: true, runValidators: true }
+        );
+
+        if (!property) {
+            return res.status(404).json({ message: 'Property not found' });
+        }
+
+        // Log activity
+        await logActivity('Property Updated', `Property "${property.title}" was updated`, 'property', req.admin.adminId);
+
+        res.json(property);
+    } catch (error) {
+        console.error('Property update error:', error);
+        res.status(400).json({ message: error.message || 'Error updating property' });
+    }
+});
+
+app.delete('/api/properties/:id', authenticateToken, async (req, res) => {
+    try {
+        const property = await Property.findByIdAndDelete(req.params.id);
+        if (!property) {
+            return res.status(404).json({ message: 'Property not found' });
+        }
+
+        // Delete associated images
+        if (property.images && property.images.length > 0) {
+            property.images.forEach(image => {
+                const imagePath = path.join(__dirname, 'public', image);
+                if (fs.existsSync(imagePath)) {
+                    fs.unlinkSync(imagePath);
+                }
+            });
+        }
+
+        // Log activity
+        await logActivity('Property Deleted', `Property "${property.title}" was deleted`, 'property', req.admin.adminId);
+
+        res.json({ message: 'Property deleted successfully' });
+    } catch (error) {
+        console.error('Property deletion error:', error);
+        res.status(500).json({ message: 'Error deleting property' });
+    }
+});
+
+// Inquiries Routes
+app.get('/api/inquiries', authenticateToken, async (req, res) => {
+    try {
+        const inquiries = await Inquiry.find()
+            .populate('propertyId', 'title location')
+            .sort({ createdAt: -1 })
+            .lean();
+        res.json(inquiries);
+    } catch (error) {
+        console.error('Inquiries fetch error:', error);
+        res.status(500).json({ message: 'Error fetching inquiries' });
+    }
+});
+
+app.get('/api/inquiries/:id', authenticateToken, async (req, res) => {
+    try {
+        const inquiry = await Inquiry.findById(req.params.id)
+            .populate('propertyId', 'title location');
+        if (!inquiry) {
+            return res.status(404).json({ message: 'Inquiry not found' });
+        }
+        res.json(inquiry);
+    } catch (error) {
+        console.error('Inquiry fetch error:', error);
+        res.status(500).json({ message: 'Error fetching inquiry' });
+    }
+});
+
+app.post('/api/inquiries', async (req, res) => {
+    try {
+        const inquiry = new Inquiry(req.body);
+        await inquiry.save();
+
+        // Log activity
+        await logActivity('New Inquiry', `New inquiry from ${inquiry.name}`, 'inquiry');
+
+        res.status(201).json(inquiry);
+    } catch (error) {
+        console.error('Inquiry creation error:', error);
+        res.status(400).json({ message: error.message || 'Error creating inquiry' });
+    }
+});
+
+app.put('/api/inquiries/:id', authenticateToken, async (req, res) => {
+    try {
+        const inquiry = await Inquiry.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            { new: true, runValidators: true }
+        );
+
+        if (!inquiry) {
+            return res.status(404).json({ message: 'Inquiry not found' });
+        }
+
+        // Log activity
+        await logActivity('Inquiry Updated', `Inquiry from ${inquiry.name} was updated`, 'inquiry', req.admin.adminId);
+
+        res.json(inquiry);
+    } catch (error) {
+        console.error('Inquiry update error:', error);
+        res.status(400).json({ message: error.message || 'Error updating inquiry' });
+    }
+});
+
+app.delete('/api/inquiries/:id', authenticateToken, async (req, res) => {
+    try {
+        const inquiry = await Inquiry.findByIdAndDelete(req.params.id);
+        if (!inquiry) {
+            return res.status(404).json({ message: 'Inquiry not found' });
+        }
+
+        // Log activity
+        await logActivity('Inquiry Deleted', `Inquiry from ${inquiry.name} was deleted`, 'inquiry', req.admin.adminId);
+
+        res.json({ message: 'Inquiry deleted successfully' });
+    } catch (error) {
+        console.error('Inquiry deletion error:', error);
+        res.status(500).json({ message: 'Error deleting inquiry' });
+    }
+});
+
+// Team Routes
+app.get('/api/team', authenticateToken, async (req, res) => {
+    try {
+        const team = await Team.find().sort({ createdAt: -1 }).lean();
+        res.json(team);
+    } catch (error) {
+        console.error('Team fetch error:', error);
+        res.status(500).json({ message: 'Error fetching team members' });
+    }
+});
+
+app.get('/api/team/:id', authenticateToken, async (req, res) => {
+    try {
+        const member = await Team.findById(req.params.id);
+        if (!member) {
+            return res.status(404).json({ message: 'Team member not found' });
+        }
+        res.json(member);
+    } catch (error) {
+        console.error('Team member fetch error:', error);
+        res.status(500).json({ message: 'Error fetching team member' });
+    }
+});
+
+app.post('/api/team', authenticateToken, upload.single('image'), async (req, res) => {
+    try {
+        const memberData = { ...req.body };
+
+        // Handle Cloudinary file upload
+        if (req.file) {
+            // If using Cloudinary uploader, req.file.path or req.file.url contains the URL
+            memberData.image = req.file.path || req.file.url;
+        } else {
+            memberData.image = ''; // empty if no image uploaded
+        }
+
+        // Parse skills if provided as comma-separated string
+        if (memberData.skills && typeof memberData.skills === 'string') {
+            memberData.skills = memberData.skills.split(',').map(skill => skill.trim());
+        }
+
+        const member = new Team(memberData);
+        await member.save();
+
+        // Log activity
+        await logActivity(
+            'Team Member Added',
+            `${member.name} was added to the team`,
+            'team',
+            req.admin.adminId
+        );
+
+        res.status(201).json(member);
+    } catch (error) {
+        console.error('Team member creation error:', error);
+        res.status(400).json({ message: error.message || 'Error creating team member' });
+    }
+});
+
+
+app.put('/api/team/:id', authenticateToken, upload.single('image'), async (req, res) => {
+    try {
+        const memberData = { ...req.body };
+
+        // Handle file upload
+        if (req.file) {
+            memberData.image = `/uploads/${req.file.filename}`;
+        }
+
+        // Parse skills if it's a string
+        if (memberData.skills && typeof memberData.skills === 'string') {
+            memberData.skills = memberData.skills.split(',').map(skill => skill.trim());
+        }
+
+        const member = await Team.findByIdAndUpdate(
+            req.params.id,
+            memberData,
+            { new: true, runValidators: true }
+        );
+
+        if (!member) {
+            return res.status(404).json({ message: 'Team member not found' });
+        }
+
+        // Log activity
+        await logActivity('Team Member Updated', `${member.name}'s profile was updated`, 'team', req.admin.adminId);
+
+        res.json(member);
+    } catch (error) {
+        console.error('Team member update error:', error);
+        res.status(400).json({ message: error.message || 'Error updating team member' });
+    }
+});
+
+app.delete('/api/team/:id', authenticateToken, async (req, res) => {
+    try {
+        const member = await Team.findByIdAndDelete(req.params.id);
+        if (!member) {
+            return res.status(404).json({ message: 'Team member not found' });
+        }
+
+        // Delete associated image
+        if (member.image) {
+            const imagePath = path.join(__dirname, 'public', member.image);
+            if (fs.existsSync(imagePath)) {
+                fs.unlinkSync(imagePath);
+            }
+        }
+
+        // Log activity
+        await logActivity('Team Member Removed', `${member.name} was removed from the team`, 'team', req.admin.adminId);
+
+        res.json({ message: 'Team member deleted successfully' });
+    } catch (error) {
+        console.error('Team member deletion error:', error);
+        res.status(500).json({ message: 'Error deleting team member' });
+    }
+});
+
+// Portfolio Routes
+app.get('/api/portfolio', authenticateToken, async (req, res) => {
+    try {
+        const portfolio = await Portfolio.find().sort({ date: -1 }).lean();
+        res.json(portfolio);
+    } catch (error) {
+        console.error('Portfolio fetch error:', error);
+        res.status(500).json({ message: 'Error fetching portfolio items' });
+    }
+});
+
+app.get('/api/portfolio/:id', authenticateToken, async (req, res) => {
+    try {
+        const item = await Portfolio.findById(req.params.id);
+        if (!item) {
+            return res.status(404).json({ message: 'Portfolio item not found' });
+        }
+        res.json(item);
+    } catch (error) {
+        console.error('Portfolio item fetch error:', error);
+        res.status(500).json({ message: 'Error fetching portfolio item' });
+    }
+});
+
+app.post('/api/portfolio', authenticateToken, upload.array('images', 5), async (req, res) => {
+    try {
+        const portfolioData = { ...req.body };
+
+        // Handle Cloudinary file uploads
+        if (req.files && req.files.length > 0) {
+            portfolioData.images = req.files
+                .map(file => file.path || file.url)   // Cloudinary gives `path` or `url`
+                .filter(url => typeof url === 'string');
+        } else {
+            portfolioData.images = [];
+        }
+
+        // (Optional) Convert fields if you expect numbers/dates
+        if (portfolioData.value) portfolioData.value = parseFloat(portfolioData.value);
+        if (portfolioData.date) portfolioData.date = new Date(portfolioData.date);
+
+        // Save to DB
+        const portfolio = new Portfolio(portfolioData);
+        await portfolio.save();
+
+        // Log activity (if you want like properties)
+        await logActivity(
+            'Portfolio Created',
+            `New portfolio item "${portfolio.title}" was added`,
+            'portfolio',
+            req.admin.adminId
+        );
+
+        res.status(201).json(portfolio);
+    } catch (error) {
+        console.error('Portfolio creation error:', error);
+        res.status(400).json({ message: error.message || 'Error creating portfolio item' });
+    }
+});
+
+
+app.put('/api/portfolio/:id', authenticateToken, upload.array('images', 5), async (req, res) => {
+    try {
+        const portfolioData = { ...req.body };
+
+        // Handle file uploads
+        if (req.files && req.files.length > 0) {
+            const newImages = req.files.map(file => `/uploads/${file.filename}`);
+            // If existing images, append new ones, otherwise use new ones
+            if (portfolioData.existingImages) {
+                portfolioData.images = [...JSON.parse(portfolioData.existingImages), ...newImages];
+            } else {
+                portfolioData.images = newImages;
+            }
+        }
+
+        // Convert date string to Date object
+        if (portfolioData.date) {
+            portfolioData.date = new Date(portfolioData.date);
+        }
+
+        const item = await Portfolio.findByIdAndUpdate(
+            req.params.id,
+            portfolioData,
+            { new: true, runValidators: true }
+        );
+
+        if (!item) {
+            return res.status(404).json({ message: 'Portfolio item not found' });
+        }
+
+        // Log activity
+        await logActivity('Portfolio Item Updated', `Portfolio item "${item.title}" was updated`, 'portfolio', req.admin.adminId);
+
+        res.json(item);
+    } catch (error) {
+        console.error('Portfolio item update error:', error);
+        res.status(400).json({ message: error.message || 'Error updating portfolio item' });
+    }
+});
+
+app.delete('/api/portfolio/:id', authenticateToken, async (req, res) => {
+    try {
+        const item = await Portfolio.findByIdAndDelete(req.params.id);
+        if (!item) {
+            return res.status(404).json({ message: 'Portfolio item not found' });
+        }
+
+        // Delete associated images
+        if (item.images && item.images.length > 0) {
+            item.images.forEach(image => {
+                const imagePath = path.join(__dirname, 'public', image);
+                if (fs.existsSync(imagePath)) {
+                    fs.unlinkSync(imagePath);
+                }
+            });
+        }
+
+        // Log activity
+        await logActivity('Portfolio Item Deleted', `Portfolio item "${item.title}" was deleted`, 'portfolio', req.admin.adminId);
+
+        res.json({ message: 'Portfolio item deleted successfully' });
+    } catch (error) {
+        console.error('Portfolio item deletion error:', error);
+        res.status(500).json({ message: 'Error deleting portfolio item' });
+    }
+});
+
+// Activity Routes
+app.get('/api/activity', authenticateToken, async (req, res) => {
+    try {
+        const activities = await Activity.find()
+            .populate('userId', 'name email')
+            .sort({ timestamp: -1 })
+            .limit(50)
+            .lean();
+        res.json(activities);
+    } catch (error) {
+        console.error('Activity fetch error:', error);
+        res.status(500).json({ message: 'Error fetching recent activity' });
+    }
+});
+
+// Public Routes (for frontend website)
+app.get('/api/public/properties', async (req, res) => {
+    try {
+        const { type, propertyType, minPrice, maxPrice, location, page = 1, limit = 12 } = req.query;
+        
+        const query = { status: 'active' };
+        
+        if (type) query.type = type;
+        if (propertyType) query.propertyType = propertyType;
+        if (location) query.location = { $regex: location, $options: 'i' };
+        if (minPrice || maxPrice) {
+            query.price = {};
+            if (minPrice) query.price.$gte = parseFloat(minPrice);
+            if (maxPrice) query.price.$lte = parseFloat(maxPrice);
+        }
+
+        const properties = await Property.find(query)
+            .select('-__v')
+            .sort({ createdAt: -1 })
+            .limit(limit * 1)
+            .skip((page - 1) * limit)
+            .lean();
+
+        const total = await Property.countDocuments(query);
+
+        res.json({
+            properties,
+            totalPages: Math.ceil(total / limit),
+            currentPage: page,
+            total
+        });
+    } catch (error) {
+        console.error('Public properties fetch error:', error);
+        res.status(500).json({ message: 'Error fetching properties' });
+    }
+});
+
+app.get('/api/public/properties/:id', async (req, res) => {
+    try {
+        const property = await Property.findOne({ _id: req.params.id, status: 'active' });
+        if (!property) {
+            return res.status(404).json({ message: 'Property not found' });
+        }
+        res.json(property);
+    } catch (error) {
+        console.error('Public property fetch error:', error);
+        res.status(500).json({ message: 'Error fetching property' });
+    }
+});
+
+app.get('/api/public/team', async (req, res) => {
+    try {
+        const team = await Team.find()
+            .select('-__v -email')
+            .sort({ createdAt: -1 })
+            .lean();
+        res.json(team);
+    } catch (error) {
+        console.error('Public team fetch error:', error);
+        res.status(500).json({ message: 'Error fetching team members' });
+    }
+});
+
+app.get('/api/public/portfolio', async (req, res) => {
+    try {
+        const { category } = req.query;
+        const query = category ? { category } : {};
+        
+        const portfolio = await Portfolio.find(query)
+            .select('-__v')
+            .sort({ date: -1 })
+            .lean();
+        res.json(portfolio);
+    } catch (error) {
+        console.error('Public portfolio fetch error:', error);
+        res.status(500).json({ message: 'Error fetching portfolio items' });
+    }
+});
+
+// Contact form submission (public)
+app.post('/api/public/contact', async (req, res) => {
+    try {
+        const inquiry = new Inquiry(req.body);
+        await inquiry.save();
+
+        // Log activity
+        await logActivity('New Contact', `Contact form submission from ${inquiry.name}`, 'inquiry');
+
+        res.status(201).json({ 
+            message: 'Thank you for your inquiry. We will get back to you soon!',
+            inquiry 
+        });
+    } catch (error) {
+        console.error('Contact form error:', error);
+        res.status(400).json({ message: error.message || 'Error submitting contact form' });
+    }
+});
+
+// File upload endpoint
+app.post('/api/upload', authenticateToken, upload.array('files', 10), async (req, res) => {
+    try {
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ message: 'No files uploaded' });
+        }
+
+        const fileUrls = req.files.map(file => `/uploads/${file.filename}`);
+        
+        // Log activity
+        await logActivity('Files Uploaded', `${req.files.length} file(s) uploaded`, 'admin', req.admin.adminId);
+
+        res.json({
+            message: 'Files uploaded successfully',
+            files: fileUrls
+        });
+    } catch (error) {
+        console.error('File upload error:', error);
+        res.status(500).json({ message: 'Error uploading files' });
+    }
+});
+
+// Search endpoint
+app.get('/api/search', authenticateToken, async (req, res) => {
+    try {
+        const { q, type } = req.query;
+        
+        if (!q) {
+            return res.status(400).json({ message: 'Search query is required' });
+        }
+
+        const searchRegex = { $regex: q, $options: 'i' };
+        const results = {};
+
+        if (!type || type === 'properties') {
+            results.properties = await Property.find({
+                $or: [
+                    { title: searchRegex },
+                    { location: searchRegex },
+                    { description: searchRegex }
+                ]
+            }).limit(10).lean();
+        }
+
+        if (!type || type === 'inquiries') {
+            results.inquiries = await Inquiry.find({
+                $or: [
+                    { name: searchRegex },
+                    { email: searchRegex },
+                    { message: searchRegex }
+                ]
+            }).limit(10).lean();
+        }
+
+        if (!type || type === 'team') {
+            results.team = await Team.find({
+                $or: [
+                    { name: searchRegex },
+                    { position: searchRegex },
+                    { email: searchRegex }
+                ]
+            }).limit(10).lean();
+        }
+
+        if (!type || type === 'portfolio') {
+            results.portfolio = await Portfolio.find({
+                $or: [
+                    { title: searchRegex },
+                    { description: searchRegex },
+                    { client: searchRegex }
+                ]
+            }).limit(10).lean();
+        }
+
+        res.json(results);
+    } catch (error) {
+        console.error('Search error:', error);
+        res.status(500).json({ message: 'Error performing search' });
+    }
+});
+
+// Admin management routes
+app.get('/api/admin/profile', authenticateToken, async (req, res) => {
+    try {
+        const admin = await Admin.findById(req.admin.adminId).select('-password');
+        if (!admin) {
+            return res.status(404).json({ message: 'Admin not found' });
+        }
+        res.json(admin);
+    } catch (error) {
+        console.error('Admin profile error:', error);
+        res.status(500).json({ message: 'Error fetching admin profile' });
+    }
+});
+
+app.put('/api/admin/profile', authenticateToken, async (req, res) => {
+    try {
+        const { name, email, currentPassword, newPassword } = req.body;
+        const admin = await Admin.findById(req.admin.adminId);
+        
+        if (!admin) {
+            return res.status(404).json({ message: 'Admin not found' });
+        }
+
+        // Update basic info
+        if (name) admin.name = name;
+        if (email) admin.email = email;
+
+        // Update password if provided
+        if (currentPassword && newPassword) {
+            const isValidPassword = await bcrypt.compare(currentPassword, admin.password);
+            if (!isValidPassword) {
+                return res.status(400).json({ message: 'Current password is incorrect' });
+            }
+            admin.password = await bcrypt.hash(newPassword, 12);
+        }
+
+        await admin.save();
+
+        // Log activity
+        await logActivity('Profile Updated', `${admin.name} updated their profile`, 'admin', admin._id);
+
+        res.json({ 
+            message: 'Profile updated successfully',
+            admin: {
+                id: admin._id,
+                name: admin.name,
+                email: admin.email,
+                role: admin.role
+            }
+        });
+    } catch (error) {
+        console.error('Admin profile update error:', error);
+        res.status(500).json({ message: 'Error updating profile' });
+    }
+});
+
+// Bulk operations
+app.post('/api/properties/bulk-delete', authenticateToken, async (req, res) => {
+    try {
+        const { ids } = req.body;
+        
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({ message: 'Property IDs are required' });
+        }
+
+        // Get properties before deletion to clean up images
+        const properties = await Property.find({ _id: { $in: ids } });
+        
+        // Delete properties
+        const result = await Property.deleteMany({ _id: { $in: ids } });
+
+        // Clean up images
+        properties.forEach(property => {
+            if (property.images && property.images.length > 0) {
+                property.images.forEach(image => {
+                    const imagePath = path.join(__dirname, 'public', image);
+                    if (fs.existsSync(imagePath)) {
+                        fs.unlinkSync(imagePath);
+                    }
+                });
+            }
         });
 
-    } catch (error) {
-        console.error('Newsletter signup error:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to subscribe to newsletter'
+        // Log activity
+        await logActivity('Bulk Delete', `${result.deletedCount} properties deleted`, 'property', req.admin.adminId);
+
+        res.json({ 
+            message: `${result.deletedCount} properties deleted successfully`,
+            deletedCount: result.deletedCount
         });
+    } catch (error) {
+        console.error('Bulk delete error:', error);
+        res.status(500).json({ message: 'Error deleting properties' });
+    }
+});
+
+app.put('/api/inquiries/bulk-update-status', authenticateToken, async (req, res) => {
+    try {
+        const { ids, status } = req.body;
+        
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({ message: 'Inquiry IDs are required' });
+        }
+
+        if (!['new', 'pending', 'completed', 'closed'].includes(status)) {
+            return res.status(400).json({ message: 'Invalid status' });
+        }
+
+        const result = await Inquiry.updateMany(
+            { _id: { $in: ids } },
+            { status }
+        );
+
+        // Log activity
+        await logActivity('Bulk Status Update', `${result.modifiedCount} inquiries updated to ${status}`, 'inquiry', req.admin.adminId);
+
+        res.json({ 
+            message: `${result.modifiedCount} inquiries updated successfully`,
+            modifiedCount: result.modifiedCount
+        });
+    } catch (error) {
+        console.error('Bulk status update error:', error);
+        res.status(500).json({ message: 'Error updating inquiry statuses' });
+    }
+});
+
+// Analytics endpoints
+app.get('/api/analytics/overview', authenticateToken, async (req, res) => {
+    try {
+        const { period = '30d' } = req.query;
+        
+        let dateFilter = {};
+        const now = new Date();
+        
+        switch (period) {
+            case '7d':
+                dateFilter = { createdAt: { $gte: new Date(now - 7 * 24 * 60 * 60 * 1000) } };
+                break;
+            case '30d':
+                dateFilter = { createdAt: { $gte: new Date(now - 30 * 24 * 60 * 60 * 1000) } };
+                break;
+            case '90d':
+                dateFilter = { createdAt: { $gte: new Date(now - 90 * 24 * 60 * 60 * 1000) } };
+                break;
+            case '1y':
+                dateFilter = { createdAt: { $gte: new Date(now - 365 * 24 * 60 * 60 * 1000) } };
+                break;
+            default:
+                dateFilter = {};
+        }
+
+        const [
+            totalProperties,
+            totalInquiries,
+            totalTeam,
+            totalPortfolio,
+            recentProperties,
+            recentInquiries,
+            propertyTypes,
+            inquiryStatuses
+        ] = await Promise.all([
+            Property.countDocuments(),
+            Inquiry.countDocuments(),
+            Team.countDocuments(),
+            Portfolio.countDocuments(),
+            Property.countDocuments(dateFilter),
+            Inquiry.countDocuments(dateFilter),
+            Property.aggregate([
+                { $group: { _id: '$propertyType', count: { $sum: 1 } } }
+            ]),
+            Inquiry.aggregate([
+                { $group: { _id: '$status', count: { $sum: 1 } } }
+            ])
+        ]);
+
+        res.json({
+            totals: {
+                properties: totalProperties,
+                inquiries: totalInquiries,
+                team: totalTeam,
+                portfolio: totalPortfolio
+            },
+            period: {
+                properties: recentProperties,
+                inquiries: recentInquiries
+            },
+            breakdown: {
+                propertyTypes: propertyTypes.reduce((acc, item) => {
+                    acc[item._id] = item.count;
+                    return acc;
+                }, {}),
+                inquiryStatuses: inquiryStatuses.reduce((acc, item) => {
+                    acc[item._id || 'new'] = item.count;
+                    return acc;
+                }, {})
+            }
+        });
+    } catch (error) {
+        console.error('Analytics overview error:', error);
+        res.status(500).json({ message: 'Error fetching analytics data' });
+    }
+});
+
+// Export data endpoints
+app.get('/api/export/properties', authenticateToken, async (req, res) => {
+    try {
+        const properties = await Property.find().lean();
+        
+        // Convert to CSV format
+        const csvData = properties.map(property => ({
+            Title: property.title,
+            Location: property.location,
+            Price: property.price,
+            Type: property.type,
+            PropertyType: property.propertyType,
+            Bedrooms: property.bedrooms,
+            Bathrooms: property.bathrooms,
+            Area: property.area,
+            Status: property.status,
+            CreatedAt: property.createdAt,
+            UpdatedAt: property.updatedAt
+        }));
+
+        res.json({
+            data: csvData,
+            filename: `properties_export_${new Date().toISOString().split('T')[0]}.csv`
+        });
+    } catch (error) {
+        console.error('Properties export error:', error);
+        res.status(500).json({ message: 'Error exporting properties data' });
+    }
+});
+
+app.get('/api/export/inquiries', authenticateToken, async (req, res) => {
+    try {
+        const inquiries = await Inquiry.find().lean();
+        
+        const csvData = inquiries.map(inquiry => ({
+            Name: inquiry.name,
+            Email: inquiry.email,
+            Phone: inquiry.phone || '',
+            Service: inquiry.service || '',
+            Message: inquiry.message,
+            Status: inquiry.status,
+            CreatedAt: inquiry.createdAt
+        }));
+
+        res.json({
+            data: csvData,
+            filename: `inquiries_export_${new Date().toISOString().split('T')[0]}.csv`
+        });
+    } catch (error) {
+        console.error('Inquiries export error:', error);
+        res.status(500).json({ message: 'Error exporting inquiries data' });
     }
 });
 
 // Error handling middleware
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({
-        success: false,
-        error: 'Something went wrong on our server'
+app.use((error, req, res, next) => {
+    console.error('Unhandled error:', error);
+    
+    if (error.name === 'ValidationError') {
+        const errors = Object.values(error.errors).map(err => err.message);
+        return res.status(400).json({ 
+            message: 'Validation Error',
+            errors 
+        });
+    }
+    
+    if (error.name === 'CastError') {
+        return res.status(400).json({ message: 'Invalid ID format' });
+    }
+    
+    if (error.code === 11000) {
+        return res.status(400).json({ message: 'Duplicate entry' });
+    }
+
+    res.status(500).json({ 
+        message: 'Internal server error',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
 });
 
-// 404 handler
-app.use((req, res) => {
-    res.status(404).json({
-        success: false,
-        error: 'Endpoint not found'
-    });
+// Handle 404 routes
+app.use('*', (req, res) => {
+    res.status(404).json({ message: 'Route not found' });
 });
+
+// Graceful shutdown
+process.on('SIGINT', async () => {
+    console.log('Shutting down gracefully...');
+    await mongoose.connection.close();
+    process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+    console.log('Shutting down gracefully...');
+    await mongoose.connection.close();
+    process.exit(0);
+});
+
+
+
+
+
 
 // Start server
 async function startServer() {

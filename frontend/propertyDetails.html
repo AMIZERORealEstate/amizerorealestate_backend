@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="listing.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: #2d3748;
+            background: #f7fafc;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 1rem 0;
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #3182ce;
+        }
+
+        .back-btn {
+            background: #e2e8f0;
+            color: #4a5568;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-btn:hover {
+            background: #cbd5e0;
+            transform: translateX(-2px);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .property-layout {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 3rem;
+            align-items: start;
+        }
+
+        /* Property Content */
+        .property-content {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        /* Schedule Visit Form */
+        .schedule-form {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            padding: 2rem;
+            position: sticky;
+            top: 120px;
+        }
+
+        .form-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-subtitle {
+            color: #718096;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3182ce;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: #3182ce;
+            color: white;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-submit:hover {
+            background: #2c5282;
+            transform: translateY(-1px);
+        }
+
+        .agent-info {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .agent-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+
+        .agent-contact {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+        .agent-contact i {
+            color: #3182ce;
+            width: 16px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .property-layout {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .schedule-form {
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">AMIZERO Real Estate Ltd</div>
+            <a href="listing.html?type=properties" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Back to Properties
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <div class="property-layout">
+            <!-- Property Content (from your modal) -->
+            <div class="property-content">
+                <div id="modalContent">
+                    <!-- Content will be populated by your existing JavaScript -->
+                </div>
+            </div>
+
+            <!-- Schedule Visit Form -->
+            <div class="schedule-form">
+                <h3 class="form-title">Schedule a Visit</h3>
+                <p class="form-subtitle">Book a personal tour of this property</p>
+                
+                <div class="agent-info">
+                    <div class="agent-title">Property Agent</div>
+                    <div class="agent-contact">
+                        <i class="fas fa-user"></i>
+                        <span>Aphrodis Amizero</span>
+                    </div>
+                    <div class="agent-contact">
+                        <i class="fas fa-phone"></i>
+                        <span>+250 (725) 502-317</span>
+                    </div>
+                    <div class="agent-contact">
+                        <i class="fas fa-envelope"></i>
+                        <span>amizerorealestate@gmail.com</span>
+                    </div>
+                </div>
+                
+                <form id="scheduleForm" onsubmit="submitVisitForm(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">First Name *</label>
+                            <input type="text" class="form-input" name="firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Last Name *</label>
+                            <input type="text" class="form-input" name="lastName" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Email Address *</label>
+                        <input type="email" class="form-input" name="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Phone Number *</label>
+                        <input type="tel" class="form-input" name="phone" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Preferred Date *</label>
+                            <input type="date" class="form-input" name="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Preferred Time *</label>
+                            <select class="form-input" name="time" required>
+                                <option value="">Select time</option>
+                                <option value="09:00">9:00 AM</option>
+                                <option value="10:00">10:00 AM</option>
+                                <option value="11:00">11:00 AM</option>
+                                <option value="12:00">12:00 PM</option>
+                                <option value="13:00">1:00 PM</option>
+                                <option value="14:00">2:00 PM</option>
+                                <option value="15:00">3:00 PM</option>
+                                <option value="16:00">4:00 PM</option>
+                                <option value="17:00">5:00 PM</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Message (Optional)</label>
+                        <textarea class="form-input form-textarea" name="message" placeholder="Tell us about your requirements or any specific questions..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn-submit">
+                        Schedule Visit
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+<script>
+    // Property Details Page Script
+// Replace the script section in your propertyDetails.html with this
+
+const API_URL = "http://localhost:2000/api/public/properties";
+let currentPropertyImages = [];
+let currentImageIndex = 0;
+let imageCarouselInterval = null;
+
+// Get property ID from URL parameters
+function getPropertyIdFromURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('id');
+}
+
+// Format price function
+function formatPrice(price, type) {
+    const numPrice = Number(price) || 0;
+    const formatted = new Intl.NumberFormat('RWF', {
+        style: 'currency',
+        currency: 'RWF',
+        minimumFractionDigits: 0
+    }).format(numPrice);
+    return type === 'rent' ? `${formatted}/month` : formatted;
+}
+
+// Create image carousel HTML
+function createImageCarousel(images) {
+    if (!images || images.length === 0) {
+        return `<img src="https://via.placeholder.com/800x300?text=No+Image" alt="No Image" class="property-image-modal">`;
+    }
+
+    if (images.length === 1) {
+        return `<img src="${images[0]}" alt="Property Image" class="property-image-modal" onerror="this.src='https://via.placeholder.com/800x300?text=No+Image'">`;
+    }
+
+    return `
+        <div class="image-carousel-container">
+            <div class="image-carousel">
+                ${images.map((img, index) => `
+                    <img src="${img}" 
+                         alt="Property Image ${index + 1}" 
+                         class="carousel-image ${index === 0 ? 'active' : ''}" 
+                         onerror="this.src='https://via.placeholder.com/800x300?text=No+Image'">
+                `).join('')}
+            </div>
+            
+            <button class="carousel-btn carousel-prev" onclick="previousImage()">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="carousel-btn carousel-next" onclick="nextImage()">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            
+            <div class="carousel-indicators">
+                ${images.map((_, index) => `
+                    <button class="indicator ${index === 0 ? 'active' : ''}" 
+                            onclick="goToImage(${index})"></button>
+                `).join('')}
+            </div>
+            
+            <div class="image-counter">
+                <span id="currentImageNumber">1</span> / ${images.length}
+            </div>
+            
+            <button class="carousel-play-pause" onclick="toggleAutoPlay()" title="Pause/Play slideshow">
+                <i class="fas fa-pause" id="playPauseIcon"></i>
+            </button>
+        </div>
+    `;
+}
+
+// Create modal content
+function createModalContent(property) {
+    const formattedPrice = formatPrice(property.price, property.type);
+    const badgeClass = property.type === 'sale' ? 'badge-sale' : 'badge-rent';
+    const badgeText = property.type === 'sale' ? 'For Sale' : 'For Rent';
+
+    // Store images globally for carousel
+    currentPropertyImages = property.images || ['https://via.placeholder.com/800x300?text=No+Image'];
+    currentImageIndex = 0;
+
+    const imageCarouselHTML = createImageCarousel(currentPropertyImages);
+
+    return `
+        ${imageCarouselHTML}
+        
+        <div class="property-badge-modal ${badgeClass}">${badgeText}</div>
+        
+        <h1 class="property-title-modal">${property.title}</h1>
+        
+        <div class="property-price-modal">${formattedPrice}</div>
+        
+        <div class="property-location-modal">
+            <i class="fas fa-map-marker-alt"></i> ${property.location}
+        </div>
+        
+        <div class="property-details-grid">
+            <div class="detail-item">
+                <i class="fas fa-bed"></i>
+                <div class="detail-label">Bedrooms</div>
+                <div class="detail-value">${property.bedrooms || 'N/A'}</div>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-bath"></i>
+                <div class="detail-label">Bathrooms</div>
+                <div class="detail-value">${property.bathrooms || 'N/A'}</div>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-ruler-combined"></i>
+                <div class="detail-label">Area</div>
+                <div class="detail-value">${property.area ? property.area + ' m²' : 'N/A'}</div>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-home"></i>
+                <div class="detail-label">Type</div>
+                <div class="detail-value">${property.propertyType || 'N/A'}</div>
+            </div>
+        </div>
+        
+        <div class="property-description">
+            <h3 class="description-title">Description</h3>
+            <p class="description-text">${property.description || 'No description available'}</p>
+        </div>
+        
+        
+        </div>
+    `;
+}
+
+// Load single property from API
+async function loadPropertyDetails() {
+    const propertyId = getPropertyIdFromURL();
+    const modalContent = document.getElementById('modalContent');
+    
+    if (!propertyId) {
+        modalContent.innerHTML = `
+            <div style="text-align: center; padding: 2rem;">
+                <h2>Property Not Found</h2>
+                <p>No property ID provided in URL.</p>
+                <a href="properties.html" class="btn btn-primary">Back to Properties</a>
+            </div>
+        `;
+        return;
+    }
+
+    // Show loading state
+    modalContent.innerHTML = `
+        <div style="text-align: center; padding: 2rem;">
+            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #3182ce;"></i>
+            <p style="margin-top: 1rem;">Loading property details...</p>
+        </div>
+    `;
+
+    try {
+        // Fetch property from API
+        const response = await fetch(`${API_URL}/${propertyId}`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const property = await response.json();
+        
+        // Format property data
+        const formattedProperty = {
+            id: property.id,
+            title: property.title || 'No title',
+            price: property.price || 0,
+            type: property.type || 'sale',
+            location: property.location || 'Unknown',
+            bedrooms: property.bedrooms,
+            bathrooms: property.bathrooms,
+            area: property.area,
+            propertyType: property.propertyType || 'house',
+            description: property.description || 'No description available',
+            images: Array.isArray(property.images) && property.images.length > 0 
+                ? property.images 
+                : ['https://via.placeholder.com/800x300?text=No+Image']
+        };
+
+        // Set global property ID for the form
+        window.currentPropertyId = propertyId;
+        
+        // Populate content
+        modalContent.innerHTML = createModalContent(formattedProperty);
+        
+        // Start image carousel if multiple images
+        if (formattedProperty.images.length > 1) {
+            startImageCarousel();
+        }
+        
+    } catch (error) {
+        console.error('Error loading property:', error);
+        modalContent.innerHTML = `
+            <div style="text-align: center; padding: 2rem;">
+                <h2>Error Loading Property</h2>
+                <p>Could not load property details: ${error.message}</p>
+                <p>Please check if the API server is running on port 2000.</p>
+                <a href="properties.html" class="btn btn-primary">Back to Properties</a>
+            </div>
+        `;
+    }
+}
+
+// Image carousel functions
+function startImageCarousel() {
+    if (currentPropertyImages.length <= 1) return;
+    
+    if (imageCarouselInterval) {
+        clearInterval(imageCarouselInterval);
+    }
+    
+    imageCarouselInterval = setInterval(() => {
+        nextImage();
+    }, 3000);
+}
+
+function stopImageCarousel() {
+    if (imageCarouselInterval) {
+        clearInterval(imageCarouselInterval);
+        imageCarouselInterval = null;
+    }
+}
+
+function nextImage() {
+    if (currentPropertyImages.length <= 1) return;
+    
+    currentImageIndex = (currentImageIndex + 1) % currentPropertyImages.length;
+    updateCarouselDisplay();
+}
+
+function previousImage() {
+    if (currentPropertyImages.length <= 1) return;
+    
+    currentImageIndex = currentImageIndex === 0 
+        ? currentPropertyImages.length - 1 
+        : currentImageIndex - 1;
+    updateCarouselDisplay();
+}
+
+function goToImage(index) {
+    if (currentPropertyImages.length <= 1) return;
+    
+    currentImageIndex = index;
+    updateCarouselDisplay();
+}
+
+function updateCarouselDisplay() {
+    const images = document.querySelectorAll('.carousel-image');
+    const indicators = document.querySelectorAll('.indicator');
+    const counter = document.getElementById('currentImageNumber');
+    
+    images.forEach((img, index) => {
+        img.classList.toggle('active', index === currentImageIndex);
+    });
+    
+    indicators.forEach((indicator, index) => {
+        indicator.classList.toggle('active', index === currentImageIndex);
+    });
+    
+    if (counter) {
+        counter.textContent = currentImageIndex + 1;
+    }
+}
+
+function toggleAutoPlay() {
+    const playPauseIcon = document.getElementById('playPauseIcon');
+    
+    if (imageCarouselInterval) {
+        stopImageCarousel();
+        playPauseIcon.classList.remove('fa-pause');
+        playPauseIcon.classList.add('fa-play');
+    } else {
+        startImageCarousel();
+        playPauseIcon.classList.remove('fa-play');
+        playPauseIcon.classList.add('fa-pause');
+    }
+}
+
+// Schedule visit form submission
+function submitVisitForm(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    const data = Object.fromEntries(formData);
+    data.propertyId = window.currentPropertyId;
+    
+    console.log('Visit form data:', data);
+    
+    alert(`Thank you ${data.firstName}! Your visit request has been submitted. We'll contact you shortly to confirm your appointment on ${data.date} at ${data.time}.`);
+    event.target.reset();
+}
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+    // Set minimum date to today
+    const dateInput = document.querySelector('input[name="date"]');
+    if (dateInput) {
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.setAttribute('min', today);
+    }
+
+    // Load property details
+    loadPropertyDetails();
+});
+</script>
+</body>
+</html>

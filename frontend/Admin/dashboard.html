@@ -1,0 +1,1684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMIZERO Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #06b6d4;
+            --light-bg: #f8fafc;
+            --white: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --border-radius: 0.75rem;
+            --border-radius-sm: 0.5rem;
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--light-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        /* Login Page Styles */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+            position: relative;
+        }
+
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%"><stop offset="0%" stop-color="%23fff" stop-opacity="0.1"/><stop offset="100%" stop-color="%23fff" stop-opacity="0"/></radialGradient></defs><circle cx="200" cy="200" r="100" fill="url(%23a)"/><circle cx="800" cy="300" r="150" fill="url(%23a)"/><circle cx="400" cy="700" r="120" fill="url(%23a)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .login-card {
+            background: var(--white);
+            border-radius: 1.5rem;
+            box-shadow: var(--shadow-xl);
+            padding: 3rem;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            position: relative;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .login-header {
+            margin-bottom: 2.5rem;
+        }
+
+        .login-header h1 {
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+
+        .login-header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius-sm);
+            font-size: 1rem;
+            transition: var(--transition);
+            background: var(--white);
+            color: var(--text-primary);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgb(37 99 235 / 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 0.875rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border: none;
+            border-radius: var(--border-radius-sm);
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .login-btn:hover::before {
+            left: 100%;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            color: var(--danger-color);
+            font-size: 0.875rem;
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: rgb(239 68 68 / 0.1);
+            border: 1px solid rgb(239 68 68 / 0.2);
+            border-radius: var(--border-radius-sm);
+            display: none;
+        }
+
+        /* Dashboard Styles */
+        .dashboard-container {
+            display: none;
+            min-height: 100vh;
+            background: var(--light-bg);
+        }
+
+        .dashboard-header {
+            background: var(--white);
+            box-shadow: var(--shadow-sm);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .dashboard-title h1 {
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+
+        .dashboard-title p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .dashboard-nav {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .nav-item {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.875rem;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: rgb(37 99 235 / 0.1);
+            color: var(--primary-color);
+        }
+
+        .nav-item.active {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .logout-btn {
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+            font-size: 0.875rem;
+            margin-left: 1rem;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .dashboard-content {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--info-color));
+        }
+
+        .stat-icon {
+            width: 4rem;
+            height: 4rem;
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-icon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .stat-card:hover .stat-icon::before {
+            left: 100%;
+        }
+
+        .stat-icon.properties { 
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); 
+        }
+        .stat-icon.inquiries { 
+            background: linear-gradient(135deg, var(--success-color), #059669); 
+        }
+        .stat-icon.team { 
+            background: linear-gradient(135deg, var(--warning-color), #d97706); 
+        }
+        .stat-icon.portfolio { 
+            background: linear-gradient(135deg, var(--danger-color), #dc2626); 
+        }
+
+        .stat-info h3 {
+            font-size: 2rem;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .stat-info p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .content-section {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+            display: none;
+            overflow: hidden;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            background: rgb(248 250 252);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            letter-spacing: -0.025em;
+        }
+
+        .add-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 0.625rem 1.25rem;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+            font-size: 0.875rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .add-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .add-btn:hover::before {
+            left: 100%;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+          .table-wrapper {
+    width: 100%;
+    overflow-x: auto;  
+}
+
+
+.table-wrapper th:nth-child(9), /* 9th column is Description */
+.table-wrapper td:nth-child(9) {
+    max-width: 250px;      /* adjust width as needed */
+    white-space: nowrap;    /* prevent wrapping */
+    overflow: auto;       /* hide overflow */
+   
+}
+
+
+/* Make images smaller if needed */
+.data-table td img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+        .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .data-table th,
+        .data-table td {
+            white-space: nowrap;
+            padding: 1rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.875rem;
+        }
+
+        .data-table th {
+            background: rgb(248 250 252);
+            font-weight: 600;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            font-size: 0.75rem;
+        }
+
+        .data-table tbody tr {
+            transition: var(--transition);
+        }
+
+        .data-table tbody tr:hover {
+            background: rgb(248 250 252 / 0.5);
+        }
+
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .action-btn {
+            padding: 0.375rem 0.75rem;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            margin: 0 0.125rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .edit-btn {
+            background: var(--info-color);
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background: #0891b2;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .delete-btn {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background: var(--white);
+            margin: 2% auto;
+            padding: 0;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 600px;
+            box-shadow: var(--shadow-xl);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            background: rgb(248 250 252);
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 0.25rem;
+            border-radius: var(--border-radius-sm);
+            transition: var(--transition);
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            background: rgb(239 68 68 / 0.1);
+            color: var(--danger-color);
+        }
+
+        .modal form {
+            padding: 2rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+        }
+
+        .form-group select {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius-sm);
+            font-size: 1rem;
+            transition: var(--transition);
+            background: var(--white);
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgb(37 99 235 / 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn {
+            padding: 0.625rem 1.25rem;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            font-size: 0.875rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+            transform: translateY(-1px);
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .status-badge.available {
+            background: rgb(16 185 129 / 0.1);
+            color: var(--success-color);
+        }
+
+        .status-badge.sold {
+            background: rgb(239 68 68 / 0.1);
+            color: var(--danger-color);
+        }
+
+        .status-badge.pending {
+            background: rgb(245 158 11 / 0.1);
+            color: var(--warning-color);
+        }
+
+        /* Loading Spinner */
+        .loading {
+            display: inline-block;
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Messages */
+        .message {
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius-sm);
+            margin-bottom: 1.5rem;
+            display: none;
+            font-weight: 500;
+        }
+
+        .message.success {
+            background: rgb(16 185 129 / 0.1);
+            color: #065f46;
+            border: 1px solid rgb(16 185 129 / 0.2);
+        }
+
+        .message.error {
+            background: rgb(239 68 68 / 0.1);
+            color: #991b1b;
+            border: 1px solid rgb(239 68 68 / 0.2);
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        /* Recent Activity Styles */
+        #recentActivity {
+            padding: 2rem;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.875rem;
+        }
+
+        .activity-content h4 {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-content p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .activity-time {
+            margin-left: auto;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .dashboard-content {
+                padding: 1.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+                padding: 1rem;
+            }
+
+            .dashboard-nav {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .dashboard-content {
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+
+            .data-table {
+                font-size: 0.75rem;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 0.75rem 1rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 5% auto;
+            }
+
+            .login-card {
+                padding: 2rem;
+                margin: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dashboard-nav {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .nav-item {
+                width: 100%;
+                text-align: center;
+            }
+
+            .logout-btn {
+                width: 100%;
+                margin-left: 0;
+                margin-top: 0.5rem;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 0.5rem;
+            }
+
+            .action-btn {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.625rem;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .dashboard-nav,
+            .add-btn,
+            .action-btn,
+            .logout-btn {
+                display: none !important;
+            }
+
+            .dashboard-container {
+                background: white !important;
+            }
+
+            .content-section {
+                box-shadow: none !important;
+                border: 1px solid #ccc !important;
+            }
+        }
+
+        /* Focus Styles for Accessibility */
+        *:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--light-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1>AMIZERO Admin</h1>
+                <p>Real Estate Dashboard Login</p>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="login-btn" id="loginBtn">
+                    <span id="loginText">Sign In</span>
+                    <div id="loginSpinner" class="loading" style="display: none;"></div>
+                </button>
+                <div id="loginError" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboardPage" class="dashboard-container">
+        <header class="dashboard-header">
+            <div class="dashboard-title">
+                <h1>AMIZERO Admin Dashboard</h1>
+                <p>Real Estate Management System</p>
+            </div>
+            <nav class="dashboard-nav">
+                <button class="nav-item active" data-section="overview">
+                    <i class="fas fa-chart-line"></i> Overview
+                </button>
+                <button class="nav-item" data-section="properties">
+                    <i class="fas fa-home"></i> Properties
+                </button>
+                <button class="nav-item" data-section="inquiries">
+                    <i class="fas fa-envelope"></i> Inquiries
+                </button>
+                <button class="nav-item" data-section="team">
+                    <i class="fas fa-users"></i> Team
+                </button>
+                <button class="nav-item" data-section="portfolio">
+                    <i class="fas fa-briefcase"></i> Portfolio
+                </button>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </nav>
+        </header>
+
+        <main class="dashboard-content">
+            <!-- Overview Section -->
+            <section id="overview" class="content-section active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon properties">
+                            <i class="fas fa-home"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="propertiesCount">24</h3>
+                            <p>Total Properties</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon inquiries">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="inquiriesCount">12</h3>
+                            <p>New Inquiries</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon team">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="teamCount">8</h3>
+                            <p>Team Members</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon portfolio">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="portfolioCount">16</h3>
+                            <p>Portfolio Items</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-section active">
+                    <div class="section-header">
+                        <h2 class="section-title">Recent Activity</h2>
+                    </div>
+                    <div id="recentActivity">
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-plus"></i>
+                            </div>
+                            <div class="activity-content">
+                                <h4>New Property Added</h4>
+                                <p>Luxury Villa in Kicukiro has been added to the listings</p>
+                            </div>
+                            <div class="activity-time">2 hours ago</div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="activity-content">
+                                <h4>New Inquiry Received</h4>
+                                <p>Property valuation request from John Doe</p>
+                            </div>
+                            <div class="activity-time">4 hours ago</div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="activity-content">
+                                <h4>Team Member Updated</h4>
+                                <p>Sarah Johnson's profile information updated</p>
+                            </div>
+                            <div class="activity-time">6 hours ago</div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="activity-content">
+                                <h4>Property Sale Completed</h4>
+                                <p>Apartment in Remera successfully sold</p>
+                            </div>
+                            <div class="activity-time">1 day ago</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Properties Section -->
+            <section id="properties" class="content-section">
+                <div class="message" id="propertiesMessage"></div>
+                <div class="section-header">
+                    <h2 class="section-title">Property Management</h2>
+                    <button class="add-btn" id="addPropertyBtn">
+                        <i class="fas fa-plus"></i>
+                        Add Property
+                    </button>
+                </div>
+                <div style="padding: 2rem; overflow-x: auto;" >
+                    <table class="data-table">
+                        <thead>
+   <tr>
+    <th>Image</th>
+    <th>Title</th>
+    <th>Location</th>
+    <th>Price</th>
+    <th>Type</th>
+    <th>Property Type</th>
+    <th>Bedrooms</th>
+    <th>Bathrooms</th>
+    <th>Area (m²)</th>
+    <th>Description</th>
+    <th>Status</th>
+    <th>Created At</th>
+    <th>Updated At</th>
+    <th>Actions</th>
+  </tr>
+</thead>
+
+                        <tbody id="propertiesTableBody">
+                            <tr>
+                                <td>Modern Villa</td>
+                                <td>Kicukiro</td>
+                                <td>RWF 85,000,000</td>
+                                <td>Villa</td>
+                                <td><span class="status-badge available">Available</span></td>
+                                <td>
+                                    <button class="action-btn edit-btn">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <button class="action-btn delete-btn">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Downtown Apartment</td>
+                                <td>Remera</td>
+                                <td>RWF 45,000,000</td>
+                                <td>Apartment</td>
+                                <td><span class="status-badge sold">Sold</span></td>
+                                <td>
+                                    <button class="action-btn edit-btn">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <button class="action-btn delete-btn">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Commercial Space</td>
+                                <td>Nyarugenge</td>
+                                <td>RWF 120,000,000</td>
+                                <td>Commercial</td>
+                                <td><span class="status-badge pending">Pending</span></td>
+                                <td>
+                                    <button class="action-btn edit-btn">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <button class="action-btn delete-btn">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Inquiries Section -->
+            <section id="inquiries" class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">Contact Inquiries</h2>
+                </div>
+                <div style="padding: 2rem;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Service</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inquiriesTableBody">
+                            <tr>
+                                <td>John Doe</td>
+                                <td>john.doe@email.com</td>
+                                <td>Property Valuation</td>
+                                <td>2024-01-15</td>
+                                <td><span class="status-badge pending">New</span></td>
+                                <td>
+                                    <button class="action-btn edit-btn">
+                                        <i class="fas fa-eye"></i> View
+                                    </button>
+                                    <button class="action-btn delete-btn">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Jane Smith</td>
+                                <td>jane.smith@email.com</td>
+                                <td>Property Management</td>
+                                <td>2024-01-14</td>
+                                <td><span class="status-badge available">Responded</span></td>
+                                <td>
+                                    <button class="action-btn edit-btn">
+                                        <i class="fas fa-eye"></i> View
+                                    </button>
+                                    <button class="action-btn delete-btn">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Mike Johnson</td>
+                                <td>mike.johnson@email.com</td>
+                                <td>Real Estate Brokerage</td>
+                                <td>2024-01-13</td>
+                                <td><span class="status-badge pending">New</span></td>
+                                <td>
+                                    <button class="action-btn edit-btn">
+                                        <i class="fas fa-eye"></i> View
+                                    </button>
+                                    <button class="action-btn delete-btn">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Team Section -->
+            <section id="team" class="content-section">
+                <div class="message" id="teamMessage"></div>
+                <div class="section-header">
+                    <h2 class="section-title">Team Management</h2>
+                    <button class="add-btn" id="addTeamBtn">
+                        <i class="fas fa-plus"></i>
+                        Add Team Member
+                    </button>
+                </div>
+                <div style="padding: 2rem;" class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+    <tr>
+        <th>Photo</th>
+        <th>Full Name</th>
+        <th>Position</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Bio</th>
+        <th>Actions</th>
+    </tr>
+</thead>
+
+                        <tbody id="teamTableBody">
+                            <tr>
+                                <td>Sarah Johnson</td>
+                                <td>Property Manager</td>
+                                <td>sarah.johnson@amizero.com</td>
+                                <td>+250 788 123 456</td>
+                                <td>
+                                    <button class="action-btn edit-btn">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <button class="action-btn delete-btn">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>David Wilson</td>
+                                <td>Real Estate Agent</td>
+                                <td>david.wilson@amizero.com</td>
+                                <td>+250 788 234 567</td>
+                                <td>
+                                    <button class="action-btn edit-btn">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <button class="action-btn delete-btn">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Maria Garcia</td>
+                                <td>Property Valuator</td>
+                                <td>maria.garcia@amizero.com</td>
+                                <td>+250 788 345 678</td>
+                                <td>
+                                    <button class="action-btn edit-btn">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <button class="action-btn delete-btn">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Portfolio Section -->
+            <section id="portfolio" class="content-section">
+                <div class="message" id="portfolioMessage"></div>
+                <div class="section-header">
+                    <h2 class="section-title">Portfolio Management</h2>
+                    <button class="add-btn" id="addPortfolioBtn">
+                        <i class="fas fa-plus"></i>
+                        Add Portfolio Item
+                    </button>
+                </div>
+                <div style="padding: 2rem;" class="table-wrapper">
+                    <table class="data-table">
+
+                        <thead>
+   <thead>
+    <tr>
+        <th>Title</th>
+        <th>Category</th>
+        <th>Value</th>
+        <th>Date</th>
+        <th>Client</th>
+        <th>Location</th>
+        <th>Duration</th>
+        <th>Status</th>
+        <th>Description</th>
+        <th>Image</th>
+        <th>Actions</th>
+    </tr>
+</thead>
+
+
+                   
+                                
+                        <tbody id="portfolioTableBody">
+                            <tr>
+                                <td>Kigali Heights Valuation</td>
+                                <td>Property Valuation</td>
+                                <td>RWF 2,500,000</td>
+                                <td>2024-01-10</td>
+                                <td>
+                                    <button class="action-btn edit-btn">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <button class="action-btn delete-btn">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Nyarutarama Estate Management</td>
+                                <td>Property Management</td>
+                                <td>RWF 15,000,000</td>
+                                <td>2024-01-08</td>
+                                <td>
+                                    <button class="action-btn edit-btn">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <button class="action-btn delete-btn">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Commercial Complex Survey</td>
+                                <td>Quantity Survey</td>
+                                <td>RWF 8,500,000</td>
+                                <td>2024-01-05</td>
+                                <td>
+                                    <button class="action-btn edit-btn">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <button class="action-btn delete-btn">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Property Modal -->
+    <div id="propertyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="propertyModalTitle">Add Property</h2>
+                <button class="close-btn" onclick="closeModal('propertyModal')">&times;</button>
+            </div>
+            <form id="propertyForm"  enctype="multipart/form-data">
+                <input type="hidden" id="propertyId">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="propertyTitle">Title</label>
+                        <input type="text" id="propertyTitle" name="title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="propertyLocation">Location</label>
+                        <input type="text" id="propertyLocation" name="location" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="propertyPrice">Price (RWF)</label>
+                        <input type="number" id="propertyPrice" name="price" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="propertyType">Type</label>
+                        <select id="propertyType" name="type" required>
+                            <option value="">Select Type</option>
+                            <option value="sale">For Sale</option>
+                            <option value="rent">For Rent</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="propertyCategory">Category</label>
+                        <select id="propertyCategory" name="propertyType" required>
+                            <option value="">Select Category</option>
+                            <option value="house">House</option>
+                            <option value="apartment">Apartment</option>
+                            <option value="villa">Villa</option>
+                            <option value="office">Office</option>
+                            <option value="land">Land</option>
+                            <option value="commercial">Commercial</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="propertyBedrooms">Bedrooms</label>
+                        <input type="number" id="propertyBedrooms" name="bedrooms" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="propertyBathrooms">Bathrooms</label>
+                        <input type="number" id="propertyBathrooms" name="bathrooms" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="propertyArea">Area (m²)</label>
+                        <input type="number" id="propertyArea" name="area" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="propertyImage">Property Image</label>
+                        <input type="file" id="propertyImage" name="images" multiple accept="image/*">
+                    </div>
+                    <div id="preview"></div>
+                </div>
+                <div class="form-group">
+                    <label for="propertyDescription">Description</label>
+                    <textarea id="propertyDescription" name="description" rows="8" cols="60"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('propertyModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Property</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Team Modal -->
+<div id="teamModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="teamModalTitle">Add Team Member</h2>
+            <button class="close-btn" onclick="closeModal('teamModal')">&times;</button>
+        </div>
+        <form id="teamForm" enctype="multipart/form-data">
+            <input type="hidden" id="teamId">
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="teamName">Full Name</label>
+                    <input type="text" id="teamName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="teamPosition">Position</label>
+                    <input type="text" id="teamPosition" name="position" required>
+                </div>
+                <div class="form-group">
+                    <label for="teamEmail">Email</label>
+                    <input type="email" id="teamEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="teamPhone">Phone</label>
+                    <input type="tel" id="teamPhone" name="phone">
+                </div>
+                <div class="form-group">
+                    <label for="teamImage">Profile Image</label>
+                    <input type="file" id="teamImage" name="image" accept="image/*">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="teamBio">Bio</label>
+                <textarea id="teamBio" name="bio" rows="8" cols="25"></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('teamModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Team Member</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+    <!-- Portfolio Modal -->
+<div id="portfolioModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="portfolioModalTitle">Add Portfolio Item</h2>
+            <button class="close-btn" onclick="closeModal('portfolioModal')">&times;</button>
+        </div>
+        <form id="portfolioForm" enctype="multipart/form-data">
+            <input type="hidden" id="portfolioId">
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="portfolioTitle">Title</label>
+                    <input type="text" id="portfolioTitle" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="portfolioCategory">Category</label>
+                    <select id="portfolioCategory" name="category" required>
+                        <option value="">Select Category</option>
+                        <option value="valuation">Property Valuation</option>
+                        <option value="management">Property Management</option>
+                        <option value="brokerage">Real Estate Brokerage</option>
+                        <option value="survey">Quantity Survey</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="portfolioValue">Value (RWF)</label>
+                    <input type="text" id="portfolioValue" name="value">
+                </div>
+                <div class="form-group">
+                    <label for="portfolioDate">Project Date</label>
+                    <input type="date" id="portfolioDate" name="date" required>
+                </div>
+                <div class="form-group">
+                    <label for="portfolioClient">Client</label>
+                    <input type="text" id="portfolioClient" name="client">
+                </div>
+                <div class="form-group">
+                    <label for="portfolioLocation">Location</label>
+                    <input type="text" id="portfolioLocation" name="location">
+                </div>
+                <div class="form-group">
+                    <label for="portfolioDuration">Duration</label>
+                    <input type="text" id="portfolioDuration" name="duration">
+                </div>
+                <div class="form-group">
+                    <label for="portfolioStatus">Status</label>
+                    <select id="portfolioStatus" name="status">
+                        <option value="completed">Completed</option>
+                        <option value="ongoing">Ongoing</option>
+                        <option value="planned">Planned</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="portfolioImages">Upload Images</label>
+                <input type="file" id="portfolioImages" name="images" multiple accept="image/*">
+            </div>
+
+            <div class="form-group">
+                <label for="portfolioDescription">Description</label>
+                <textarea id="portfolioDescription" name="description" rows="10" cols="50" required></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('portfolioModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Portfolio Item</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+    <script src="dashboard.js" defer></script>
+
+
+    <script>
+document.getElementById("propertyImage").addEventListener("change", function() {
+    const preview = document.getElementById("preview");
+    preview.innerHTML = ""; // reset
+    Array.from(this.files).forEach(file => {
+        let p = document.createElement("p");
+        p.textContent = file.name;
+        preview.appendChild(p);
+    });
+    let count = document.createElement("p");
+    count.textContent = `Total files: ${this.files.length}`;
+    preview.appendChild(count);
+});
+</script>
+
+    <script>
+        // Dashboard JavaScript functionality
+        
+     
+        
+        // Navigation functionality
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // Remove active class from all nav items
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                // Add active class to clicked item
+                this.classList.add('active');
+                
+                // Hide all sections
+                document.querySelectorAll('.content-section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                // Show target section
+                const targetSection = this.getAttribute('data-section');
+                document.getElementById(targetSection).classList.add('active');
+            });
+        });
+        
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            if (confirm('Are you sure you want to logout?')) {
+                document.getElementById('dashboardPage').style.display = 'none';
+                document.getElementById('loginPage').style.display = 'flex';
+                // Reset form
+                document.getElementById('loginForm').reset();
+            }
+        });
+        
+        // Modal functionality
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        // Add Property Modal
+        document.getElementById('addPropertyBtn').addEventListener('click', function() {
+            document.getElementById('propertyModalTitle').textContent = 'Add Property';
+            document.getElementById('propertyForm').reset();
+            document.getElementById('propertyModal').style.display = 'block';
+        });
+        
+        // Add Team Modal
+        document.getElementById('addTeamBtn').addEventListener('click', function() {
+            document.getElementById('teamModalTitle').textContent = 'Add Team Member';
+            document.getElementById('teamForm').reset();
+            document.getElementById('teamModal').style.display = 'block';
+        });
+        
+        // Add Portfolio Modal
+        document.getElementById('addPortfolioBtn').addEventListener('click', function() {
+            document.getElementById('portfolioModalTitle').textContent = 'Add Portfolio Item';
+            document.getElementById('portfolioForm').reset();
+            document.getElementById('portfolioModal').style.display = 'block';
+        });
+        
+        // Form submissions
+        document.getElementById('propertyForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Add your form submission logic here
+            showMessage('propertiesMessage', 'Property saved successfully!', 'success');
+            closeModal('propertyModal');
+        });
+        
+        document.getElementById('teamForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Add your form submission logic here
+            showMessage('teamMessage', 'Team member saved successfully!', 'success');
+            closeModal('teamModal');
+        });
+        
+        document.getElementById('portfolioForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Add your form submission logic here
+            showMessage('portfolioMessage', 'Portfolio item saved successfully!', 'success');
+            closeModal('portfolioModal');
+        });
+        
+        // Show message function
+        function showMessage(elementId, message, type) {
+            const messageEl = document.getElementById(elementId);
+            messageEl.textContent = message;
+            messageEl.className = `message ${type} show`;
+            setTimeout(() => {
+                messageEl.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        });
+        
+        // Initialize dashboard with sample data
+    
+        
+        function animateCounter(elementId, targetValue) {
+            const element = document.getElementById(elementId);
+            let currentValue = 0;
+            const increment = targetValue / 30;
+            const timer = setInterval(() => {
+                currentValue += increment;
+                if (currentValue >= targetValue) {
+                    element.textContent = targetValue;
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.floor(currentValue);
+                }
+            }, 50);
+        }
+    </script>
+</body>
+</html>

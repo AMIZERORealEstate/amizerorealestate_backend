@@ -261,7 +261,7 @@
         }
 
         .fade-in-element {
-            opacity: 0;
+            opacity: 1;
             transform: translateY(30px);
             transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
@@ -272,30 +272,16 @@
         }
 
         /* Responsive Design */
+
+
+         @media (max-width: 1180px){
+            #company-name{
+                display: none;
+            }
+            }
         @media (max-width: 768px) {
-            .hamburger {
-                display: flex;
-            }
-
-            .nav-menu {
-                position: fixed;
-                left: -100%;
-                top: 1px;
-                flex-direction: column;
-                background: white;
-                width: 100%;
-                text-align: center;
-               
-                transition: 0.3s;
-                box-shadow: 0 10px 27px rgba(0, 0, 0, 0.05);
-                padding: 2rem 0;
-            }
-
-            .nav-menu.active {
-                left: 0;
-            }
            
-
+            
             .hero h1 {
                 font-size: 2.5rem;
             }
@@ -309,9 +295,12 @@
                 align-items: center;
             }
 
+           
+
             .about-main {
                 grid-template-columns: 1fr;
                 gap: 3rem;
+                
             }
 
             .about-mission-vision {
@@ -334,6 +323,7 @@
 
             section {
                 padding: 3rem 5%;
+               
             }
         }
 
@@ -357,6 +347,115 @@
             .stat-item {
                 padding: 1.5rem;
             }
+           
 
 
         }
+
+
+   #contact-info {
+  /* background-color: #0b1d5a; */
+  background: var(--gradient);
+  display: flex;
+  justify-content: right;
+  gap: 10px; /* space between items */
+  padding: 10px;
+  font-family: Arial, sans-serif;
+  height: 50px;
+}
+
+#contact-item {
+  display: flex;
+  text-align: center;
+  gap: 10px;
+  background: none;
+  margin-right: 4.3%;
+}
+
+#contact-item .icon {
+  font-size: 20px;
+  color: orange; /* icon color */
+}
+
+#contact-text .label {
+  font-weight: bold;
+  margin-right: 5px;
+  color: rgb(238, 183, 5);
+  font-size: 14px;
+}
+
+#contact-text .value {
+  font-size: 14px;
+  color: white;
+}
+
+#company-name {
+  font-size: 16px;
+  font-weight: bold;
+  color: #dadcdf;
+  text-align: center;
+  background: linear-gradient(90deg, #fcf5f4, #ffe7e7);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 2px;
+}
+
+/* Tablet responsive */
+@media screen and (max-width: 768px) {
+  #contact-info {
+    justify-content: center;
+    flex-wrap: nowrap;
+    height: auto;
+    min-height: 50px;
+    
+  }
+  
+  #contact-item {
+    margin-right: 1%;
+    flex-direction: row;
+    column-gap: 2px;
+  }
+  
+  #contact-item .icon {
+    font-size: 16px;
+  }
+
+  #contact-text .label,
+  #contact-text .value {
+    font-size: 12px;
+    
+  }
+  #company-name{
+    display: none;
+  }
+}
+
+/* Phone responsive */
+@media screen and (max-width: 480px) {
+  #contact-info {
+    flex-direction: column;
+    align-items: left;
+    height: 60px;
+    /* display: none; */
+
+   
+    
+  }
+  
+  #contact-item {
+    margin-right: 0;
+    padding:10px;
+    margin-bottom: -35px;
+    
+  }
+  
+  #contact-item:last-child {
+    margin-bottom: 0;
+  }
+
+  
+
+   
+  
+}
