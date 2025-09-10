@@ -124,7 +124,7 @@ class AdminDashboard {
         await Promise.all([
             this.loadStats(),
             this.loadProperties(),
-            this.loadInquiries(),
+
             this.loadTeamMembers(),
             this.loadPortfolio(),
             this.loadRecentActivity()
@@ -137,7 +137,6 @@ class AdminDashboard {
             const stats = await response.json();
             
             document.getElementById('propertiesCount').textContent = stats.properties || 0;
-            document.getElementById('inquiriesCount').textContent = stats.inquiries || 0;
             document.getElementById('teamCount').textContent = stats.team || 0;
             document.getElementById('portfolioCount').textContent = stats.portfolio || 0;
         } catch (error) {
@@ -157,17 +156,7 @@ class AdminDashboard {
         }
     }
 
-    async loadInquiries() {
-        try {
-            const response = await this.authenticatedFetch('/inquiries');
-            const inquiries = await response.json();
-            this.renderInquiriesTable(inquiries);
-        } catch (error) {
-            console.error('Error loading inquiries:', error);
-            document.getElementById('inquiriesTableBody').innerHTML = 
-                '<tr><td colspan="6" style="text-align: center; color: #e74c3c;">Error loading inquiries</td></tr>';
-        }
-    }
+
 
     async loadTeamMembers() {
         try {
@@ -243,31 +232,7 @@ class AdminDashboard {
         `).join('');
     }
 
-    renderInquiriesTable(inquiries) {
-        const tbody = document.getElementById('inquiriesTableBody');
-        if (inquiries.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #666;">No inquiries found</td></tr>';
-            return;
-        }
-
-        tbody.innerHTML = inquiries.map(inquiry => `
-            <tr>
-                <td>${inquiry.name}</td>
-                <td>${inquiry.email}</td>
-                <td>${inquiry.service || 'General'}</td>
-                <td>${new Date(inquiry.createdAt).toLocaleDateString()}</td>
-                <td><span class="badge badge-${inquiry.status || 'new'}">${inquiry.status || 'New'}</span></td>
-                <td>
-                    <button class="action-btn edit-btn" onclick="dashboard.viewInquiry('${inquiry._id}')">
-                        <i class="fas fa-eye"></i> View
-                    </button>
-                    <button class="action-btn delete-btn" onclick="dashboard.deleteInquiry('${inquiry._id}')">
-                        <i class="fas fa-trash"></i> Delete
-                    </button>
-                </td>
-            </tr>
-        `).join('');
-    }
+    
 
     renderTeamTable(team) {
     const tbody = document.getElementById('teamTableBody');
@@ -590,37 +555,7 @@ class AdminDashboard {
         }
     }
 
-    async deleteInquiry(id) {
-        if (!confirm('Are you sure you want to delete this inquiry?')) return;
-
-        try {
-            const response = await this.authenticatedFetch(`/inquiries/${id}`, { method: 'DELETE' });
-            if (response.ok) {
-                this.showMessage('inquiriesMessage', 'Inquiry deleted successfully!', 'success');
-                this.loadInquiries();
-                this.loadStats();
-            }
-        } catch (error) {
-            console.error('Error deleting inquiry:', error);
-        }
-    }
-
-    async viewInquiry(id) {
-        try {
-            const response = await this.authenticatedFetch(`/inquiries/${id}`);
-            const inquiry = await response.json();
-            alert(`
-Name: ${inquiry.name}
-Email: ${inquiry.email}
-Phone: ${inquiry.phone || 'N/A'}
-Service: ${inquiry.service || 'General'}
-Message: ${inquiry.message}
-Date: ${new Date(inquiry.createdAt).toLocaleString()}
-            `.trim());
-        } catch (error) {
-            alert('Error loading inquiry details');
-        }
-    }
+ 
 
     // Utility methods
     async authenticatedFetch(url, options = {}) {
@@ -704,3 +639,46 @@ const additionalStyles = `
 `;
 
 document.head.insertAdjacentHTML('beforeend', additionalStyles);
+
+
+
+
+// newsletter
+
+async function loadNewsletterSubscribers() {
+    const token = localStorage.getItem('adminToken');
+    try {
+        const res = await fetch('/api/newsletter', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        console.log("Newsletter data:", data); // 🔹 debug log
+        const tbody = document.getElementById('newsletterTableBody');
+        tbody.innerHTML = '';
+
+        if (!data.success || data.subscribers.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">No subscribers found</td></tr>`;
+            return;
+        }
+
+        data.subscribers.forEach(sub => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${sub.email}</td>
+                <td>${sub.name || '-'}</td>
+                <td>${new Date(sub.subscribedAt).toLocaleString()}</td>
+                <td>${sub.status}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } catch (err) {
+        console.error("Failed to load newsletter subscribers", err);
+    }
+}
+
+
+
+
+
+
+

@@ -155,6 +155,8 @@ function createPropertyCard(property) {
     const badgeClass = property.type === 'sale' ? 'badge-sale' : 'badge-rent';
     const badgeText = property.type === 'sale' ? 'For Sale' : 'For Rent';
     const favoriteClass = property.favorite ? 'active' : '';
+     const phoneNumber ="250725502317";
+   
 
     return `
         <div class="property-card" data-id="${property.id}">
@@ -178,7 +180,7 @@ function createPropertyCard(property) {
                     <button class="btn btn-primary btn-sm view-details" data-id="${property.id}">
                         <i class="fas fa-eye"></i> View Details
                     </button>
-                    <button class="btn btn-outline btn-sm contact-agent" onclick="contactAgentModal('${property.id}')">
+                    <button class="btn btn-outline btn-sm contact-agent"  onclick="window.open('https://wa.me/${phoneNumber}', '_blank')">
                         <i class="fas fa-phone"></i> Contact
                     </button>
                 </div>
@@ -188,11 +190,16 @@ function createPropertyCard(property) {
 
 }
 
+
+
+
+
+
 document.addEventListener("click", function (e) {
     if (e.target.closest(".view-details")) {
         const propertyId = e.target.closest(".view-details").getAttribute("data-id");
         // redirect with property id
-        window.location.href = `propertyDetails.html?id=${propertyId}`;
+        window.location.href = `propertyDetails.html?id=${propertyId}`, "_blank";
     }
 });
 
@@ -372,6 +379,8 @@ function createImageCarousel(images) {
         </div>
     `;
 }
+
+
 
 // Start image carousel
 function startImageCarousel() {

@@ -275,30 +275,192 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-// Newsletter form handling
-        document.querySelector('.newsletter-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const email = this.querySelector('input[type="email"]').value;
-            alert('Thank you for subscribing! We will send you updates to ' + email);
-            this.reset();
-        });
-        
-        // Back to top functionality
-        document.querySelector('.back-to-top').addEventListener('click', function(e) {
-            e.preventDefault();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
+// Newsletter form handling - SINGLE VERSION
+document.querySelectorAll('.newsletter-form').forEach(form => {
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const emailInput = this.querySelector('input[type="email"]');
+        const email = emailInput.value.trim();
 
-        // Add parallax effect to hero section
-        window.addEventListener('scroll', () => {
-            const scrolled = window.pageYOffset;
-            const hero = document.querySelector('.hero');
-            if (hero) {
-                hero.style.transform = `translateY(${scrolled * 0.3}px)`;
+        if (!email) {
+            showNewsletterModal('Please enter a valid email.');
+            return;
+        }
+
+        try {
+            const res = await fetch('/api/newsletter', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+
+            const data = await res.json();
+            
+
+            if (res.ok && data.success) {
+                showNewsletterModal(data.message);
+                emailInput.value = '';
+            } else {
+                showNewsletterModal(data.error || 'Subscription failed.');
             }
-        });
+        } catch (err) {
+            showNewsletterModal('Failed to subscribe. Please try again.');
+            console.error('Newsletter error:', err);
+        }
+    });
+});
 
 
+// Newsletter Modal Setup
+function createNewsletterModal() {
+    if (document.getElementById('newsletterModal')) return;
 
-        // Show the loader
+    const modal = document.createElement('div');
+    modal.id = 'newsletterModal';
+    modal.style.display = 'none';
+    modal.style.position = 'fixed';
+    modal.style.zIndex = '10000';
+    modal.style.left = '0';
+    modal.style.top = '0';
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.backgroundColor = 'rgba(0,0,0,0.6)';
+    modal.style.backdropFilter = 'blur(5px)';
+    modal.style.justifyContent = 'center';
+    modal.style.alignItems = 'center';
+    modal.style.flexDirection = 'column';
+    modal.style.opacity = '0';
+    modal.style.transition = 'opacity 0.3s ease';
+
+    const content = document.createElement('div');
+    content.style.background = 'linear-gradient(145deg, #ffffff, #f8f9fa)';
+    content.style.padding = '2.5rem';
+    content.style.borderRadius = '20px';
+    content.style.maxWidth = '420px';
+    content.style.width = '90%';
+    content.style.textAlign = 'center';
+    content.style.position = 'relative';
+    content.style.boxShadow = '0 25px 50px rgba(0, 0, 0, 0.25)';
+    content.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+    content.style.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+    content.style.transform = 'scale(0.7) translateY(50px)';
+    content.style.transition = 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+
+    // Success icon
+    const icon = document.createElement('div');
+    icon.innerHTML = '✓';
+    icon.style.width = '60px';
+    icon.style.height = '60px';
+    icon.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+    icon.style.borderRadius = '50%';
+    icon.style.margin = '0 auto 1.5rem';
+    icon.style.display = 'flex';
+    icon.style.alignItems = 'center';
+    icon.style.justifyContent = 'center';
+    icon.style.fontSize = '2rem';
+    icon.style.color = 'white';
+    icon.style.fontWeight = 'bold';
+    icon.style.boxShadow = '0 10px 25px rgba(16, 185, 129, 0.3)';
+
+    const close = document.createElement('span');
+    close.innerHTML = '&times;';
+    close.style.position = 'absolute';
+    close.style.top = '15px';
+    close.style.right = '20px';
+    close.style.fontSize = '1.8rem';
+    close.style.cursor = 'pointer';
+    close.style.color = '#64748b';
+    close.style.width = '30px';
+    close.style.height = '30px';
+    close.style.display = 'flex';
+    close.style.alignItems = 'center';
+    close.style.justifyContent = 'center';
+    close.style.borderRadius = '50%';
+    close.style.background = 'rgba(248, 249, 250, 0.8)';
+    close.style.transition = 'all 0.2s ease';
+
+    close.addEventListener('mouseenter', () => {
+        close.style.color = '#ef4444';
+        close.style.background = 'rgba(239, 68, 68, 0.1)';
+        close.style.transform = 'scale(1.1)';
+    });
+
+    close.addEventListener('mouseleave', () => {
+        close.style.color = '#64748b';
+        close.style.background = 'rgba(248, 249, 250, 0.8)';
+        close.style.transform = 'scale(1)';
+    });
+
+    close.addEventListener('click', () => {
+        modal.style.opacity = '0';
+        content.style.transform = 'scale(0.7) translateY(50px)';
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    });
+
+    const message = document.createElement('p');
+    message.id = 'newsletterModalMessage';
+    message.style.fontSize = '1.2rem';
+    message.style.margin = '1.5rem 0';
+    message.style.color = '#334155';
+    message.style.lineHeight = '1.6';
+    message.style.fontWeight = '500';
+
+    // Progress bar for auto-dismiss
+    const progressBar = document.createElement('div');
+    progressBar.style.position = 'absolute';
+    progressBar.style.bottom = '0';
+    progressBar.style.left = '0';
+    progressBar.style.height = '4px';
+    progressBar.style.background = 'linear-gradient(90deg, #10b981, #059669)';
+    progressBar.style.borderRadius = '0 0 20px 20px';
+    progressBar.style.width = '100%';
+    progressBar.style.transformOrigin = 'left';
+    progressBar.style.transform = 'scaleX(0)';
+    progressBar.style.transition = 'transform 3s linear';
+
+    content.appendChild(close);
+    content.appendChild(icon);
+    content.appendChild(message);
+    content.appendChild(progressBar);
+    modal.appendChild(content);
+    document.body.appendChild(modal);
+
+    // Close on outside click - SINGLE VERSION
+    modal.addEventListener('click', e => {
+        if (e.target === modal) {
+            modal.style.opacity = '0';
+            content.style.transform = 'scale(0.7) translateY(50px)';
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        }
+    });
+}
+
+function showNewsletterModal(msg) {
+    createNewsletterModal();
+    const modal = document.getElementById('newsletterModal');
+    const content = modal.querySelector('div');
+    const progressBar = modal.querySelector('div > div:last-child');
     
+    document.getElementById('newsletterModalMessage').textContent = msg;
+    modal.style.display = 'flex';
+    
+    // Trigger animations
+    setTimeout(() => {
+        modal.style.opacity = '1';
+        content.style.transform = 'scale(1) translateY(0)';
+        progressBar.style.transform = 'scaleX(1)';
+    }, 10);
+
+    // Auto-dismiss after 3 seconds
+    setTimeout(() => {
+        modal.style.opacity = '0';
+        content.style.transform = 'scale(0.7) translateY(50px)';
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    }, 3000);
+}

@@ -9,7 +9,24 @@
     <link rel="stylesheet" href="index.css">
     <link rel="stylesheet" href="about.css">
     
-   
+   <style>
+
+    @media(max-width: 480px){
+    
+.cta{
+        display: flex;
+        flex-direction: column;
+        row-gap: 1rem !important;
+    }
+    .listingbtn , .contact_servicesbtn{
+        display: flex;
+        flex-direction: column;
+        row-gap: 1rem !important;
+    }
+
+    }
+    
+   </style>
 </head>
 <body>
     <!-- Header -->
@@ -33,7 +50,7 @@
         </div>
 
         <nav>
-            <a href="index.html" class="logo"><img src="images/company_logo-removebg-preview - Copy.png" alt=""></a>
+            <a href="index.html" class="logo"><img src="images/company_logo_blue_color-removebg-preview.png" alt=""></a>
             <ul class="nav-menu">
                 <li><a href="index.html" class="active">Home</a></li>
                 <li><a href="listing.html">Listing</a></li>
@@ -62,8 +79,8 @@
             
 
             <div class="cta-buttons">
-
-               <a href="listing.html?type=buy" class="btn btn-buy">
+                <div class="listingbtn" style="display: flex; gap: 2rem;">
+                 <a href="listing.html?type=buy" class="btn btn-buy">
         <i class="fas fa-home"></i>
         Buy a Property
     </a>
@@ -71,7 +88,10 @@
         <i class="fas fa-key"></i>
         Rent a Property
     </a>
-                <a href="services.html?type=services" class="btn btn-primary">
+                </div>
+
+                <div class="contact_servicesbtn" style="display: flex; gap: 2rem;">
+    <a href="services.html?type=services" class="btn btn-primary">
 
                     <i class="fas fa-building"></i>
                     Our Services
@@ -80,6 +100,10 @@
                     <i class="fas fa-phone"></i>
                     Get in Touch
                 </a>
+                </div>
+
+               
+                
             </div>
          
         </div>
@@ -130,12 +154,12 @@
             <div class="footer-section social-awards">
                 <h3>Connect & Recognize</h3>
                 <div class="social-links">
-                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                    <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                    <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
-                    <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    <a href="https://www.facebook.com/profile.php?id=100079745410953" aria-label="Facebook" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://x.com/AMIZERO_RealEst?t=e2BML0ybqgVfdY9Xkyz5cw&s=09" aria-label="Twitter" target="_blank"><i class="fab fa-twitter"></i></a>
+                    <a href="https://www.linkedin.com/in/aphrodis-amizero-523280243?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" aria-label="LinkedIn" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="https://www.instagram.com/amizero_realestate?igsh=MWZ0bW0ydDRya3Y0Yw==" aria-label="Instagram" target="_blank"><i class="fab fa-instagram"></i></a>
+                    <a href="https://wa.me/250725502317" aria-label="WhatsApp" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                    <a href="https://www.youtube.com/@Amizero_RealEstate" aria-label="YouTube" target="_blank"><i class="fab fa-youtube"></i></a>
                 </div>
                 
                 <div class="awards-list">
@@ -156,8 +180,8 @@
             <div class="footer-bottom-left">
                 <p>&copy; <span id="year"></span> AMIZERO Real Estate Ltd. All rights reserved.</p>
                 <div class="footer-links">
-                    <a href="#privacy">Privacy Policy</a>
-                    <a href="#terms">Terms of Service</a>
+                    <a href="https://docs.google.com/document/d/1oM2efPSQ6FOW38egru1eOc53FVCkeQW_7VKy5Rabmjk/edit?usp=sharing" target="_blank">Privacy Policy</a>
+                    <a href="https://docs.google.com/document/d/1JNCxnBGV89Wz_YTmbVT7vn6Ui4iBDwhYWG8qBi8QHXc/edit?usp=sharing" target="_blank">Terms of Service</a>
                 </div>
             </div>
             <div class="footer-bottom-right">
@@ -170,10 +194,12 @@
 
 
 
-  <script src="script.js"></script>
+  
  <script>
         document.getElementById("year").textContent = new Date().getFullYear();
 </script>
+
+<script src="script.js" defer></script>
        
         
         <script>

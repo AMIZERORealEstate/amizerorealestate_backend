@@ -345,128 +345,11 @@ app.put('/api/contacts/:id/status', async (req, res) => {
     }
 });
 
-// Newsletter signup endpoint
-app.post('/api/newsletter', async (req, res) => {
-    try {
-        if (!db) {
-            return res.status(500).json({
-                success: false,
-                error: 'Database connection not available'
-            });
-        }
 
-        const { email, name } = req.body;
 
-        if (!email) {
-            return res.status(400).json({
-                success: false,
-                error: 'Email is required'
-            });
-        }
 
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            return res.status(400).json({
-                success: false,
-                error: 'Please provide a valid email address'
-            });
-        }
 
-        const collection = db.collection('newsletter');
-        
-        const existing = await collection.findOne({ email: email.toLowerCase() });
-        if (existing) {
-            return res.status(400).json({
-                success: false,
-                error: 'Email is already subscribed to our newsletter'
-            });
-        }
 
-        const newsletterData = {
-            email: email.toLowerCase(),
-            name: name || null,
-            subscribedAt: new Date(),
-            status: 'active',
-            source: 'website'
-        };
-
-        await collection.insertOne(newsletterData);
-
-        res.json({
-            success: true,
-            message: 'Successfully subscribed to newsletter!'
-        });
-
-    } catch (error) {
-        console.error('Newsletter signup error:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to subscribe to newsletter'
-        });
-    }
-});
-
-// Analytics endpoint
-app.get('/api/analytics', async (req, res) => {
-    try {
-        if (!db) {
-            return res.status(500).json({
-                success: false,
-                error: 'Database connection not available'
-            });
-        }
-
-        const collection = db.collection('contacts');
-        
-        const totalContacts = await collection.countDocuments();
-        const newContacts = await collection.countDocuments({ status: 'new' });
-        const thisMonth = new Date();
-        thisMonth.setDate(1);
-        const monthlyContacts = await collection.countDocuments({
-            timestamp: { $gte: thisMonth }
-        });
-
-        const serviceStats = await collection.aggregate([
-            { $group: { _id: '$service', count: { $sum: 1 } } },
-            { $sort: { count: -1 } }
-        ]).toArray();
-
-        const sixMonthsAgo = new Date();
-        sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-        
-        const monthlyTrend = await collection.aggregate([
-            { $match: { timestamp: { $gte: sixMonthsAgo } } },
-            {
-                $group: {
-                    _id: {
-                        year: { $year: '$timestamp' },
-                        month: { $month: '$timestamp' }
-                    },
-                    count: { $sum: 1 }
-                }
-            },
-            { $sort: { '_id.year': 1, '_id.month': 1 } }
-        ]).toArray();
-
-        res.json({
-            success: true,
-            analytics: {
-                totalContacts,
-                newContacts,
-                monthlyContacts,
-                serviceStats,
-                monthlyTrend
-            }
-        });
-
-    } catch (error) {
-        console.error('Analytics error:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to retrieve analytics'
-        });
-    }
-});
 
 // Health check endpoint
 app.get('/api/health', async (req, res) => {
@@ -524,16 +407,20 @@ const PropertySchema = new mongoose.Schema({
 });
 
 
-const InquirySchema = new mongoose.Schema({
-    name: { type: String, required: true },
+const ScheduleVisitSchema = new mongoose.Schema({
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
     email: { type: String, required: true },
-    phone: { type: String },
-    service: { type: String },
-    message: { type: String, required: true },
-    status: { type: String, enum: ['new', 'pending', 'completed', 'closed'], default: 'new' },
-    propertyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Property' },
+    phone: { type: String, required: true },
+    propertyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Property', required: true },
+    preferredDate: { type: Date, required: true },
+    preferredTime: { type: String, required: true },
+    message: { type: String },
+    status: { type: String, enum: ['pending', 'confirmed', 'completed', 'cancelled'], default: 'pending' },
     createdAt: { type: Date, default: Date.now }
 });
+
+const ScheduleVisit = mongoose.model('ScheduleVisit', ScheduleVisitSchema);
 
 const TeamSchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -555,7 +442,7 @@ const PortfolioSchema = new mongoose.Schema({
     title: { type: String, required: true },
     category: { 
         type: String, 
-        enum: ['valuation', 'management', 'brokerage', 'survey'], 
+        enum: ['valuation', 'management', 'brokerage', 'survey','development'], 
         required: true 
     },
     description: { type: String, required: true },
@@ -578,7 +465,7 @@ const PortfolioSchema = new mongoose.Schema({
 const ActivitySchema = new mongoose.Schema({
     action: { type: String, required: true },
     description: { type: String, required: true },
-    type: { type: String, enum: ['property', 'inquiry', 'team', 'portfolio', 'admin'], required: true },
+    type: { type: String, enum: ['property', 'team', 'portfolio', 'admin'], required: true },
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },
     timestamp: { type: Date, default: Date.now }
 });
@@ -586,7 +473,7 @@ const ActivitySchema = new mongoose.Schema({
 // Models
 const Admin = mongoose.model('Admin', AdminSchema, 'admin'); 
 const Property = mongoose.model('Property', PropertySchema);
-const Inquiry = mongoose.model('Inquiry', InquirySchema);
+
 const Team = mongoose.model('Team', TeamSchema);
 const Portfolio = mongoose.model('Portfolio', PortfolioSchema);
 const Activity = mongoose.model('Activity', ActivitySchema);
@@ -719,16 +606,14 @@ app.get('/api/auth/verify', authenticateToken, async (req, res) => {
 // Dashboard Statistics Route
 app.get('/api/stats', authenticateToken, async (req, res) => {
     try {
-        const [properties, inquiries, team, portfolio] = await Promise.all([
+        const [properties, team, portfolio] = await Promise.all([
             Property.countDocuments({ status: 'active' }),
-            Inquiry.countDocuments(),
             Team.countDocuments(),
             Portfolio.countDocuments()
         ]);
 
         res.json({
             properties,
-            inquiries,
             team,
             portfolio
         });
@@ -940,87 +825,175 @@ app.delete('/api/properties/:id', authenticateToken, async (req, res) => {
     }
 });
 
-// Inquiries Routes
-app.get('/api/inquiries', authenticateToken, async (req, res) => {
+
+
+
+// GET all schedule visits (Admin only)
+app.get('/api/schedule-visits', authenticateToken, async (req, res) => {
     try {
-        const inquiries = await Inquiry.find()
+        const scheduleVisits = await ScheduleVisit.find()
             .populate('propertyId', 'title location')
             .sort({ createdAt: -1 })
             .lean();
-        res.json(inquiries);
+        res.json(scheduleVisits);
     } catch (error) {
-        console.error('Inquiries fetch error:', error);
-        res.status(500).json({ message: 'Error fetching inquiries' });
+        console.error('Schedule visits fetch error:', error);
+        res.status(500).json({ message: 'Error fetching schedule visits' });
     }
 });
 
-app.get('/api/inquiries/:id', authenticateToken, async (req, res) => {
+// GET single schedule visit (Admin only)
+app.get('/api/schedule-visits/:id', authenticateToken, async (req, res) => {
     try {
-        const inquiry = await Inquiry.findById(req.params.id)
+        const scheduleVisit = await ScheduleVisit.findById(req.params.id)
             .populate('propertyId', 'title location');
-        if (!inquiry) {
-            return res.status(404).json({ message: 'Inquiry not found' });
+        if (!scheduleVisit) {
+            return res.status(404).json({ message: 'Schedule visit not found' });
         }
-        res.json(inquiry);
+        res.json(scheduleVisit);
     } catch (error) {
-        console.error('Inquiry fetch error:', error);
-        res.status(500).json({ message: 'Error fetching inquiry' });
+        console.error('Schedule visit fetch error:', error);
+        res.status(500).json({ message: 'Error fetching schedule visit' });
     }
 });
 
-app.post('/api/inquiries', async (req, res) => {
+// POST new schedule visit (Public endpoint)
+app.post('/api/schedule-visits', async (req, res) => {
     try {
-        const inquiry = new Inquiry(req.body);
-        await inquiry.save();
+        const scheduleVisit = new ScheduleVisit(req.body);
+        await scheduleVisit.save();
 
         // Log activity
-        await logActivity('New Inquiry', `New inquiry from ${inquiry.name}`, 'inquiry');
+        await logActivity('New Visit Scheduled', `New visit scheduled by ${scheduleVisit.firstName} ${scheduleVisit.lastName}`, 'schedule_visit');
 
-        res.status(201).json(inquiry);
+        res.status(201).json(scheduleVisit);
     } catch (error) {
-        console.error('Inquiry creation error:', error);
-        res.status(400).json({ message: error.message || 'Error creating inquiry' });
+        console.error('Schedule visit creation error:', error);
+        res.status(400).json({ message: error.message || 'Error creating schedule visit' });
     }
 });
 
-app.put('/api/inquiries/:id', authenticateToken, async (req, res) => {
+// PUT update schedule visit (Admin only)
+app.put('/api/schedule-visits/:id', authenticateToken, async (req, res) => {
     try {
-        const inquiry = await Inquiry.findByIdAndUpdate(
+        const scheduleVisit = await ScheduleVisit.findByIdAndUpdate(
             req.params.id,
             req.body,
             { new: true, runValidators: true }
         );
 
-        if (!inquiry) {
-            return res.status(404).json({ message: 'Inquiry not found' });
+        if (!scheduleVisit) {
+            return res.status(404).json({ message: 'Schedule visit not found' });
         }
 
         // Log activity
-        await logActivity('Inquiry Updated', `Inquiry from ${inquiry.name} was updated`, 'inquiry', req.admin.adminId);
+        await logActivity('Visit Updated', `Visit by ${scheduleVisit.firstName} ${scheduleVisit.lastName} was updated`, 'schedule_visit', req.admin.adminId);
 
-        res.json(inquiry);
+        res.json(scheduleVisit);
     } catch (error) {
-        console.error('Inquiry update error:', error);
-        res.status(400).json({ message: error.message || 'Error updating inquiry' });
+        console.error('Schedule visit update error:', error);
+        res.status(400).json({ message: error.message || 'Error updating schedule visit' });
     }
 });
 
-app.delete('/api/inquiries/:id', authenticateToken, async (req, res) => {
+
+// PATCH /api/schedule-visits/:id  → Confirm visit
+app.patch('/api/schedule-visits/:id', authenticateToken, async (req, res) => {
     try {
-        const inquiry = await Inquiry.findByIdAndDelete(req.params.id);
-        if (!inquiry) {
-            return res.status(404).json({ message: 'Inquiry not found' });
+        const visitId = req.params.id;
+        const { status } = req.body;
+
+        const visit = await ScheduleVisit.findByIdAndUpdate(
+            visitId,
+            { status },
+            { new: true } // return updated document
+        );
+
+        if (!visit) return res.status(404).json({ message: 'Visit not found' });
+
+        res.json({ message: 'Visit updated', visit });
+    } catch (error) {
+        console.error('Failed to update visit:', error);
+        res.status(500).json({ message: 'Failed to update visit' });
+    }
+});
+
+
+// DELETE schedule visit (Admin only)
+app.delete('/api/schedule-visits/:id', authenticateToken, async (req, res) => {
+    try {
+        const scheduleVisit = await ScheduleVisit.findByIdAndDelete(req.params.id);
+        if (!scheduleVisit) {
+            return res.status(404).json({ message: 'Schedule visit not found' });
         }
 
         // Log activity
-        await logActivity('Inquiry Deleted', `Inquiry from ${inquiry.name} was deleted`, 'inquiry', req.admin.adminId);
+        await logActivity('Visit Deleted', `Visit by ${scheduleVisit.firstName} ${scheduleVisit.lastName} was deleted`, 'schedule_visit', req.admin.adminId);
 
-        res.json({ message: 'Inquiry deleted successfully' });
+        res.json({ message: 'Schedule visit deleted successfully' });
     } catch (error) {
-        console.error('Inquiry deletion error:', error);
-        res.status(500).json({ message: 'Error deleting inquiry' });
+        console.error('Schedule visit deletion error:', error);
+        res.status(500).json({ message: 'Error deleting schedule visit' });
     }
 });
+
+module.exports = { ScheduleVisit };
+
+
+
+// Define Newsletter schema + model right here
+const NewsletterSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+  subscribedAt: { type: Date, default: Date.now },
+  status: { type: String, default: 'active' },
+  source: { type: String, default: 'website' }
+});
+
+const Newsletter = mongoose.model('Newsletter', NewsletterSchema);
+
+// Newsletter signup endpoint
+app.post('/api/newsletter', async (req, res) => {
+    try {
+        const { email, name } = req.body;
+
+        if (!email) {
+            return res.status(400).json({ success: false, error: 'Email is required' });
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({ success: false, error: 'Please provide a valid email address' });
+        }
+
+        const existing = await Newsletter.findOne({ email: email.toLowerCase() });
+        if (existing) {
+            return res.status(400).json({ success: false, error: 'Email is already subscribed to our newsletter' });
+        }
+
+        await Newsletter.create({
+            email: email.toLowerCase(),
+            name: name || null
+        });
+
+        res.json({ success: true, message: 'Successfully subscribed to newsletter!' });
+    } catch (error) {
+        console.error('Newsletter signup error:', error);
+        res.status(500).json({ success: false, error: 'Failed to subscribe to newsletter' });
+    }
+});
+
+// Get all newsletter subscribers (protected)
+app.get('/api/newsletter', authenticateToken, async (req, res) => {
+    try {
+        const subscribers = await Newsletter.find().sort({ subscribedAt: -1 });
+        res.json({ success: true, subscribers });
+    } catch (error) {
+        console.error("Error fetching newsletter subscribers:", error);
+        res.status(500).json({ success: false, error: 'Failed to fetch subscribers' });
+    }
+});
+
+
 
 // Team Routes
 app.get('/api/team', authenticateToken, async (req, res) => {
@@ -1164,6 +1137,50 @@ app.get('/api/portfolio/:id', authenticateToken, async (req, res) => {
         res.status(500).json({ message: 'Error fetching portfolio item' });
     }
 });
+
+app.get('/api/public/portfolio', async (req, res) => {
+  try {
+    const { category, status } = req.query;
+
+    // Start with empty query (fetch all by default)
+    let query = {};
+
+    // Status filter (optional)
+    if (status && status !== 'all') {
+      query.status = status; // e.g., "completed", "ongoing", "planned"
+    }
+
+    // Category filter (optional)
+    if (category && category !== 'all') {
+      query.category = category;
+    }
+
+    const portfolio = await Portfolio.find(query).sort({ date: -1 }).lean();
+
+    // Return only public fields
+    const publicPortfolio = portfolio.map(p => ({
+      id: p._id,
+      title: p.title,
+      category: p.category,
+      description: p.description,
+      value: p.value,
+      date: p.date,
+      client: p.client,
+      location: p.location,
+      duration: p.duration,
+      status: p.status,
+      images: p.images || []
+    }));
+
+    res.json(publicPortfolio);
+  } catch (error) {
+    console.error('Portfolio fetch error:', error);
+    res.status(500).json({ error: 'Failed to fetch portfolio items' });
+  }
+});
+
+
+
 
 app.post('/api/portfolio', authenticateToken, upload.array('images', 5), async (req, res) => {
     try {
@@ -1363,24 +1380,7 @@ app.get('/api/public/portfolio', async (req, res) => {
     }
 });
 
-// Contact form submission (public)
-app.post('/api/public/contact', async (req, res) => {
-    try {
-        const inquiry = new Inquiry(req.body);
-        await inquiry.save();
 
-        // Log activity
-        await logActivity('New Contact', `Contact form submission from ${inquiry.name}`, 'inquiry');
-
-        res.status(201).json({ 
-            message: 'Thank you for your inquiry. We will get back to you soon!',
-            inquiry 
-        });
-    } catch (error) {
-        console.error('Contact form error:', error);
-        res.status(400).json({ message: error.message || 'Error submitting contact form' });
-    }
-});
 
 // File upload endpoint
 app.post('/api/upload', authenticateToken, upload.array('files', 10), async (req, res) => {
@@ -1422,16 +1422,6 @@ app.get('/api/search', authenticateToken, async (req, res) => {
                     { title: searchRegex },
                     { location: searchRegex },
                     { description: searchRegex }
-                ]
-            }).limit(10).lean();
-        }
-
-        if (!type || type === 'inquiries') {
-            results.inquiries = await Inquiry.find({
-                $or: [
-                    { name: searchRegex },
-                    { email: searchRegex },
-                    { message: searchRegex }
                 ]
             }).limit(10).lean();
         }
@@ -1559,44 +1549,15 @@ app.post('/api/properties/bulk-delete', authenticateToken, async (req, res) => {
     }
 });
 
-app.put('/api/inquiries/bulk-update-status', authenticateToken, async (req, res) => {
-    try {
-        const { ids, status } = req.body;
-        
-        if (!ids || !Array.isArray(ids) || ids.length === 0) {
-            return res.status(400).json({ message: 'Inquiry IDs are required' });
-        }
 
-        if (!['new', 'pending', 'completed', 'closed'].includes(status)) {
-            return res.status(400).json({ message: 'Invalid status' });
-        }
 
-        const result = await Inquiry.updateMany(
-            { _id: { $in: ids } },
-            { status }
-        );
-
-        // Log activity
-        await logActivity('Bulk Status Update', `${result.modifiedCount} inquiries updated to ${status}`, 'inquiry', req.admin.adminId);
-
-        res.json({ 
-            message: `${result.modifiedCount} inquiries updated successfully`,
-            modifiedCount: result.modifiedCount
-        });
-    } catch (error) {
-        console.error('Bulk status update error:', error);
-        res.status(500).json({ message: 'Error updating inquiry statuses' });
-    }
-});
-
-// Analytics endpoints
 app.get('/api/analytics/overview', authenticateToken, async (req, res) => {
     try {
         const { period = '30d' } = req.query;
-        
+
         let dateFilter = {};
         const now = new Date();
-        
+
         switch (period) {
             case '7d':
                 dateFilter = { createdAt: { $gte: new Date(now - 7 * 24 * 60 * 60 * 1000) } };
@@ -1616,46 +1577,41 @@ app.get('/api/analytics/overview', authenticateToken, async (req, res) => {
 
         const [
             totalProperties,
-            totalInquiries,
             totalTeam,
             totalPortfolio,
             recentProperties,
-            recentInquiries,
             propertyTypes,
-            inquiryStatuses
+            totalVisits,
+            confirmedVisits,
+            pendingVisits
         ] = await Promise.all([
             Property.countDocuments(),
-            Inquiry.countDocuments(),
             Team.countDocuments(),
             Portfolio.countDocuments(),
             Property.countDocuments(dateFilter),
-            Inquiry.countDocuments(dateFilter),
             Property.aggregate([
                 { $group: { _id: '$propertyType', count: { $sum: 1 } } }
             ]),
-            Inquiry.aggregate([
-                { $group: { _id: '$status', count: { $sum: 1 } } }
-            ])
+            ScheduleVisit.countDocuments(), // total visits
+            ScheduleVisit.countDocuments({ status: 'confirmed' }), // confirmed visits
+            ScheduleVisit.countDocuments({ status: 'pending' }) // pending visits
         ]);
 
         res.json({
             totals: {
                 properties: totalProperties,
-                inquiries: totalInquiries,
                 team: totalTeam,
-                portfolio: totalPortfolio
+                portfolio: totalPortfolio,
+                visits: totalVisits,
+                confirmedVisits: confirmedVisits,
+                pendingVisits: pendingVisits
             },
             period: {
-                properties: recentProperties,
-                inquiries: recentInquiries
+                properties: recentProperties
             },
             breakdown: {
                 propertyTypes: propertyTypes.reduce((acc, item) => {
                     acc[item._id] = item.count;
-                    return acc;
-                }, {}),
-                inquiryStatuses: inquiryStatuses.reduce((acc, item) => {
-                    acc[item._id || 'new'] = item.count;
                     return acc;
                 }, {})
             }
@@ -1665,6 +1621,7 @@ app.get('/api/analytics/overview', authenticateToken, async (req, res) => {
         res.status(500).json({ message: 'Error fetching analytics data' });
     }
 });
+
 
 // Export data endpoints
 app.get('/api/export/properties', authenticateToken, async (req, res) => {
@@ -1696,29 +1653,7 @@ app.get('/api/export/properties', authenticateToken, async (req, res) => {
     }
 });
 
-app.get('/api/export/inquiries', authenticateToken, async (req, res) => {
-    try {
-        const inquiries = await Inquiry.find().lean();
-        
-        const csvData = inquiries.map(inquiry => ({
-            Name: inquiry.name,
-            Email: inquiry.email,
-            Phone: inquiry.phone || '',
-            Service: inquiry.service || '',
-            Message: inquiry.message,
-            Status: inquiry.status,
-            CreatedAt: inquiry.createdAt
-        }));
 
-        res.json({
-            data: csvData,
-            filename: `inquiries_export_${new Date().toISOString().split('T')[0]}.csv`
-        });
-    } catch (error) {
-        console.error('Inquiries export error:', error);
-        res.status(500).json({ message: 'Error exporting inquiries data' });
-    }
-});
 
 // Error handling middleware
 app.use((error, req, res, next) => {
