@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Our Team - AMIZERO Real Estate Ltd</title>
-    <link rel="icon" type="image/x-icon" href="images/android-chrome-512x512.png">
+    <link rel="icon" type="image/x-icon" href="images/company_logo_blue_color-removebg-preview.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="index.css">
     <link rel="stylesheet" href="about.css">
@@ -25,7 +25,7 @@
                 <span class="icon">⏰</span>
                 <div class="contact-text" id="contact-text">
                     <span class="label">OPENING HOURS:</span>
-                    <span class="value">Mon - Fri 8:00AM - 5:00PM</span>
+                    <span class="value">Mon - Fri 8:00AM - 6:00PM</span>
                 </div>
             </div>
         </div>
@@ -74,8 +74,11 @@
                 <div class="team-contact">
                     <a href="#" class="contact-link"><i class="fas fa-envelope"></i></a>
                     <a href="#" class="contact-link"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="contact-link"><i class="fab fa-twitter"></i></a>
                 </div>
             </div>
+
+        
 
             <div class="team-member fade-in">
                 <div class="team-avatar">
@@ -193,7 +196,7 @@
                 </div>
             </div>
             <div class="footer-bottom-right">
-                <a href="#home" class="back-to-top" aria-label="Back to top">
+                <a href="#team" class="back-to-top" aria-label="Back to top">
                     <i class="fas fa-chevron-up"></i>
                 </a>
             </div>
@@ -240,6 +243,188 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
+    </script>
+
+    <script>
+        // Function to load team members from public API
+async function loadTeamMembers() {
+    try {
+        // Get the team grid container
+        const teamGrid = document.querySelector('.team-grid');
+        
+        if (!teamGrid) {
+            console.error('Team grid container not found');
+            return;
+        }
+
+        // Show loading state
+        teamGrid.innerHTML = '<div class="loading">Loading team members...</div>';
+
+        // Fetch team data from public API (no authentication needed)
+        const response = await fetch('/api/public/team', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const teamMembers = await response.json();
+
+        // Clear the container
+        teamGrid.innerHTML = '';
+
+        // Handle different response formats
+        const members = teamMembers.data || teamMembers; // Support both formats
+
+        // Generate HTML for each team member
+        members.forEach(member => {
+            const teamMemberHTML = `
+                <div class="team-member fade-in">
+                    <div class="team-avatar">
+                        <img src="${member.image || 'images/default-avatar.jpg'}" alt="${member.name || 'Team Member'}" onerror="this.src='images/default-avatar.jpg'">
+                    </div>
+                    <h3>${member.name || 'Name not available'}</h3>
+                    <div class="team-position">${member.position || 'Position not specified'}</div>
+                    <p class="team-bio">${member.bio || 'Bio not available'}</p>
+                    <div class="team-skills">
+                        ${member.skills && member.skills.length > 0 ? 
+                            member.skills.map(skill => `<span class="skill-tag">${skill}</span>`).join('') : 
+                            '<span class="skill-tag">No skills listed</span>'
+                        }
+                    </div>
+                    <div class="team-contact">
+    ${member.email ? `<a href="mailto:${member.email}" class="contact-link"><i class="fas fa-envelope"></i></a>` : ''}
+    ${member.linkedin ? `<a href="${member.linkedin}" class="contact-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin-in"></i></a>` : ''}
+    ${member.twitter ? `<a href="${member.twitter}" class="contact-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-twitter"></i></a>` : ''}
+</div>
+
+                </div>
+            `;
+            
+            teamGrid.innerHTML += teamMemberHTML;
+        });
+
+        // If no team members found
+        if (members.length === 0) {
+            teamGrid.innerHTML = '<div class="no-team-members">No team members found.</div>';
+        }
+
+        // Trigger fade-in animations if you have CSS for it
+        const teamMemberElements = document.querySelectorAll('.team-member.fade-in');
+        teamMemberElements.forEach((element, index) => {
+            setTimeout(() => {
+                element.style.opacity = '1';
+                element.style.transform = 'translateY(0)';
+            }, index * 100); // Stagger the animations
+        });
+
+    } catch (error) {
+        console.error('Error loading team members:', error);
+        
+        // Show error message
+        const teamGrid = document.querySelector('.team-grid');
+        if (teamGrid) {
+            teamGrid.innerHTML = `
+                <div class="error-message" style="text-align: center; padding: 2rem;">
+                    <p>Unable to load team members. Please try again later.</p>
+                    <button onclick="loadTeamMembers()" class="retry-btn" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Retry</button>
+                </div>
+            `;
+        }
+    }
+}
+
+// Alternative function with filtering capability
+async function loadTeamMembersByPosition(position = null) {
+    try {
+        const teamGrid = document.querySelector('.team-grid');
+        
+        if (!teamGrid) {
+            console.error('Team grid container not found');
+            return;
+        }
+
+        teamGrid.innerHTML = '<div class="loading">Loading team members...</div>';
+
+        // Build URL with query parameters if needed
+        let url = '/api/public/team';
+        if (position) {
+            url += `?position=${encodeURIComponent(position)}`;
+        }
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const members = data.data || data;
+
+        teamGrid.innerHTML = '';
+
+        members.forEach(member => {
+            const teamMemberHTML = `
+                <div class="team-member fade-in">
+                    <div class="team-avatar">
+                        <img src="${member.image || 'images/default-avatar.jpg'}" alt="${member.name || 'Team Member'}" onerror="this.src='images/default-avatar.jpg'">
+                    </div>
+                    <h3>${member.name || 'Name not available'}</h3>
+                    <div class="team-position">${member.position || 'Position not specified'}</div>
+                    <p class="team-bio">${member.bio || 'Bio not available'}</p>
+                    <div class="team-skills">
+                        ${member.skills && member.skills.length > 0 ? 
+                            member.skills.map(skill => `<span class="skill-tag">${skill}</span>`).join('') : 
+                            '<span class="skill-tag">No skills listed</span>'
+                        }
+                    </div>
+                      <div class="team-contact">
+    ${member.email ? `<a href="mailto:${member.email}" class="contact-link"><i class="fas fa-envelope"></i></a>` : ''}
+    ${member.linkedin ? `<a href="${member.linkedin}" class="contact-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin-in"></i></a>` : ''}
+    <a href="${member.twitter ? member.twitter : '#'}" class="contact-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-twitter"></i></a>
+</div>
+
+
+                </div>
+            `;
+            
+            teamGrid.innerHTML += teamMemberHTML;
+        });
+
+        if (members.length === 0) {
+            teamGrid.innerHTML = '<div class="no-team-members">No team members found.</div>';
+        }
+
+    } catch (error) {
+        console.error('Error loading team members:', error);
+        const teamGrid = document.querySelector('.team-grid');
+        if (teamGrid) {
+            teamGrid.innerHTML = `
+                <div class="error-message" style="text-align: center; padding: 2rem;">
+                    <p>Unable to load team members. Please try again later.</p>
+                    <button onclick="loadTeamMembers()" class="retry-btn" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Retry</button>
+                </div>
+            `;
+        }
+    }
+}
+
+// Load team members when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    loadTeamMembers();
+});
+
+// Utility function to refresh team data
+function refreshTeamMembers() {
+    loadTeamMembers();
+}
+
+// Export functions if using modules
+// export { loadTeamMembers, loadTeamMembersByPosition, refreshTeamMembers };
     </script>
 </body>
 </html>

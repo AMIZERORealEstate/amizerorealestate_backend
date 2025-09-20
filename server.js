@@ -462,6 +462,7 @@ const PortfolioSchema = new mongoose.Schema({
 });
 
 
+
 const ActivitySchema = new mongoose.Schema({
     action: { type: String, required: true },
     description: { type: String, required: true },
@@ -1006,6 +1007,40 @@ app.get('/api/team', authenticateToken, async (req, res) => {
     }
 });
 
+
+// Public API endpoint for team members (no authentication required)
+app.get('/api/public/team', async (req, res) => {
+    try {
+        // Fetch all team members from database, sorted by creation date (newest first)
+        const team = await Team.find().sort({ createdAt: -1 }).lean();
+        
+        // Optional: Select only specific fields for public display (security consideration)
+        // Remove sensitive fields if any exist in your Team model
+        const publicTeam = team.map(member => ({
+            _id: member._id,
+            name: member.name,
+            position: member.position,
+            bio: member.bio,
+            image: member.image,
+            skills: member.skills,
+            email: member.email, // Remove this if you don't want emails public
+            linkedin: member.linkedin,
+            createdAt: member.createdAt
+            // Add other fields you want to make public
+            // Exclude sensitive fields like passwords, internal notes, etc.
+        }));
+
+        res.json(publicTeam);
+    } catch (error) {
+        console.error('Public team fetch error:', error);
+        res.status(500).json({ 
+            success: false,
+            message: 'Error fetching team members',
+            error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+        });
+    }
+});
+
 app.get('/api/team/:id', authenticateToken, async (req, res) => {
     try {
         const member = await Team.findById(req.params.id);
@@ -1283,6 +1318,282 @@ app.delete('/api/portfolio/:id', authenticateToken, async (req, res) => {
     } catch (error) {
         console.error('Portfolio item deletion error:', error);
         res.status(500).json({ message: 'Error deleting portfolio item' });
+    }
+});
+
+
+
+
+
+// Achievement Management Routes 
+
+// Achievement Schema 
+const AchievementSchema = new mongoose.Schema({
+    listings: {
+        type: Number,
+        default: 0,
+        min: 0,
+        required: true
+    },
+    propertiesManaged: {
+        type: Number,
+        default: 0,
+        min: 0,
+        required: true
+    },
+    transactions: {
+        type: Number,
+        default: 0,
+        min: 0,
+        required: true
+    },
+    projects: {
+        type: Number,
+        default: 0,
+        min: 0,
+        required: true
+    },
+    lastUpdated: {
+        type: Date,
+        default: Date.now
+    },
+    updatedBy: {
+        type: String,
+        default: 'admin'
+    }
+}, {
+    timestamps: true
+});
+
+// Achievement Model 
+const Achievement = mongoose.model('Achievement', AchievementSchema);
+
+// Routes
+
+// GET - Retrieve current achievements (Public - no authentication required)
+app.get('/api/achievements', async (req, res) => {
+    try {
+        let achievements = await Achievement.findOne().sort({ createdAt: -1 });
+        
+        // If no achievements found, create default ones
+        if (!achievements) {
+            achievements = new Achievement({
+                listings: 300,
+                propertiesManaged: 300,
+                transactions: 1000,
+                projects: 50,
+                updatedBy: 'system'
+            });
+            await achievements.save();
+            
+            // Log activity
+            await logActivity('Achievements Initialized', 'Default achievement values created', 'admin');
+        }
+        
+        res.json({
+            success: true,
+            data: {
+                listings: achievements.listings,
+                propertiesManaged: achievements.propertiesManaged,
+                transactions: achievements.transactions,
+                projects: achievements.projects,
+                lastUpdated: achievements.lastUpdated,
+                updatedBy: achievements.updatedBy
+            },
+            message: 'Achievements retrieved successfully'
+        });
+    } catch (error) {
+        console.error('Error retrieving achievements:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error retrieving achievements',
+            error: error.message
+        });
+    }
+});
+
+// POST - Create or update achievements (Requires authentication)
+app.post('/api/achievements', authenticateToken, async (req, res) => {
+    try {
+        const { listings, propertiesManaged, transactions, projects, updatedBy } = req.body;
+        
+        // Validate required fields
+        if (listings === undefined || propertiesManaged === undefined || 
+            transactions === undefined || projects === undefined) {
+            return res.status(400).json({
+                success: false,
+                message: 'All achievement values are required (listings, propertiesManaged, transactions, projects)'
+            });
+        }
+        
+        // Validate that values are non-negative numbers
+        const values = { listings, propertiesManaged, transactions, projects };
+        for (const [key, value] of Object.entries(values)) {
+            if (typeof value !== 'number' || value < 0 || isNaN(value)) {
+                return res.status(400).json({
+                    success: false,
+                    message: `${key} must be a non-negative number`
+                });
+            }
+        }
+        
+        // Create new achievement record (keeping history)
+        const achievement = new Achievement({
+            listings: Math.floor(listings),
+            propertiesManaged: Math.floor(propertiesManaged),
+            transactions: Math.floor(transactions),
+            projects: Math.floor(projects),
+            updatedBy: updatedBy || req.admin?.name || 'admin',
+            lastUpdated: new Date()
+        });
+        
+        const savedAchievement = await achievement.save();
+        
+        // Log activity
+        await logActivity(
+            'Achievements Updated', 
+            `Achievement values updated: Listings: ${listings}, Properties: ${propertiesManaged}, Transactions: ${transactions}, Projects: ${projects}`, 
+            'admin', 
+            req.admin?.adminId
+        );
+        
+        res.json({
+            success: true,
+            data: {
+                listings: savedAchievement.listings,
+                propertiesManaged: savedAchievement.propertiesManaged,
+                transactions: savedAchievement.transactions,
+                projects: savedAchievement.projects,
+                lastUpdated: savedAchievement.lastUpdated,
+                updatedBy: savedAchievement.updatedBy
+            },
+            message: 'Achievements updated successfully'
+        });
+    } catch (error) {
+        console.error('Error updating achievements:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error updating achievements',
+            error: error.message
+        });
+    }
+});
+
+// PUT - Edit specific achievement field (Requires authentication)
+app.put('/api/achievements/:field', authenticateToken, async (req, res) => {
+    try {
+        const { field } = req.params;
+        const { value, updatedBy } = req.body;
+        
+        // Validate field name
+        const validFields = ['listings', 'propertiesManaged', 'transactions', 'projects'];
+        if (!validFields.includes(field)) {
+            return res.status(400).json({
+                success: false,
+                message: `Invalid field. Must be one of: ${validFields.join(', ')}`
+            });
+        }
+        
+        // Validate value
+        if (typeof value !== 'number' || value < 0 || isNaN(value)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Value must be a non-negative number'
+            });
+        }
+        
+        // Get the latest achievement record
+        let latestAchievement = await Achievement.findOne().sort({ createdAt: -1 });
+        
+        if (!latestAchievement) {
+            // Create new if none exists with default values
+            latestAchievement = {
+                listings: 300,
+                propertiesManaged: 300,
+                transactions: 1000,
+                projects: 50
+            };
+        }
+        
+        // Create new achievement record with updated field
+        const newAchievement = new Achievement({
+            listings: latestAchievement.listings,
+            propertiesManaged: latestAchievement.propertiesManaged,
+            transactions: latestAchievement.transactions,
+            projects: latestAchievement.projects,
+            // Update the specific field
+            [field]: Math.floor(value),
+            lastUpdated: new Date(),
+            updatedBy: updatedBy || req.admin?.name || 'admin'
+        });
+        
+        const savedAchievement = await newAchievement.save();
+        
+        // Log activity
+        await logActivity(
+            'Achievement Field Updated', 
+            `${field} updated from ${latestAchievement[field]} to ${value}`, 
+            'admin', 
+            req.admin?.adminId
+        );
+        
+        res.json({
+            success: true,
+            data: {
+                listings: savedAchievement.listings,
+                propertiesManaged: savedAchievement.propertiesManaged,
+                transactions: savedAchievement.transactions,
+                projects: savedAchievement.projects,
+                lastUpdated: savedAchievement.lastUpdated,
+                updatedBy: savedAchievement.updatedBy
+            },
+            message: `${field} updated successfully to ${value}`
+        });
+    } catch (error) {
+        console.error('Error updating achievement field:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error updating achievement field',
+            error: error.message
+        });
+    }
+});
+
+// GET - Retrieve achievement history (Requires authentication)
+app.get('/api/achievements/history', authenticateToken, async (req, res) => {
+    try {
+        const { limit = 10, page = 1 } = req.query;
+        const skip = (page - 1) * limit;
+        
+        const achievements = await Achievement.find()
+            .sort({ createdAt: -1 })
+            .limit(parseInt(limit))
+            .skip(skip)
+            .select('-__v')
+            .lean();
+        
+        const total = await Achievement.countDocuments();
+        
+        res.json({
+            success: true,
+            data: achievements,
+            pagination: {
+                total,
+                page: parseInt(page),
+                limit: parseInt(limit),
+                pages: Math.ceil(total / limit),
+                hasNext: page * limit < total,
+                hasPrev: page > 1
+            },
+            message: 'Achievement history retrieved successfully'
+        });
+    } catch (error) {
+        console.error('Error retrieving achievement history:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error retrieving achievement history',
+            error: error.message
+        });
     }
 });
 

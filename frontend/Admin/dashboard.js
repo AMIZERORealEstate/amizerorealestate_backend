@@ -3,12 +3,14 @@ class AdminDashboard {
     constructor() {
         this.apiUrl = '/api';
         this.currentSection = 'loginForm';
+        this.skills = []; // Move skills array into the class
         this.init();
     }
 
     init() {
         this.setupEventListeners();
         this.checkAuthStatus();
+        this.setupSkillsInput(); // Add skills setup
     }
 
     setupEventListeners() {
@@ -41,6 +43,53 @@ class AdminDashboard {
                 }
             });
         });
+    }
+
+    // Skills management setup
+    setupSkillsInput() {
+        const skillInput = document.getElementById('skillInput');
+        if (skillInput) {
+            skillInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this.addSkill(e.target.value.trim());
+                    e.target.value = '';
+                }
+            });
+        }
+    }
+
+    addSkill(skill) {
+        if (skill && !this.skills.includes(skill)) {
+            this.skills.push(skill);
+            this.updateSkillsDisplay();
+            this.updateSkillsHidden();
+        }
+    }
+
+    removeSkill(skill) {
+        this.skills = this.skills.filter(s => s !== skill);
+        this.updateSkillsDisplay();
+        this.updateSkillsHidden();
+    }
+
+    updateSkillsDisplay() {
+        const container = document.getElementById('skillsContainer');
+        if (container) {
+            container.innerHTML = this.skills.map(skill => `
+                <span class="skill-tag">
+                    ${skill}
+                    <button type="button" class="skill-remove" onclick="dashboard.removeSkill('${skill}')">&times;</button>
+                </span>
+            `).join('');
+        }
+    }
+
+    updateSkillsHidden() {
+        const hiddenInput = document.getElementById('skillsHidden');
+        if (hiddenInput) {
+            hiddenInput.value = JSON.stringify(this.skills);
+        }
     }
 
     // Authentication methods
@@ -124,7 +173,6 @@ class AdminDashboard {
         await Promise.all([
             this.loadStats(),
             this.loadProperties(),
-
             this.loadTeamMembers(),
             this.loadPortfolio(),
             this.loadRecentActivity()
@@ -155,8 +203,6 @@ class AdminDashboard {
                 '<tr><td colspan="6" style="text-align: center; color: #e74c3c;">Error loading properties</td></tr>';
         }
     }
-
-
 
     async loadTeamMembers() {
         try {
@@ -192,6 +238,8 @@ class AdminDashboard {
         }
     }
 
+
+
     // Render methods
     renderPropertiesTable(properties) {
         const tbody = document.getElementById('propertiesTableBody');
@@ -201,114 +249,141 @@ class AdminDashboard {
         }
 
         tbody.innerHTML = properties.map(property => `
-           <tr>
-  <td>
-    ${property.images && property.images.length > 0 
-      ? `<img src="${property.images[0]}" alt="Property Image" style="width:100px; height:60px; object-fit:cover; border-radius:5px;">`
-      : 'No Image'}
-  </td>
-  <td>${property.title}</td>
-  <td>${property.location}</td>
-  <td>RWF ${new Intl.NumberFormat().format(property.price)}</td>
-  <td>${property.type}</td>
-  <td>${property.propertyType}</td>
-  <td>${property.bedrooms}</td>
-  <td>${property.bathrooms}</td>
-  <td>${property.area}</td>
-  <td>${property.description || ''}</td>
-  <td><span class="badge badge-${property.status.toLowerCase()}">${property.status}</span></td>
- 
-  <td>${new Date(property.createdAt).toLocaleDateString()}</td>
-  <td>${new Date(property.updatedAt).toLocaleDateString()}</td>
-  <td>
-    <button class="action-btn edit-btn" onclick="dashboard.editProperty('${property._id}')">
-      <i class="fas fa-edit"></i> Edit
-    </button>
-    <button class="action-btn delete-btn" onclick="dashboard.deleteProperty('${property._id}')">
-      <i class="fas fa-trash"></i> Delete
-    </button>
-  </td>
-</tr>
+            <tr>
+                <td>
+                    ${property.images && property.images.length > 0 
+                        ? `<img src="${property.images[0]}" alt="Property Image" style="width:100px; height:60px; object-fit:cover; border-radius:5px;">`
+                        : 'No Image'}
+                </td>
+                <td>${property.title}</td>
+                <td>${property.location}</td>
+                <td>RWF ${new Intl.NumberFormat().format(property.price)}</td>
+                <td>${property.type}</td>
+                <td>${property.propertyType}</td>
+                <td>${property.bedrooms}</td>
+                <td>${property.bathrooms}</td>
+                <td>${property.area}</td>
+                <td>${property.description || ''}</td>
+                <td><span class="badge badge-${property.status.toLowerCase()}">${property.status}</span></td>
+                <td>${new Date(property.createdAt).toLocaleDateString()}</td>
+                <td>${new Date(property.updatedAt).toLocaleDateString()}</td>
+                <td>
+                    <button class="action-btn edit-btn" onclick="dashboard.editProperty('${property._id}')">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="action-btn delete-btn" onclick="dashboard.deleteProperty('${property._id}')">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </td>
+            </tr>
         `).join('');
     }
 
-    
-
     renderTeamTable(team) {
-    const tbody = document.getElementById('teamTableBody');
-    if (!team || team.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#666;">No team members found</td></tr>';
-        return;
+        const tbody = document.getElementById('teamTableBody');
+        if (!team || team.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#666;">No team members found</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = team.map(member => `
+            <tr>
+                <td>
+                    ${
+                        member.image
+                            ? `<img src="${member.image}" alt="${member.name}" style="width:60px;height:60px;object-fit:cover;border-radius:50%;">`
+                            : '<div style="width:60px;height:60px;background:#e9ecef;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#666;"><i class="fas fa-user"></i></div>'
+                    }
+                </td>
+                <td><strong>${member.name}</strong></td>
+                <td>${member.position}</td>
+                <td><a href="mailto:${member.email}" class="social-link">${member.email}</a></td>
+                <td>${member.phone || 'N/A'}</td>
+                <td>
+                    <div class="skills-display">
+                        ${member.skills && member.skills.length > 0 
+                            ? member.skills.map(skill => `<span class="skill-badge">${skill}</span>`).join('')
+                            : '<span style="color:#666;">No skills listed</span>'
+                        }
+                    </div>
+                </td>
+                <td>
+                    <div class="social-links">
+                        ${member.socialLinks?.linkedin 
+                            ? `<a href="${member.socialLinks.linkedin}" target="_blank" class="social-link" title="LinkedIn"><i class="fab fa-linkedin"></i></a>`
+                            : ''
+                        }
+                        ${member.socialLinks?.twitter 
+                            ? `<a href="${member.socialLinks.twitter}" target="_blank" class="social-link" title="Twitter"><i class="fab fa-twitter"></i></a>`
+                            : ''
+                        }
+                        ${member.socialLinks?.email 
+                            ? `<a href="mailto:${member.socialLinks.email}" class="social-link" title="Email"><i class="fas fa-envelope"></i></a>`
+                            : ''
+                        }
+                        ${(!member.socialLinks?.linkedin && !member.socialLinks?.twitter && !member.socialLinks?.email) 
+                            ? '<span style="color:#666;">N/A</span>'
+                            : ''
+                        }
+                    </div>
+                </td>
+                <td style="max-width:200px; white-space:normal; word-wrap:break-word; overflow:hidden; text-overflow:ellipsis;">
+                    ${member.bio ? 
+                        (member.bio.length > 100 ? 
+                            `<span title="${member.bio}">${member.bio.substring(0, 100)}...</span>` : 
+                            member.bio
+                        ) : 
+                        '<span style="color:#666;">No bio available</span>'
+                    }
+                </td>
+                <td>
+                    <button class="action-btn edit-btn" onclick="dashboard.editTeamMember('${member._id}')" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn delete-btn" onclick="dashboard.deleteTeamMember('${member._id}')" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
     }
 
-    tbody.innerHTML = team.map(member => `
-        <tr>
-            <td>
-                ${
-                    member.image
-                        ? `<img src="${member.image}" alt="team photo" style="width:80px;height:80px;object-fit:cover;border-radius:50%;">`
-                        : 'No Image'
-                }
-            </td>
-            <td>${member.name}</td>
-            <td>${member.position}</td>
-            <td>${member.email}</td>
-            <td>${member.phone || 'N/A'}</td>
-            <td style="max-width:600px; white-space:normal; word-wrap:break-word; overflow:auto; vertical-align:top;">
-                ${member.bio || 'N/A'}
-            </td>
-            <td>
-                <button class="action-btn edit-btn" onclick="dashboard.editTeamMember('${member._id}')">
-                    <i class="fas fa-edit"></i> Edit
-                </button>
-                <button class="action-btn delete-btn" onclick="dashboard.deleteTeamMember('${member._id}')">
-                    <i class="fas fa-trash"></i> Delete
-                </button>
-            </td>
-        </tr>
-    `).join('');
-}
+    renderPortfolioTable(portfolio) {
+        const tbody = document.getElementById('portfolioTableBody');
+        if (!portfolio || portfolio.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;color:#666;">No portfolio items found</td></tr>';
+            return;
+        }
 
-
-   renderPortfolioTable(portfolio) {
-    const tbody = document.getElementById('portfolioTableBody');
-    if (!portfolio || portfolio.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;color:#666;">No portfolio items found</td></tr>';
-        return;
+        tbody.innerHTML = portfolio.map(item => `
+            <tr>
+                <td>${item.title}</td>
+                <td><span class="badge badge-${item.category}">${item.category}</span></td>
+                <td>${item.value || 'N/A'}</td>
+                <td>${new Date(item.date).toLocaleDateString()}</td>
+                <td>${item.client || 'N/A'}</td>
+                <td>${item.location || 'N/A'}</td>
+                <td>${item.duration || 'N/A'}</td>
+                <td>${item.status}</td>
+                <td>${item.description || 'N/A'}</td>
+                <td>
+                    ${
+                        item.images && item.images.length > 0
+                            ? `<img src="${item.images[0]}" alt="portfolio image" style="width:100px;height:60px;object-fit:cover;border-radius:6px;">`
+                            : 'No Image'
+                    }
+                </td>
+                <td>
+                    <button class="action-btn edit-btn" onclick="dashboard.editPortfolioItem('${item._id}')">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="action-btn delete-btn" onclick="dashboard.deletePortfolioItem('${item._id}')">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </td>
+            </tr>
+        `).join('');
     }
-
-    tbody.innerHTML = portfolio.map(item => `
-        <tr>
-            <td>${item.title}</td>
-            <td><span class="badge badge-${item.category}">${item.category}</span></td>
-            <td>${item.value || 'N/A'}</td>
-            <td>${new Date(item.date).toLocaleDateString()}</td>
-            <td>${item.client || 'N/A'}</td>
-            <td>${item.location || 'N/A'}</td>
-            <td>${item.duration || 'N/A'}</td>
-            <td>${item.status}</td>
-            <td>${item.description || 'N/A'}</td>
-            <td>
-                ${
-                    item.images && item.images.length > 0
-                        ? `<img src="${item.images[0]}" alt="portfolio image" style="width:100px;height:60px;object-fit:cover;border-radius:6px;">`
-                        : 'No Image'
-                }
-            </td>
-            <td>
-                <button class="action-btn edit-btn" onclick="dashboard.editPortfolioItem('${item._id}')">
-                    <i class="fas fa-edit"></i> Edit
-                </button>
-                <button class="action-btn delete-btn" onclick="dashboard.deletePortfolioItem('${item._id}')">
-                    <i class="fas fa-trash"></i> Delete
-                </button>
-            </td>
-        </tr>
-    `).join('');
-}
-
-
-
 
     renderRecentActivity(activities) {
         const container = document.getElementById('recentActivity');
@@ -348,12 +423,19 @@ class AdminDashboard {
         
         if (mode === 'add') {
             form.reset();
+            this.skills = []; // Reset skills array
+            this.updateSkillsDisplay(); // Clear skills display
             modal.querySelector('.modal-title').textContent = `Add ${modalId.replace('Modal', '')}`;
             if (form.querySelector('input[type="hidden"]')) {
                 form.querySelector('input[type="hidden"]').value = '';
             }
         } else if (mode === 'edit' && data) {
             this.populateForm(form, data);
+            // Load existing skills if editing team member
+            if (data.skills && modalId === 'teamModal') {
+                this.skills = data.skills;
+                this.updateSkillsDisplay();
+            }
             modal.querySelector('.modal-title').textContent = `Edit ${modalId.replace('Modal', '')}`;
         }
         
@@ -382,95 +464,92 @@ class AdminDashboard {
 
     // CRUD Operations
     async handlePropertySubmit(e) {
-    e.preventDefault();
-    const formData = new FormData(e.target); // keep as FormData
-    const isEdit = formData.get('propertyId'); // check if editing
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const isEdit = formData.get('propertyId');
 
-    try {
-        const url = isEdit ? `/properties/${formData.get('propertyId')}` : '/properties';
-        const method = isEdit ? 'PUT' : 'POST';
-        
-        const response = await this.authenticatedFetch(url, {
-            method,
-            body: formData // send FormData directly
-        });
+        try {
+            const url = isEdit ? `/properties/${formData.get('propertyId')}` : '/properties';
+            const method = isEdit ? 'PUT' : 'POST';
+            
+            const response = await this.authenticatedFetch(url, {
+                method,
+                body: formData
+            });
 
-        if (response.ok) {
-            this.showMessage('propertiesMessage', `Property ${isEdit ? 'updated' : 'added'} successfully!`, 'success');
-            this.closeModal('propertyModal');
-            this.loadProperties();
-            this.loadStats();
-        } else {
-            const error = await response.json();
-            this.showMessage('propertiesMessage', error.message, 'error');
+            if (response.ok) {
+                this.showMessage('propertiesMessage', `Property ${isEdit ? 'updated' : 'added'} successfully!`, 'success');
+                this.closeModal('propertyModal');
+                this.loadProperties();
+                this.loadStats();
+            } else {
+                const error = await response.json();
+                this.showMessage('propertiesMessage', error.message, 'error');
+            }
+        } catch (error) {
+            this.showMessage('propertiesMessage', 'Error saving property', 'error');
         }
-    } catch (error) {
-        this.showMessage('propertiesMessage', 'Error saving property', 'error');
     }
-}
-
 
     async handleTeamSubmit(e) {
-    e.preventDefault();
-    const formData = new FormData(e.target); // keep as FormData
-    const isEdit = formData.get('teamId');   // check if editing
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const isEdit = formData.get('teamId');
 
-    try {
-        const url = isEdit ? `/team/${formData.get('teamId')}` : '/team';
-        const method = isEdit ? 'PUT' : 'POST';
-        
-        const response = await this.authenticatedFetch(url, {
-            method,
-            body: formData // send FormData directly
-        });
+        try {
+            const url = isEdit ? `/team/${formData.get('teamId')}` : '/team';
+            const method = isEdit ? 'PUT' : 'POST';
+            
+            const response = await this.authenticatedFetch(url, {
+                method,
+                body: formData
+            });
 
-        if (response.ok) {
-            this.showMessage(
-                'teamMessage',
-                `Team member ${isEdit ? 'updated' : 'added'} successfully!`,
-                'success'
-            );
-            this.closeModal('teamModal');
-            this.loadTeamMembers();
-            this.loadStats();
-        } else {
-            const error = await response.json();
-            this.showMessage('teamMessage', error.message, 'error');
+            if (response.ok) {
+                this.showMessage(
+                    'teamMessage',
+                    `Team member ${isEdit ? 'updated' : 'added'} successfully!`,
+                    'success'
+                );
+                this.closeModal('teamModal');
+                this.loadTeamMembers();
+                this.loadStats();
+            } else {
+                const error = await response.json();
+                this.showMessage('teamMessage', error.message, 'error');
+            }
+        } catch (error) {
+            this.showMessage('teamMessage', 'Error saving team member', 'error');
         }
-    } catch (error) {
-        this.showMessage('teamMessage', 'Error saving team member', 'error');
     }
-}
-
 
     async handlePortfolioSubmit(e) {
-    e.preventDefault();
-    const formData = new FormData(e.target); // keep as FormData
-    const isEdit = formData.get('portfolioId'); // check if editing
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const isEdit = formData.get('portfolioId');
 
-    try {
-        const url = isEdit ? `/portfolio/${formData.get('portfolioId')}` : '/portfolio';
-        const method = isEdit ? 'PUT' : 'POST';
-        
-        const response = await this.authenticatedFetch(url, {
-            method,
-            body: formData // send FormData directly
-        });
+        try {
+            const url = isEdit ? `/portfolio/${formData.get('portfolioId')}` : '/portfolio';
+            const method = isEdit ? 'PUT' : 'POST';
+            
+            const response = await this.authenticatedFetch(url, {
+                method,
+                body: formData
+            });
 
-        if (response.ok) {
-            this.showMessage('portfolioMessage', `Portfolio ${isEdit ? 'updated' : 'added'} successfully!`, 'success');
-            this.closeModal('portfolioModal');
-            this.loadPortfolio();
-            this.loadStats();
-        } else {
-            const error = await response.json();
-            this.showMessage('portfolioMessage', error.message, 'error');
+            if (response.ok) {
+                this.showMessage('portfolioMessage', `Portfolio ${isEdit ? 'updated' : 'added'} successfully!`, 'success');
+                this.closeModal('portfolioModal');
+                this.loadPortfolio();
+                this.loadStats();
+            } else {
+                const error = await response.json();
+                this.showMessage('portfolioMessage', error.message, 'error');
+            }
+        } catch (error) {
+            this.showMessage('portfolioMessage', 'Error saving portfolio item', 'error');
         }
-    } catch (error) {
-        this.showMessage('portfolioMessage', 'Error saving portfolio item', 'error');
     }
-}
-
 
     // Edit methods
     async editProperty(id) {
@@ -555,8 +634,6 @@ class AdminDashboard {
         }
     }
 
- 
-
     // Utility methods
     async authenticatedFetch(url, options = {}) {
         const token = localStorage.getItem('adminToken');
@@ -635,50 +712,36 @@ const additionalStyles = `
     .badge-management { background: #e8f5e8; color: #2e7d32; }
     .badge-brokerage { background: #f3e5f5; color: #7b1fa2; }
     .badge-survey { background: #fff3e0; color: #f57c00; }
+
+    .skill-tag {
+        display: inline-block;
+        background: #007bff;
+        color: white;
+        padding: 4px 8px;
+        margin: 2px;
+        border-radius: 12px;
+        font-size: 12px;
+    }
+
+    .skill-remove {
+        background: none;
+        border: none;
+        color: white;
+        margin-left: 4px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .skill-badge {
+        display: inline-block;
+        background: #e9ecef;
+        color: #333;
+        padding: 2px 6px;
+        margin: 1px;
+        border-radius: 8px;
+        font-size: 11px;
+    }
 </style>
 `;
 
 document.head.insertAdjacentHTML('beforeend', additionalStyles);
-
-
-
-
-// newsletter
-
-async function loadNewsletterSubscribers() {
-    const token = localStorage.getItem('adminToken');
-    try {
-        const res = await fetch('/api/newsletter', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await res.json();
-        console.log("Newsletter data:", data); // 🔹 debug log
-        const tbody = document.getElementById('newsletterTableBody');
-        tbody.innerHTML = '';
-
-        if (!data.success || data.subscribers.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">No subscribers found</td></tr>`;
-            return;
-        }
-
-        data.subscribers.forEach(sub => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${sub.email}</td>
-                <td>${sub.name || '-'}</td>
-                <td>${new Date(sub.subscribedAt).toLocaleString()}</td>
-                <td>${sub.status}</td>
-            `;
-            tbody.appendChild(tr);
-        });
-    } catch (err) {
-        console.error("Failed to load newsletter subscribers", err);
-    }
-}
-
-
-
-
-
-
-
