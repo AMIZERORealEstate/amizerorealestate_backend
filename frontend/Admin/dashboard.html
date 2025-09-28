@@ -450,7 +450,10 @@
             width: 100%;
             border-collapse: separate;
             border-spacing: 0;
+            
         }
+
+       
 
         .data-table th,
         .data-table td {
@@ -459,6 +462,7 @@
             text-align: left;
             border-bottom: 1px solid var(--border-color);
             font-size: 0.875rem;
+           
         }
 
         .data-table th {
@@ -468,6 +472,7 @@
             text-transform: uppercase;
             letter-spacing: 0.025em;
             font-size: 0.75rem;
+
         }
 
         .data-table tbody tr {
@@ -1336,9 +1341,11 @@
     <!-- Dashboard -->
     <div id="dashboardPage" class="dashboard-container">
         <header class="dashboard-header">
+            <a style="width: 60px; height: 50px;" href="overview"><img src="company_logo_blue_color-removebg-preview.png" alt="" style="width: 100%; height: 100%;"></a>
             <div class="dashboard-title">
-                <h1>AMIZERO Admin Dashboard</h1>
-                <p>Real Estate Management System</p>
+
+                <h1>AMIZERO Real Estate</h1>
+                <p>Website Management Dashboard</p>
             </div>
             <nav class="dashboard-nav">
                 <button class="nav-item active" data-section="overview">
@@ -1967,9 +1974,9 @@
                 </div>
             </div>
 
-            <div class="form-group" style="padding: 0 20px;">
+            <div class="form-group" style="padding: 0 10px;">
                 <label for="teamBio">Bio</label>
-                <textarea id="teamBio" name="bio" rows="4" placeholder="Brief description about the team member..."></textarea>
+                <textarea id="teamBio" name="bio" rows="10" cols="50"  placeholder="add a team member bio..." style="padding: 20px;"></textarea>
             </div>
 
             <!-- Social Links Section -->

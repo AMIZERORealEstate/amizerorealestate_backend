@@ -429,7 +429,12 @@ const TeamSchema = new mongoose.Schema({
     phone: { type: String },
     bio: { type: String },
     image: { type: String },
-    skills: [{ type: String }],
+   
+    skills: {
+  type: [{ type: String }],
+  default: []   // ensures empty array if no skills provided
+},
+
     socialLinks: {
         linkedin: { type: String },
         twitter: { type: String },
@@ -1011,11 +1016,11 @@ app.get('/api/team', authenticateToken, async (req, res) => {
 // Public API endpoint for team members (no authentication required)
 app.get('/api/public/team', async (req, res) => {
     try {
-        // Fetch all team members from database, sorted by creation date (newest first)
-        const team = await Team.find().sort({ createdAt: -1 }).lean();
-        
-        // Optional: Select only specific fields for public display (security consideration)
-        // Remove sensitive fields if any exist in your Team model
+        const team = await Team.find()
+            .sort({ createdAt: -1 })
+            .lean();
+
+        // Build the object with all the fields you want exposed
         const publicTeam = team.map(member => ({
             _id: member._id,
             name: member.name,
@@ -1023,11 +1028,10 @@ app.get('/api/public/team', async (req, res) => {
             bio: member.bio,
             image: member.image,
             skills: member.skills,
-            email: member.email, // Remove this if you don't want emails public
-            linkedin: member.linkedin,
+            email: member.email, // keep or remove depending on security
+            phone: member.phone,
+            socialLinks: member.socialLinks, // ✅ include this
             createdAt: member.createdAt
-            // Add other fields you want to make public
-            // Exclude sensitive fields like passwords, internal notes, etc.
         }));
 
         res.json(publicTeam);
@@ -1040,6 +1044,7 @@ app.get('/api/public/team', async (req, res) => {
         });
     }
 });
+
 
 app.get('/api/team/:id', authenticateToken, async (req, res) => {
     try {
@@ -1067,9 +1072,26 @@ app.post('/api/team', authenticateToken, upload.single('image'), async (req, res
         }
 
         // Parse skills if provided as comma-separated string
-        if (memberData.skills && typeof memberData.skills === 'string') {
-            memberData.skills = memberData.skills.split(',').map(skill => skill.trim());
+     let skills = memberData.skills;
+if (skills) {
+    if (typeof skills === 'string') {
+        try {
+            const parsed = JSON.parse(skills);
+            if (Array.isArray(parsed)) {
+                skills = parsed.filter(skill => skill.trim().length > 0);
+            } else {
+                skills = skills.split(',').map(s => s.trim()).filter(s => s);
+            }
+        } catch {
+            skills = skills.split(',').map(s => s.trim()).filter(s => s);
         }
+    }
+} else {
+    skills = [];
+}
+memberData.skills = skills;
+
+
 
         const member = new Team(memberData);
         await member.save();
@@ -1662,18 +1684,7 @@ app.get('/api/public/properties/:id', async (req, res) => {
     }
 });
 
-app.get('/api/public/team', async (req, res) => {
-    try {
-        const team = await Team.find()
-            .select('-__v -email')
-            .sort({ createdAt: -1 })
-            .lean();
-        res.json(team);
-    } catch (error) {
-        console.error('Public team fetch error:', error);
-        res.status(500).json({ message: 'Error fetching team members' });
-    }
-});
+
 
 app.get('/api/public/portfolio', async (req, res) => {
     try {
@@ -2020,11 +2031,11 @@ async function startServer() {
     try {
         await connectToMongoDB();
         
-        app.listen(PORT, () => {
-            console.log(`🚀 AMIZERO Real Estate server running on port ${PORT}`);
-            console.log(`📂 Serving static files from 'public' directory`);
-            console.log(`🌐 API endpoints available at http://localhost:${PORT}/api/`);
-        });
+      app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 AMIZERO Real Estate server running on port ${PORT}`);
+    console.log(`📂 Serving static files from 'public' directory`);
+    console.log(`🌐 API endpoints available at http://192.168.1.73:${PORT}/api/`);
+});
     } catch (error) {
         console.error('❌ Failed to start server:', error);
         process.exit(1);

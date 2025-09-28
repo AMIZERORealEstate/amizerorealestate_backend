@@ -464,3 +464,27 @@ function showNewsletterModal(msg) {
         }, 300);
     }, 3000);
 }
+
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const contactInfo = document.getElementById("contact-info");
+    if (!contactInfo) return;
+
+    let lastScroll = window.scrollY;
+
+    window.addEventListener("scroll", function () {
+        let currentScroll = window.scrollY;
+
+        // Scrolling down → hide immediately
+        if (currentScroll > lastScroll) {
+            contactInfo.style.display = "none";
+        } 
+        // Scrolling up → show immediately
+        else if (currentScroll < lastScroll) {
+            contactInfo.style.display = "flex";
+        }
+
+        lastScroll = currentScroll;
+    });
+});

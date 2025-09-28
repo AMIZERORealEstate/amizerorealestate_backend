@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Brochure Preview Test</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 2rem; }
+    button { padding: 10px 20px; margin-right: 10px; }
+  </style>
+</head>
+<body>
+
+  <h2>Brochure PDF Preview / Download</h2>
+  <button onclick="previewBrochure()">Preview Brochure</button>
+  <button onclick="downloadBrochure()">Download Brochure</button>
+
+  <script>
+    // ===== Build brochure content =====
+    function buildBrochure(project) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      const primaryColor = [102,126,234];
+      const textColor    = [44,62,80];
+      const lightGray    = [127,140,141];
+
+      let yPosition  = 15;
+      const leftMargin = 20;
+      const pageWidth = doc.internal.pageSize.width;
+
+      // helper for text
+      const addText = (text, size=10, color=textColor, bold=false) => {
+        if (yPosition > doc.internal.pageSize.height - 30) {
+          doc.addPage();
+          yPosition = 20;
+        }
+        doc.setFontSize(size);
+        doc.setTextColor(...color);
+        doc.setFont(undefined, bold ? "bold" : "normal");
+        doc.text(text, leftMargin, yPosition);
+        yPosition += size * 0.4 + 2;
+      };
+
+      const addSection = (title, spacing=8) => {
+        if (yPosition > doc.internal.pageSize.height - 40) {
+          doc.addPage();
+          yPosition = 20;
+        }
+        yPosition += spacing;
+        doc.setFontSize(12);
+        doc.setTextColor(...primaryColor);
+        doc.setFont(undefined, "bold");
+        doc.text(title, leftMargin, yPosition);
+        const tWidth = doc.getTextWidth(title);
+        doc.setDrawColor(...primaryColor);
+        doc.line(leftMargin, yPosition + 2, leftMargin + tWidth, yPosition + 2);
+        yPosition += 8;
+      };
+
+      // --- Header ---
+      doc.setFillColor(...primaryColor);
+      doc.rect(0, 0, pageWidth, 30, "F");
+      doc.setFontSize(18);
+      doc.setTextColor(255,255,255);
+      doc.setFont(undefined,"bold");
+      doc.text("AMIZERO REAL ESTATE", leftMargin, 18);
+      doc.setFontSize(10);
+      doc.setFont(undefined,"normal");
+      doc.text("PROJECT BROCHURE", pageWidth - 60, 18);
+
+      // --- Project title ---
+      yPosition = 40;
+      doc.setFontSize(20);
+      doc.setTextColor(...textColor);
+      doc.setFont(undefined,"bold");
+      doc.text(project.title, leftMargin, yPosition);
+      yPosition += 10;
+
+      // --- Category ---
+      doc.setFontSize(10);
+      doc.setTextColor(...primaryColor);
+      doc.setFont(undefined,"bold");
+      doc.text(project.category.toUpperCase(), leftMargin, yPosition);
+      yPosition += 5;
+
+      // --- Overview ---
+      addSection("PROJECT OVERVIEW");
+      doc.setFontSize(10);
+      doc.setTextColor(...textColor);
+      doc.setFont(undefined,"normal");
+      const lines = doc.splitTextToSize(project.description, pageWidth - 40);
+      lines.forEach(line => { doc.text(line, leftMargin, yPosition); yPosition += 9; });
+
+      // --- Details ---
+      addSection("PROJECT DETAILS");
+      const details = [
+        {label:"Location:", value: project.location},
+        {label:"Date Completed:", value: project.date},
+        {label:"Duration:", value: project.duration},
+        {label:"Project Value:", value: project.value},
+        {label:"Client:", value: project.client},
+        {label:"Status:", value: project.status}
+      ];
+      details.forEach(d => {
+        doc.setFont(undefined,"bold"); doc.setTextColor(...textColor);
+        doc.text(d.label, leftMargin, yPosition);
+        doc.setFont(undefined,"normal"); doc.setTextColor(...lightGray);
+        doc.text(d.value || "N/A", leftMargin + 50, yPosition);
+        yPosition += 9;
+      });
+
+      // --- Contact ---
+      addSection("CONTACT INFORMATION");
+      const contacts = [
+        {label:"Phone:", value:"+250 725 502 317"},
+        {label:"Email:", value:"amizerorealestate@gmail.com"},
+        {label:"Office:", value:"Kigali, Rwanda"}
+      ];
+      contacts.forEach(c => {
+        doc.setFont(undefined,"bold"); doc.setTextColor(...textColor);
+        doc.text(c.label, leftMargin, yPosition);
+        doc.setFont(undefined,"normal"); doc.setTextColor(...lightGray);
+        doc.text(c.value, leftMargin + 30, yPosition);
+        yPosition += 9;
+      });
+
+      // --- Footer ---
+      const footerY = doc.internal.pageSize.height - 20;
+      doc.setFillColor(...primaryColor);
+      doc.rect(0, footerY - 5, pageWidth, 25, "F");
+      doc.setFontSize(8);
+      doc.setTextColor(255,255,255);
+      doc.setFont(undefined,"normal");
+      doc.text(`Generated on ${new Date().toLocaleDateString()}`, leftMargin, footerY + 5);
+      doc.text("Amizero Real Estate - Your Trusted Property Partner", pageWidth - 100, footerY + 5);
+
+      return doc;
+    }
+
+    // ===== Preview in new tab =====
+    function previewBrochure() {
+      const sampleProject = {
+        title: "Sample Residential Building",
+        category: "Housing",
+        description: "A modern 3-storey apartment complex featuring spacious units, underground parking, and landscaped gardens. Built with eco-friendly materials and smart-home technology.",
+        location: "Kigali, Rwanda",
+        date: "2024",
+        duration: "12 months",
+        value: "$2,500,000",
+        client: "John Doe",
+        status: "Completed"
+      };
+      const doc = buildBrochure(sampleProject);
+      window.open(doc.output("bloburl"));
+    }
+
+    // ===== Download =====
+    function downloadBrochure() {
+      const sampleProject = {
+        title: "Sample Residential Building",
+        category: "Housing",
+        description: "A modern 3-storey apartment complex featuring spacious units, underground parking, and landscaped gardens. Built with eco-friendly materials and smart-home technology.",
+        location: "Kigali, Rwanda",
+        date: "2024",
+        duration: "12 months",
+        value: "$2,500,000",
+        client: "John Doe",
+        status: "Completed"
+      };
+      const doc = buildBrochure(sampleProject);
+      doc.save(sampleProject.title.replace(/[^a-zA-Z0-9]/g,"_") + "_Brochure.pdf");
+    }
+  </script>
+</body>
+</html>

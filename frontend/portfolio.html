@@ -50,25 +50,33 @@
         </nav>
     </header>
 
-<section id="portfolio" class="portfolio">
-    <div class="section-header">
-        <h2>Our Portfolio</h2>
-        <p>Showcasing our completed projects and successful case studies</p>
-    </div>
-    
-    <div class="portfolio-filters">
-        <button class="filter-btn active" data-filter="all">All Projects</button>
-        <button class="filter-btn" data-filter="valuation">Property Valuation</button>
-        <button class="filter-btn" data-filter="management">Property Management</button>
-        <button class="filter-btn" data-filter="brokerage">Real Estate Brokerage</button>
-        <button class="filter-btn" data-filter="survey">Quantity Survey</button>
-        <button class="filter-btn" data-filter="development">Property Development</button>
-    </div>
+<section class="portfolio">
+        <div class="container">
+            <div class="section-header">
+                <h2>Our Portfolio</h2>
+                <p>Discover our exceptional real estate projects that showcase innovation, quality, and strategic development across various sectors.</p>
+            </div>
 
-    <div class="portfolio-grid">
-        <!-- Portfolio items will be dynamically loaded here -->
-    </div>
-</section>
+            <!-- <div class="portfolio-filters">
+                <button class="filter-btn active" data-filter="all">All Projects</button>
+                <button class="filter-btn" data-filter="valuation">Property Valuation</button>
+                <button class="filter-btn" data-filter="management">Property Management</button>
+                <button class="filter-btn" data-filter="brokerage">Real Estate Brokerage</button>
+                <button class="filter-btn" data-filter="survey">Quantity Survey</button>
+                <button class="filter-btn" data-filter="development">Property Development</button>
+            </div> -->
+
+            <div class="portfolio-grid">
+                <div class="loading-message">
+                    <div class="spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                    <h3>Loading Portfolio...</h3>
+                    <p>Please wait while we fetch your portfolio items.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
 
 
@@ -160,6 +168,284 @@
     </script>
     <script src="script.js"></script>
     <script src="portfolio.js"></script>
+
+
+
+
+
+     <script>
+        // Enhanced portfolio manager with simplified card design
+class EnhancedPortfolioManager extends PortfolioManager {
+    createPortfolioItemHTML(item) {
+        // Determine if single or multiple images
+        const imageCount = item.images && item.images.length ? item.images.length : 0;
+        const imageClass = imageCount === 1 ? 'single-image' : imageCount > 1 ? 'multiple-images' : 'no-image';
+        
+        // Use first image if available, otherwise use a default placeholder
+        const imageContent = item.images && item.images.length > 0 
+            ? `<img src="${item.images[0]}" alt="${item.title}">`
+            : `<div class="portfolio-placeholder">
+                <i class="${this.getCategoryIcon(item.category)} portfolio-icon"></i>
+               </div>`;
+        
+        // Add badge for special projects (only show if featured or has special status)
+        const badgeHTML = item.featured ? '<div class="portfolio-badge featured">Featured</div>' : 
+                        item.status === 'new' ? '<div class="portfolio-badge new">New</div>' : 
+                        item.status === 'sale' ? '<div class="portfolio-badge sale">Sale</div>' : '';
+
+        return `
+            <div class="portfolio-item ${imageClass}" 
+                 data-category="${item.category}" 
+                 onclick="openPortfolioDetails('${item.id || item.title.replace(/\s+/g, '-').toLowerCase()}')"
+                 style="cursor: pointer;">
+                <div class="portfolio-image-container">
+                    ${imageContent}
+                    <div class="portfolio-title-overlay">
+                        <h3 class="portfolio-title">${item.title}</h3>
+                    </div>
+                    <div class="portfolio-overlay">
+                        <div class="view-details">
+                            <i class="fas fa-eye"></i>
+                            <span>View Details</span>
+                        </div>
+                    </div>
+                    ${badgeHTML}
+                </div>
+            </div>
+        `;
+    }
+
+    // Add CSS styles for the simplified design
+    addPortfolioStyles() {
+        if (document.getElementById('portfolio-styles')) return;
+
+        const styles = document.createElement('style');
+        styles.id = 'portfolio-styles';
+        styles.textContent = `
+                .portfolio-item {
+                background: #fff;
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                transition: all 0.3s ease;
+                position: relative;
+                height: 280px;
+            }
+
+            .portfolio-item:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            }
+
+            .portfolio-image-container {
+                position: relative;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+                background: #f8f9fa;
+            }
+
+            .portfolio-image-container img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.3s ease;
+            }
+
+            .portfolio-item:hover .portfolio-image-container img {
+                transform: scale(1.05);
+            }
+
+            .portfolio-placeholder {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+            }
+
+            .portfolio-placeholder .portfolio-icon {
+                font-size: 3rem;
+                opacity: 0.8;
+            }
+
+            .portfolio-title-overlay {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+                padding: 40px 20px 20px;
+                z-index: 1;
+            }
+
+            .portfolio-title {
+                margin: 0;
+                font-size: 1.2rem;
+                font-weight: 700;
+                color: white !important;
+                line-height: 1.3;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            }
+
+            .portfolio-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.7);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                z-index: 2;
+            }
+
+            .portfolio-item:hover .portfolio-overlay {
+                opacity: 1;
+            }
+
+            .view-details {
+                color: white;
+                text-align: center;
+                font-weight: 600;
+                font-size: 1rem;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .view-details i {
+                font-size: 1.2rem;
+            }
+
+            .portfolio-badge {
+                position: absolute;
+                top: 12px;
+                right: 12px;
+                padding: 4px 12px;
+                border-radius: 20px;
+                font-size: 0.8rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                z-index: 2;
+            }
+
+            .portfolio-badge.featured {
+                background: #ff6b6b;
+                color: white;
+            }
+
+            .portfolio-badge.new {
+                background: #4ecdc4;
+                color: white;
+            }
+
+            .portfolio-badge.sale {
+                background: #ffe66d;
+                color: #333;
+            }
+
+
+
+            /* Responsive adjustments */
+            @media (max-width: 768px) {
+                .portfolio-item {
+                    height: 240px;
+                }
+                
+                .portfolio-title {
+                    font-size: 1rem;
+                    letter-spacing: 0.5px;
+                }
+                
+                .portfolio-title-overlay {
+                    padding: 30px 15px 15px;
+                }
+                        /* Break out of container constraints on mobile */
+    .portfolio-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        padding: 0;
+        margin: 0;
+        max-width: none; /* Remove max-width constraint */
+        width: 100vw; /* Full viewport width */
+        position: relative;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
+    }
+            }
+
+            /* Grid layout improvements */
+            .portfolio-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 24px;
+                padding: 24px 0;
+            }
+
+            @media (max-width: 768px) {
+                .portfolio-grid {
+                    grid-template-columns: 1fr;
+                    gap: 16px;
+                    padding: 16px;
+                }
+            }
+        `;
+        document.head.appendChild(styles);
+    }
+
+    // Override the render method to include styles
+    renderPortfolio(container) {
+        this.addPortfolioStyles();
+        super.renderPortfolio(container);
+    }
+}
+
+// Function to open portfolio details page
+function openPortfolioDetails(itemId) {
+    // Store the selected item data for the details page
+    const selectedItem = window.portfolioManager.portfolioItems.find(item => 
+        (item.id && item.id === itemId) || 
+        item.title.replace(/\s+/g, '-').toLowerCase() === itemId
+    );
+    
+    if (selectedItem) {
+        // Store in a temporary global variable as fallback
+        window.portfolioDetailsData = {
+            selectedItem: selectedItem,
+            allItems: window.portfolioManager.portfolioItems,
+            timestamp: Date.now()
+        };
+        
+        // Navigate to details page
+        window.location.href = 'portfolioDetails.html?id=' + itemId;
+    }
+}
+
+// Initialize enhanced portfolio manager when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.portfolioManager = new EnhancedPortfolioManager();
+});
+
+// Auto-refresh every 5 minutes
+setInterval(() => {
+    if (window.portfolioManager) {
+        window.portfolioManager.refresh();
+    }
+}, 5 * 60 * 1000);
+     </script>
+
+
 
    <script>
     // Mobile Navigation Toggle

@@ -46,51 +46,83 @@ class AdminDashboard {
     }
 
     // Skills management setup
-    setupSkillsInput() {
-        const skillInput = document.getElementById('skillInput');
-        if (skillInput) {
-            skillInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    this.addSkill(e.target.value.trim());
-                    e.target.value = '';
-                }
-            });
-        }
+    // Skills management setup
+setupSkillsInput() {
+    const skillInput = document.getElementById('skillInput');
+    if (skillInput) {
+        // Add skills on Enter key
+        skillInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                this.addSkillsFromInput(e.target.value);
+                e.target.value = '';
+            }
+        });
+
+        // Optional: handle paste with commas
+        skillInput.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const pasteData = e.clipboardData.getData('text');
+            this.addSkillsFromInput(pasteData);
+        });
     }
 
-    addSkill(skill) {
-        if (skill && !this.skills.includes(skill)) {
-            this.skills.push(skill);
-            this.updateSkillsDisplay();
+    // Ensure hidden input is updated before form submit
+    const teamForm = document.getElementById('teamForm');
+    console.log('Skills hidden input value:', document.getElementById('skillsHidden').value);
+    if (teamForm) {
+        teamForm.addEventListener('submit', () => {
             this.updateSkillsHidden();
-        }
+        });
     }
+}
 
-    removeSkill(skill) {
-        this.skills = this.skills.filter(s => s !== skill);
-        this.updateSkillsDisplay();
-        this.updateSkillsHidden();
-    }
+// Add skills from input string (handles comma-separated values)
+addSkillsFromInput(inputValue) {
+    if (!inputValue) return;
 
-    updateSkillsDisplay() {
-        const container = document.getElementById('skillsContainer');
-        if (container) {
-            container.innerHTML = this.skills.map(skill => `
-                <span class="skill-tag">
-                    ${skill}
-                    <button type="button" class="skill-remove" onclick="dashboard.removeSkill('${skill}')">&times;</button>
-                </span>
-            `).join('');
-        }
-    }
+    // Split by commas, trim, and filter out empty strings
+    const newSkills = inputValue.split(',').map(s => s.trim()).filter(s => s);
 
-    updateSkillsHidden() {
-        const hiddenInput = document.getElementById('skillsHidden');
-        if (hiddenInput) {
-            hiddenInput.value = JSON.stringify(this.skills);
+    newSkills.forEach(skill => {
+        if (!this.skills.includes(skill)) {
+            this.skills.push(skill);
         }
+    });
+
+    this.updateSkillsDisplay();
+    this.updateSkillsHidden();
+}
+
+// Remove skill
+removeSkill(skill) {
+    this.skills = this.skills.filter(s => s !== skill);
+    this.updateSkillsDisplay();
+    this.updateSkillsHidden();
+}
+
+// Update skills display
+updateSkillsDisplay() {
+    const container = document.getElementById('skillsContainer');
+    if (container) {
+        container.innerHTML = this.skills.map(skill => `
+            <span class="skill-tag">
+                ${skill}
+                <button type="button" class="skill-remove" onclick="dashboard.removeSkill('${skill}')">&times;</button>
+            </span>
+        `).join('');
     }
+}
+
+// Update hidden input for backend
+updateSkillsHidden() {
+    const hiddenInput = document.getElementById('skillsHidden');
+    if (hiddenInput) {
+        hiddenInput.value = JSON.stringify(this.skills);
+        console.log("hidden skills are:", hiddenInput.value);
+    }
+}
+
 
     // Authentication methods
     async handleLogin(e) {
@@ -280,74 +312,73 @@ class AdminDashboard {
     }
 
     renderTeamTable(team) {
-        const tbody = document.getElementById('teamTableBody');
-        if (!team || team.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#666;">No team members found</td></tr>';
-            return;
-        }
-        
-        tbody.innerHTML = team.map(member => `
-            <tr>
-                <td>
-                    ${
-                        member.image
-                            ? `<img src="${member.image}" alt="${member.name}" style="width:60px;height:60px;object-fit:cover;border-radius:50%;">`
-                            : '<div style="width:60px;height:60px;background:#e9ecef;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#666;"><i class="fas fa-user"></i></div>'
-                    }
-                </td>
-                <td><strong>${member.name}</strong></td>
-                <td>${member.position}</td>
-                <td><a href="mailto:${member.email}" class="social-link">${member.email}</a></td>
-                <td>${member.phone || 'N/A'}</td>
-                <td>
-                    <div class="skills-display">
-                        ${member.skills && member.skills.length > 0 
-                            ? member.skills.map(skill => `<span class="skill-badge">${skill}</span>`).join('')
-                            : '<span style="color:#666;">No skills listed</span>'
-                        }
-                    </div>
-                </td>
-                <td>
-                    <div class="social-links">
-                        ${member.socialLinks?.linkedin 
-                            ? `<a href="${member.socialLinks.linkedin}" target="_blank" class="social-link" title="LinkedIn"><i class="fab fa-linkedin"></i></a>`
-                            : ''
-                        }
-                        ${member.socialLinks?.twitter 
-                            ? `<a href="${member.socialLinks.twitter}" target="_blank" class="social-link" title="Twitter"><i class="fab fa-twitter"></i></a>`
-                            : ''
-                        }
-                        ${member.socialLinks?.email 
-                            ? `<a href="mailto:${member.socialLinks.email}" class="social-link" title="Email"><i class="fas fa-envelope"></i></a>`
-                            : ''
-                        }
-                        ${(!member.socialLinks?.linkedin && !member.socialLinks?.twitter && !member.socialLinks?.email) 
-                            ? '<span style="color:#666;">N/A</span>'
-                            : ''
-                        }
-                    </div>
-                </td>
-                <td style="max-width:200px; white-space:normal; word-wrap:break-word; overflow:hidden; text-overflow:ellipsis;">
-                    ${member.bio ? 
-                        (member.bio.length > 100 ? 
-                            `<span title="${member.bio}">${member.bio.substring(0, 100)}...</span>` : 
-                            member.bio
-                        ) : 
-                        '<span style="color:#666;">No bio available</span>'
-                    }
-                </td>
-                <td>
-                    <button class="action-btn edit-btn" onclick="dashboard.editTeamMember('${member._id}')" title="Edit">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="action-btn delete-btn" onclick="dashboard.deleteTeamMember('${member._id}')" title="Delete">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </td>
-            </tr>
-        `).join('');
+    const tbody = document.getElementById('teamTableBody');
+    if (!team || team.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#666;">No team members found</td></tr>';
+        return;
     }
-
+    
+    tbody.innerHTML = team.map(member => `
+        <tr>
+            <td>
+                ${
+                    member.image
+                        ? `<img src="${member.image}" alt="${member.name}" style="width:60px;height:60px;object-fit:cover;border-radius:50%;">`
+                        : '<div style="width:60px;height:60px;background:#e9ecef;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#666;"><i class="fas fa-user"></i></div>'
+                }
+            </td>
+            <td><strong>${member.name}</strong></td>
+            <td>${member.position}</td>
+            <td><a href="mailto:${member.email || member.socialLinks?.email || '#'}" class="social-link">${member.email || member.socialLinks?.email || 'N/A'}</a></td>
+            <td>${member.phone || 'N/A'}</td>
+            <td>
+                <div class="skills-display">
+                    ${member.skills && member.skills.length > 0 
+                        ? member.skills.map(skill => `<span class="skill-badge">${skill}</span>`).join('')
+                        : '<span style="color:#666;">No skills listed</span>'
+                    }
+                </div>
+            </td>
+            <td>
+                <div class="social-links">
+                    ${(member.socialLinks?.linkedin || member.linkedin)
+                        ? `<a href="${member.socialLinks?.linkedin || member.linkedin}" target="_blank" class="social-link" title="LinkedIn"><i class="fab fa-linkedin"></i></a>`
+                        : ''
+                    }
+                    ${(member.socialLinks?.twitter || member.twitter)
+                        ? `<a href="${member.socialLinks?.twitter || member.twitter}" target="_blank" class="social-link" title="Twitter"><i class="fab fa-twitter"></i></a>`
+                        : ''
+                    }
+                    ${(member.socialLinks?.email || member.email)
+                        ? `<a href="mailto:${member.socialLinks?.email || member.email}" class="social-link" title="Email"><i class="fas fa-envelope"></i></a>`
+                        : ''
+                    }
+                    ${(!member.socialLinks?.linkedin && !member.linkedin && !member.socialLinks?.twitter && !member.twitter && !member.socialLinks?.email && !member.email)
+                        ? '<span style="color:#666;">N/A</span>'
+                        : ''
+                    }
+                </div>
+            </td>
+            <td style="max-width:400px; overflow:auto;">
+                ${member.bio ? 
+                    (member.bio.length > 100 ? 
+                        `<span title="${member.bio}">${member.bio.substring(0, 100)}...</span>` : 
+                        member.bio
+                    ) : 
+                    '<span style="color:#666;">No bio available</span>'
+                }
+            </td>
+            <td>
+                <button class="action-btn edit-btn" onclick="dashboard.editTeamMember('${member._id}')" title="Edit">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="action-btn delete-btn" onclick="dashboard.deleteTeamMember('${member._id}')" title="Delete">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
     renderPortfolioTable(portfolio) {
         const tbody = document.getElementById('portfolioTableBody');
         if (!portfolio || portfolio.length === 0) {

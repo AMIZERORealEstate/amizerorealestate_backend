@@ -50,74 +50,19 @@
         </nav>
     </header>
 
-    <!-- Team Section -->
-    <section id="team" class="team">
-        <div class="section-header fade-in">
-            <h2>Our Team</h2>
-            <p>Meet the experienced professionals driving AMIZERO's success</p>
-        </div>
-        
-        <div class="team-grid">
-            <div class="team-member fade-in">
-                <div class="team-avatar">
-                    <img src="images/my profile.jpg" alt="">
-                </div>
-                <h3>Aphrodis Amizero
-                </h3>
-                <div class="team-position">Chairman & CEO</div>
-                <p class="team-bio">A seasoned real estate professional and entrepreneur, Aphrodis Amizero is the founder and CEO of AMIZERO Real Estate Ltd. With a deep understanding of Rwanda's property market, he leads the company in delivering exceptional real estate solutions.</p>
-                <div class="team-skills">
-                    <span class="skill-tag">Strategic Planning</span>
-                    <span class="skill-tag">Market Analysis</span>
-                    <span class="skill-tag">Client Relations</span>
-                </div>
-                <div class="team-contact">
-                    <a href="#" class="contact-link"><i class="fas fa-envelope"></i></a>
-                    <a href="#" class="contact-link"><i class="fab fa-linkedin-in"></i></a>
-                    <a href="#" class="contact-link"><i class="fab fa-twitter"></i></a>
-                </div>
-            </div>
+   <!-- Team Section -->
+<section id="team" class="team">
+  <div class="section-header fade-in">
+    <h2>Our Team</h2>
+    <p>Meet the experienced professionals driving AMIZERO's success</p>
+  </div>
 
-        
+  <div class="team-grid">
+    <!-- This will be populated by JavaScript -->
+</div>
 
-            <div class="team-member fade-in">
-                <div class="team-avatar">
-                    <i class="fas fa-user-graduate"></i>
-                </div>
-                <h3>Marie Uwimana</h3>
-                <div class="team-position">Board Secretary</div>
-                <p class="team-bio">Certified property manager with expertise in residential and commercial property operations, ensuring smooth day-to-day business functions.</p>
-                <div class="team-skills">
-                    <span class="skill-tag">Property Management</span>
-                    <span class="skill-tag">Legal Compliance</span>
-                    <span class="skill-tag">Operations</span>
-                </div>
-                <div class="team-contact">
-                    <a href="#" class="contact-link"><i class="fas fa-envelope"></i></a>
-                    <a href="#" class="contact-link"><i class="fab fa-twitter"></i></a>
-                </div>
-            </div>
+  </section>
 
-            <div class="team-member fade-in">
-                <div class="team-avatar">
-                    <i class="fas fa-calculator"></i>
-                </div>
-                <h3>David Nshimiyimana</h3>
-                <div class="team-position">Chief Valuation Officer</div>
-                <p class="team-bio">Licensed property valuator with a strong background in financial analysis and market research, providing accurate property assessments.</p>
-                <div class="team-skills">
-                    <span class="skill-tag">Property Valuation</span>
-                    <span class="skill-tag">Market Research</span>
-                    <span class="skill-tag">Financial Analysis</span>
-                </div>
-                <div class="team-contact">
-                    <a href="#" class="contact-link"><i class="fas fa-envelope"></i></a>
-                    <a href="#" class="contact-link"><i class="fab fa-linkedin-in"></i></a>
-                </div>
-            </div>
-
-        </div>
-    </section>
 
 
 <!-- Footer -->
@@ -246,7 +191,7 @@ document.addEventListener("DOMContentLoaded", () => {
     </script>
 
     <script>
-        // Function to load team members from public API
+      // Function to load team members from public API
 async function loadTeamMembers() {
     try {
         // Get the team grid container
@@ -292,14 +237,23 @@ async function loadTeamMembers() {
                     <p class="team-bio">${member.bio || 'Bio not available'}</p>
                     <div class="team-skills">
                         ${member.skills && member.skills.length > 0 ? 
-                            member.skills.map(skill => `<span class="skill-tag">${skill}</span>`).join('') : 
+                            member.skills.map(skills => `<span class="skill-tag">${skills}</span>`).join('') : 
                             '<span class="skill-tag">No skills listed</span>'
                         }
                     </div>
+                    <p style="margin-bottom: 20px; color:rgb(115, 115, 115);" >${member.phone || 'No Phone Number'}</p>
                     <div class="team-contact">
-    ${member.email ? `<a href="mailto:${member.email}" class="contact-link"><i class="fas fa-envelope"></i></a>` : ''}
-    ${member.linkedin ? `<a href="${member.linkedin}" class="contact-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin-in"></i></a>` : ''}
-    ${member.twitter ? `<a href="${member.twitter}" class="contact-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-twitter"></i></a>` : ''}
+                        ${member.email ? 
+  `<a href="https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(member.email)}&su=${encodeURIComponent('Project Inquiry ')}&body=${encodeURIComponent('Hi ' + member.name + ',\n\nI would like to get in touch with you regarding our project.\n\nBest regards,\n[Your Name]')}" 
+     class="contact-link" target="_blank" rel="noopener noreferrer">
+      <i class="fas fa-envelope"></i>
+   </a>` 
+: '' }
+
+
+    
+    ${member.socialLinks?.linkedin ? `<a href="${member.socialLinks.linkedin}" class="contact-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin-in"></i></a>` : ''}
+    ${member.socialLinks?.twitter ? `<a href="${member.socialLinks.twitter}" class="contact-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-twitter"></i></a>` : ''}
 </div>
 
                 </div>
@@ -378,16 +332,25 @@ async function loadTeamMembersByPosition(position = null) {
                     <p class="team-bio">${member.bio || 'Bio not available'}</p>
                     <div class="team-skills">
                         ${member.skills && member.skills.length > 0 ? 
-                            member.skills.map(skill => `<span class="skill-tag">${skill}</span>`).join('') : 
+                            member.skills.map(skills => `<span class="skill-tag">${skills}</span>`).join('') : 
                             '<span class="skill-tag">No skills listed</span>'
                         }
                     </div>
-                      <div class="team-contact">
-    ${member.email ? `<a href="mailto:${member.email}" class="contact-link"><i class="fas fa-envelope"></i></a>` : ''}
-    ${member.linkedin ? `<a href="${member.linkedin}" class="contact-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin-in"></i></a>` : ''}
-    <a href="${member.twitter ? member.twitter : '#'}" class="contact-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-twitter"></i></a>
-</div>
+                   <div class="team-contact">
+  ${member.email ? 
+  `<a href="https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(member.email)}&su=${encodeURIComponent('Project Inquiry')}&body=${encodeURIComponent('Hi ' + member.name + ',\n\nI would like to get in touch with you regarding our project.\n\nBest regards,\n[Your Name]')}" 
+     class="contact-link" target="_blank" rel="noopener noreferrer">
+      <i class="fas fa-envelope"></i>
+   </a>` 
+: '' }
 
+
+
+
+    <p style="margin-bottom: 20px; color:rgb(115, 115, 115);" >${member.phone || 'No Phone Number'}</p>
+    ${member.socialLinks?.linkedin ? `<a href="${member.socialLinks.linkedin}" class="contact-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin-in"></i></a>` : ''}
+    ${member.socialLinks?.twitter ? `<a href="${member.socialLinks.twitter}" class="contact-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-twitter"></i></a>` : ''}
+</div>
 
                 </div>
             `;
@@ -412,6 +375,8 @@ async function loadTeamMembersByPosition(position = null) {
         }
     }
 }
+
+
 
 // Load team members when the page loads
 document.addEventListener('DOMContentLoaded', function() {
