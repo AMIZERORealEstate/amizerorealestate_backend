@@ -99,8 +99,17 @@ async function createDefaultAdmin() {
 // Routes
 
 // Home route
+const fileURLToPath = require('url');
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Serve static frontend files
+app.use(express.static(path.resolve(__dirname, 'frontend')));
+
+// Main route (for index.html)
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
+  res.sendFile(path.resolve(__dirname, 'frontend', 'index.html'));
 });
 
 // Contact Form Submission
