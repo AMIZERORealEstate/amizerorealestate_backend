@@ -629,7 +629,266 @@ app.get('/api/stats', authenticateToken, async (req, res) => {
     }
 });
 
-// Properties Routes
+// SERVER SIDE RENDERING
+
+// Add this route BEFORE your other property routes
+// This handles server-side rendering for social media crawlers
+
+app.get('/property/:id', async (req, res) => {
+    try {
+        const propertyId = req.params.id;
+        
+        // Fetch property from database
+        const property = await Property.findById(propertyId).lean();
+        
+        if (!property) {
+            return res.status(404).send(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Property Not Found - AMIZERO Real Estate</title>
+                </head>
+                <body>
+                    <h1>Property Not Found</h1>
+                    <p>The property you're looking for doesn't exist.</p>
+                    <a href="/listing.html?type=properties">Back to Properties</a>
+                </body>
+                </html>
+            `);
+        }
+
+        // Format property data
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        const propertyUrl = `${baseUrl}/property/${property._id}`;
+        const propertyImage = property.images && property.images.length > 0 
+            ? property.images[0] 
+            : `${baseUrl}/images/default-property.jpg`;
+        
+        // Format price
+        const formattedPrice = new Intl.NumberFormat('en-RW', {
+            style: 'currency',
+            currency: 'RWF',
+            minimumFractionDigits: 0
+        }).format(property.price || 0);
+        
+        const priceDisplay = property.type === 'rent' ? `${formattedPrice}/month` : formattedPrice;
+        
+        // Create title and description
+        const title = `${property.title} - ${priceDisplay}`;
+        const description = `${property.propertyType || 'Property'} in ${property.location} • ${property.bedrooms || 0} beds • ${property.bathrooms || 0} baths • ${property.area || 0} m²`;
+        const fullDescription = property.description ? property.description.substring(0, 200) + '...' : description;
+
+        // Generate HTML with meta tags
+        const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Basic Meta Tags -->
+    <title>${escapeHtml(title)} | AMIZERO Real Estate</title>
+    <meta name="description" content="${escapeHtml(fullDescription)}">
+    
+    <!-- Open Graph Meta Tags (Facebook, WhatsApp, LinkedIn) -->
+    <meta property="og:site_name" content="AMIZERO Real Estate Ltd">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="${propertyUrl}">
+    <meta property="og:title" content="${escapeHtml(title)}">
+    <meta property="og:description" content="${escapeHtml(fullDescription)}">
+    <meta property="og:image" content="${propertyImage}">
+    <meta property="og:image:secure_url" content="${propertyImage}">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="${escapeHtml(property.title)}">
+    <meta property="og:locale" content="en_US">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="${escapeHtml(title)}">
+    <meta name="twitter:description" content="${escapeHtml(fullDescription)}">
+    <meta name="twitter:image" content="${propertyImage}">
+    <meta name="twitter:image:alt" content="${escapeHtml(property.title)}">
+    
+    <!-- Additional Meta Tags -->
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="AMIZERO Real Estate Ltd">
+    <link rel="canonical" href="${propertyUrl}">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/images/AMR_LOGO_white_color-removebg-preview.png">
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "${property.type === 'sale' ? 'Product' : 'RealEstateListing'}",
+        "name": "${escapeHtml(property.title)}",
+        "description": "${escapeHtml(property.description || description)}",
+        "image": "${propertyImage}",
+        "url": "${propertyUrl}",
+        "offers": {
+            "@type": "Offer",
+            "price": "${property.price}",
+            "priceCurrency": "RWF",
+            "availability": "https://schema.org/InStock"
+        },
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "${escapeHtml(property.location)}",
+            "addressCountry": "RW"
+        },
+        "numberOfRooms": ${property.bedrooms || 0},
+        "numberOfBathroomsTotal": ${property.bathrooms || 0},
+        "floorSize": {
+            "@type": "QuantitativeValue",
+            "value": ${property.area || 0},
+            "unitCode": "MTK"
+        }
+    }
+    </script>
+    
+    <!-- Redirect script for JavaScript-enabled browsers -->
+    <script>
+        // Redirect to the actual property details page with query parameter
+        window.location.href = '/property-details.html?id=${property._id}';
+    </script>
+    
+    <!-- Noscript fallback -->
+    <noscript>
+        <meta http-equiv="refresh" content="0;url=/property-details.html?id=${property._id}">
+    </noscript>
+</head>
+<body>
+    <!-- Fallback content for crawlers and no-JS browsers -->
+    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
+        <header style="margin-bottom: 2rem;">
+            <h1 style="color: #2d3748; font-size: 2rem; margin-bottom: 0.5rem;">
+                ${escapeHtml(property.title)}
+            </h1>
+            <p style="color: #718096; font-size: 1.125rem;">
+                <strong>${priceDisplay}</strong>
+            </p>
+        </header>
+        
+        <main>
+            <div style="margin-bottom: 2rem;">
+                <img src="${propertyImage}" 
+                     alt="${escapeHtml(property.title)}" 
+                     style="width: 100%; max-height: 500px; object-fit: cover; border-radius: 8px;">
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                <div style="padding: 1rem; background: #f7fafc; border-radius: 8px;">
+                    <strong>📍 Location:</strong> ${escapeHtml(property.location)}
+                </div>
+                <div style="padding: 1rem; background: #f7fafc; border-radius: 8px;">
+                    <strong>🛏️ Bedrooms:</strong> ${property.bedrooms || 'N/A'}
+                </div>
+                <div style="padding: 1rem; background: #f7fafc; border-radius: 8px;">
+                    <strong>🚿 Bathrooms:</strong> ${property.bathrooms || 'N/A'}
+                </div>
+                <div style="padding: 1rem; background: #f7fafc; border-radius: 8px;">
+                    <strong>📐 Area:</strong> ${property.area ? property.area + ' m²' : 'N/A'}
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 2rem;">
+                <h2 style="color: #2d3748; font-size: 1.5rem; margin-bottom: 1rem;">Description</h2>
+                <p style="color: #4a5568; line-height: 1.6;">
+                    ${escapeHtml(property.description || 'No description available')}
+                </p>
+            </div>
+            
+            <div style="padding: 1.5rem; background: #edf2f7; border-radius: 8px; text-align: center;">
+                <p style="margin-bottom: 1rem;">If you're not redirected automatically...</p>
+                <a href="/property-details.html?id=${property._id}" 
+                   style="display: inline-block; padding: 0.75rem 1.5rem; background: #3182ce; color: white; text-decoration: none; border-radius: 6px; font-weight: 600;">
+                    View Full Property Details
+                </a>
+            </div>
+        </main>
+        
+        <footer style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #e2e8f0; text-align: center; color: #718096;">
+            <p><strong>AMIZERO Real Estate Ltd</strong></p>
+            <p>📞 +250 (725) 502-317 | 📧 amizerorealestate@gmail.com</p>
+        </footer>
+    </div>
+</body>
+</html>
+        `;
+
+        res.send(html);
+
+    } catch (error) {
+        console.error('Error rendering property:', error);
+        res.status(500).send(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Error - AMIZERO Real Estate</title>
+            </head>
+            <body>
+                <h1>Error Loading Property</h1>
+                <p>There was an error loading this property. Please try again later.</p>
+                <a href="/listing.html?type=properties">Back to Properties</a>
+            </body>
+            </html>
+        `);
+    }
+});
+
+// Helper function to escape HTML special characters
+function escapeHtml(text) {
+    if (!text) return '';
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.toString().replace(/[&<>"']/g, m => map[m]);
+}
+
+// Keep your existing routes below this...
+// Public route for single property (API endpoint)
+app.get("/api/public/properties/:id", async (req, res) => {
+    try {
+        const property = await Property.findById(req.params.id).lean();
+        
+        if (!property) {
+            return res.status(404).json({ message: 'Property not found' });
+        }
+
+        // Return public fields
+        const publicProperty = {
+            id: property._id,
+            title: property.title,
+            price: property.price,
+            type: property.type,
+            location: property.location,
+            bedrooms: property.bedrooms,
+            bathrooms: property.bathrooms,
+            area: property.area,
+            propertyType: property.propertyType,
+            description: property.description,
+            images: property.images || []
+        };
+
+        res.json(publicProperty);
+    } catch (error) {
+        console.error('Property fetch error:', error);
+        res.status(500).json({ message: 'Error fetching property' });
+    }
+});
+
+// Your existing routes...
 app.get('/api/properties', authenticateToken, async (req, res) => {
     try {
         const properties = await Property.find()
@@ -642,35 +901,23 @@ app.get('/api/properties', authenticateToken, async (req, res) => {
     }
 });
 
-
-// Public route for portfolio (no authentication)
 app.get("/api/public/properties", async (req, res) => {
     try {
         const { type, location, propertyType, bedrooms, minPrice, maxPrice, q } = req.query;
 
-        // Build dynamic query
         let query = {};
 
-        // Type filter
         if (type && type !== 'all') query.type = type;
-
-        // Location filter
         if (location) query.location = { $regex: location, $options: 'i' };
-
-        // Property type filter
         if (propertyType) query.propertyType = propertyType;
-
-        // Bedrooms filter (minimum)
         if (bedrooms) query.bedrooms = { $gte: parseInt(bedrooms) };
 
-        // Price filter
         if (minPrice || maxPrice) {
             query.price = {};
             if (minPrice) query.price.$gte = parseInt(minPrice);
             if (maxPrice) query.price.$lte = parseInt(maxPrice);
         }
 
-        // Search query (title, location, description)
         if (q) {
             const searchRegex = { $regex: q, $options: 'i' };
             query.$or = [
@@ -682,7 +929,6 @@ app.get("/api/public/properties", async (req, res) => {
 
         const properties = await Property.find(query).sort({ createdAt: -1 }).lean();
 
-        // Return only public fields
         const publicProps = properties.map(p => ({
             id: p._id,
             title: p.title,
@@ -704,8 +950,6 @@ app.get("/api/public/properties", async (req, res) => {
         res.status(500).json({ error: "Failed to fetch properties" });
     }
 });
-
-
 
 app.get('/api/properties/:id', authenticateToken, async (req, res) => {
     try {
