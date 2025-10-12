@@ -1310,6 +1310,84 @@
             }
         }
 
+        .skill-tag {
+            display: inline-block;
+            background: #007bff;
+            color: white;
+            padding: 4px 8px;
+            margin: 2px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .skill-remove {
+            background: none;
+            border: none;
+            color: white;
+            margin-left: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .skill-badge {
+            display: inline-block;
+            background: #e9ecef;
+            color: #333;
+            padding: 2px 6px;
+            margin: 1px;
+            border-radius: 8px;
+            font-size: 11px;
+        }
+
+        .skills-container {
+            margin-top: 10px;
+            min-height: 40px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 8px;
+        }
+
+        .skills-display {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 8px;
+        }
+
+        .social-link {
+            color: #3182ce;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+        }
+
+        .social-link:hover {
+            color: #2c5282;
+            transform: scale(1.1);
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .badge-sale { background: #e3f2fd; color: #1976d2; }
+        .badge-rent { background: #f3e5f5; color: #7b1fa2; }
+        .badge-success { background: #e8f5e8; color: #2e7d32; }
+        .badge-new { background: #fff3e0; color: #f57c00; }
+        .badge-pending { background: #fff3e0; color: #f57c00; }
+        .badge-completed { background: #e8f5e8; color: #2e7d32; }
+        .badge-valuation { background: #e3f2fd; color: #1976d2; }
+        .badge-management { background: #e8f5e8; color: #2e7d32; }
+        .badge-brokerage { background: #f3e5f5; color: #7b1fa2; }
+        .badge-survey { background: #fff3e0; color: #f57c00; }
+
     </style>
 </head>
 <body>
@@ -2080,11 +2158,10 @@
     </div>
 </div>
 
-
-   
-
 <script>
-
+// ============================================== 
+// EMBEDDED DASHBOARD.JS CODE - ALL FUNCTIONALITY
+// ==============================================
 
 // Dashboard JavaScript
 class AdminDashboard {
@@ -2134,7 +2211,6 @@ class AdminDashboard {
     }
 
     // Skills management setup
-    // Skills management setup
 setupSkillsInput() {
     const skillInput = document.getElementById('skillInput');
     if (skillInput) {
@@ -2157,7 +2233,6 @@ setupSkillsInput() {
 
     // Ensure hidden input is updated before form submit
     const teamForm = document.getElementById('teamForm');
-    console.log('Skills hidden input value:', document.getElementById('skillsHidden').value);
     if (teamForm) {
         teamForm.addEventListener('submit', () => {
             this.updateSkillsHidden();
@@ -2207,7 +2282,6 @@ updateSkillsHidden() {
     const hiddenInput = document.getElementById('skillsHidden');
     if (hiddenInput) {
         hiddenInput.value = JSON.stringify(this.skills);
-        console.log("hidden skills are:", hiddenInput.value);
     }
 }
 
@@ -2810,60 +2884,6 @@ function closeModal(modalId) {
 // Initialize dashboard
 const dashboard = new AdminDashboard();
 
-// Add some CSS for badges
-const additionalStyles = `
-<style>
-    .badge {
-        padding: 4px 8px;
-        border-radius: 12px;
-        font-size: 11px;
-        font-weight: 600;
-        text-transform: uppercase;
-    }
-    
-    .badge-sale { background: #e3f2fd; color: #1976d2; }
-    .badge-rent { background: #f3e5f5; color: #7b1fa2; }
-    .badge-success { background: #e8f5e8; color: #2e7d32; }
-    .badge-new { background: #fff3e0; color: #f57c00; }
-    .badge-pending { background: #fff3e0; color: #f57c00; }
-    .badge-completed { background: #e8f5e8; color: #2e7d32; }
-    .badge-valuation { background: #e3f2fd; color: #1976d2; }
-    .badge-management { background: #e8f5e8; color: #2e7d32; }
-    .badge-brokerage { background: #f3e5f5; color: #7b1fa2; }
-    .badge-survey { background: #fff3e0; color: #f57c00; }
-
-    .skill-tag {
-        display: inline-block;
-        background: #007bff;
-        color: white;
-        padding: 4px 8px;
-        margin: 2px;
-        border-radius: 12px;
-        font-size: 12px;
-    }
-
-    .skill-remove {
-        background: none;
-        border: none;
-        color: white;
-        margin-left: 4px;
-        cursor: pointer;
-        font-weight: bold;
-    }
-
-    .skill-badge {
-        display: inline-block;
-        background: #e9ecef;
-        color: #333;
-        padding: 2px 6px;
-        margin: 1px;
-        border-radius: 8px;
-        font-size: 11px;
-    }
-</style>
-`;
-
-document.head.insertAdjacentHTML('beforeend', additionalStyles);
 // ==============================================
 // CONFIGURATION - Works on both local and production
 // ==============================================
@@ -2872,12 +2892,8 @@ const API_BASE_URL = `${window.location.origin}/api`;
 // Return headers with auth token
 function getAuthHeaders() {
     const token = localStorage.getItem("adminToken");
-    if (!token) {
-        console.error("No auth token found!");
-        window.location.href = '/admin/dashboard'; // Redirect to login
-        return {};
-    }
     return {
+        "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
     };
 }
