@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Property Details</title>
-    <link rel="icon" type="image/x-icon" href="images/company_logo_blue_color-removebg-preview.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * {
@@ -937,7 +936,7 @@ function showVisitModal(title, message, isSuccess) {
         // Create share buttons
         function createShareButtons(property) {
             const baseUrl = window.location.origin;
-            const shareUrl = `${baseUrl}/property/${property.id}`;
+            const shareUrl = `${baseUrl}/propertyDetails.html?id=${property.id}`;
             const formattedPrice = formatPrice(property.price, property.type);
             
             const shareText = `Check out this property: ${property.title} - ${formattedPrice} in ${property.location}`;
