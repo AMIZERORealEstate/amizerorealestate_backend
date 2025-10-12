@@ -36,15 +36,15 @@ let mongoClient;
 
 // Email Configuration
 const emailTransporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.EMAIL_USER || 'amizerorealestate@gmail.com',
-        pass: process.env.EMAIL_PASS
-    },
-    tls: {
-        rejectUnauthorized: false
-    }
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.EMAIL_USER || "amizerorealestate@gmail.com",
+    pass: process.env.EMAIL_PASS
+  }
 });
+
 
 // Cloudinary Storage Configuration
 const storage = new CloudinaryStorage({
