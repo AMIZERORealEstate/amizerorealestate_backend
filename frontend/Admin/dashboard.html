@@ -2312,7 +2312,16 @@ updateSkillsHidden() {
 
             if (response.ok) {
                 localStorage.setItem('adminToken', result.token);
+                console.log('Token saved to localStorage:', result.token);
                 this.showDashboard();
+                
+                // Load additional data after showing dashboard
+                setTimeout(() => {
+                    loadNewsletterSubscribers();
+                    loadDashboardOverview();
+                    loadScheduledVisits();
+                    loadCurrentValues();
+                }, 500);
             } else {
                 this.showError('loginError', result.message || 'Invalid credentials');
             }
@@ -2361,7 +2370,16 @@ updateSkillsHidden() {
     showDashboard() {
         document.getElementById('loginPage').style.display = 'none';
         document.getElementById('dashboardPage').style.display = 'block';
-        this.loadDashboardData();
+        
+        // Wait a bit to ensure dashboard is visible before loading data
+        setTimeout(() => {
+            this.loadDashboardData();
+            // Load the standalone function data
+            loadNewsletterSubscribers();
+            loadDashboardOverview();
+            loadScheduledVisits();
+            loadCurrentValues();
+        }, 300);
     }
 
     // Dashboard data loading
@@ -2905,6 +2923,8 @@ function getAuthHeaders() {
 // ==============================================
 async function loadNewsletterSubscribers() {
     const token = localStorage.getItem('adminToken');
+    console.log('Newsletter - Token check:', token ? 'Token exists' : 'No token found');
+    
     if (!token) {
         console.warn("No token available for newsletter");
         return;
@@ -2917,6 +2937,8 @@ async function loadNewsletterSubscribers() {
                 'Content-Type': 'application/json'
             }
         });
+
+        console.log('Newsletter response status:', res.status);
 
         if (res.status === 401 || res.status === 403) {
             console.error('Newsletter authentication failed');
@@ -2946,6 +2968,8 @@ async function loadNewsletterSubscribers() {
             `;
             tbody.appendChild(tr);
         });
+        
+        console.log('Newsletter loaded successfully:', data.subscribers.length, 'subscribers');
     } catch (err) {
         console.error("Failed to load newsletter subscribers", err);
         const tbody = document.getElementById('newsletterTableBody');
@@ -3498,14 +3522,28 @@ document.getElementById('achievementForm').addEventListener('submit', async func
 // INITIALIZATION
 // ==============================================
 document.addEventListener('DOMContentLoaded', function() {
-    loadNewsletterSubscribers();
-    loadDashboardOverview();
-    loadScheduledVisits();
-    loadCurrentValues();
+    // Check if user is already logged in
+    const token = localStorage.getItem('adminToken');
     
-    // Refresh data every 30 seconds
-    setInterval(loadScheduledVisits, 30000);
-    setInterval(loadCurrentValues, 30000);
+    if (token) {
+        console.log('Found existing token, loading dashboard data...');
+        // Small delay to ensure DOM is ready
+        setTimeout(() => {
+            loadNewsletterSubscribers();
+            loadDashboardOverview();
+            loadScheduledVisits();
+            loadCurrentValues();
+        }, 500);
+    }
+    
+    // Refresh data every 30 seconds if logged in
+    setInterval(() => {
+        const currentToken = localStorage.getItem('adminToken');
+        if (currentToken) {
+            loadScheduledVisits();
+            loadDashboardOverview();
+        }
+    }, 30000);
 });
 </script>
 
