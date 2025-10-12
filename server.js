@@ -28,7 +28,6 @@ const mongoConfig = {
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'frontend')));
 app.use(express.static('public'));
 
 // MongoDB Connection Variables
@@ -96,16 +95,8 @@ async function createDefaultAdmin() {
     }
 }
 
-// Routes
 
-// Home route
-// Serve static frontend files
-app.use(express.static(path.join(__dirname, 'frontend')));
 
-// Home route
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
-});
 
 // Contact Form Submission
 app.post('/api/contact', async (req, res) => {
@@ -371,10 +362,6 @@ app.get('/api/health', async (req, res) => {
 
 
 
-
-app.get('/admin/dashboard', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'Admin', 'dashboard.html'));
-});
 // MongoDB Schemas
 
 const AdminSchema = new mongoose.Schema({
@@ -2217,6 +2204,22 @@ app.get('/api/export/properties', authenticateToken, async (req, res) => {
         console.error('Properties export error:', error);
         res.status(500).json({ message: 'Error exporting properties data' });
     }
+});
+
+
+// ==================== FRONTEND SERVING (ADD HERE!) ====================
+// This should be AFTER all /api/* routes but BEFORE error handlers
+
+app.use(express.static(path.join(__dirname, 'frontend')));
+
+// Specific routes
+app.get('/admin/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'Admin', 'dashboard.html'));
+});
+
+// Home route
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
 });
 
 
