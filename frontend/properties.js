@@ -17,7 +17,7 @@ const filterTabs = document.querySelectorAll('.filter-tab');
 const applyFiltersBtn = document.getElementById('applyFilters');
 const clearFiltersBtn = document.getElementById('clearFilters');
 
-const API_URL = "http://localhost:2000/api/public/properties";
+const API_URL = `${window.location.origin}/api/public/properties`;
 
 // ------------------- RENDER PROPERTIES -------------------
 function renderProperties(properties) {
