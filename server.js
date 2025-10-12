@@ -743,12 +743,12 @@ app.get('/property/:id', async (req, res) => {
     <!-- Redirect script for JavaScript-enabled browsers -->
     <script>
         // Redirect to the actual property details page with query parameter
-        window.location.href = '/property-details.html?id=${property._id}';
+        window.location.href = '/propertyDetails.html?id=${property._id}';
     </script>
     
     <!-- Noscript fallback -->
     <noscript>
-        <meta http-equiv="refresh" content="0;url=/property-details.html?id=${property._id}">
+        <meta http-equiv="refresh" content="0;url=/propertyDetails.html?id=${property._id}">
     </noscript>
 </head>
 <body>
@@ -794,7 +794,7 @@ app.get('/property/:id', async (req, res) => {
             
             <div style="padding: 1.5rem; background: #edf2f7; border-radius: 8px; text-align: center;">
                 <p style="margin-bottom: 1rem;">If you're not redirected automatically...</p>
-                <a href="/property-details.html?id=${property._id}" 
+                <a href="/propertyDetails.html?id=${property._id}" 
                    style="display: inline-block; padding: 0.75rem 1.5rem; background: #3182ce; color: white; text-decoration: none; border-radius: 6px; font-weight: 600;">
                     View Full Property Details
                 </a>
