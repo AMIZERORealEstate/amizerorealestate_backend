@@ -2630,51 +2630,93 @@ updateSkillsHidden() {
     }
 
     // Modal management
-    openModal(modalId, mode, data = null) {
-        const modal = document.getElementById(modalId);
-        const form = modal.querySelector('form');
+  openModal(modalId, mode, data = null) {
+    const modal = document.getElementById(modalId);
+    const form = modal.querySelector('form');
+    
+    if (mode === 'add') {
+        form.reset();
         
-        if (mode === 'add') {
-            form.reset();
-            this.skills = []; // Reset skills array
-            this.updateSkillsDisplay(); // Clear skills display
-            modal.querySelector('.modal-title').textContent = `Add ${modalId.replace('Modal', '')}`;
-            if (form.querySelector('input[type="hidden"]')) {
-                form.querySelector('input[type="hidden"]').value = '';
-            }
-        } else if (mode === 'edit' && data) {
-            this.populateForm(form, data);
-            // Load existing skills if editing team member
-            if (data.skills && modalId === 'teamModal') {
-                this.skills = data.skills;
-                this.updateSkillsDisplay();
-            }
-            modal.querySelector('.modal-title').textContent = `Edit ${modalId.replace('Modal', '')}`;
+        // Reset hidden ID fields based on modal type
+        if (modalId === 'portfolioModal') {
+            document.getElementById('portfolioId').value = '';
+        } else if (modalId === 'propertyModal') {
+            const hiddenInput = form.querySelector('input[name="propertyId"]');
+            if (hiddenInput) hiddenInput.value = '';
+        } else if (modalId === 'teamModal') {
+            const hiddenInput = form.querySelector('input[name="teamId"]');
+            if (hiddenInput) hiddenInput.value = '';
         }
         
-        modal.style.display = 'block';
+        // Reset skills for team modal
+        if (modalId === 'teamModal') {
+            this.skills = [];
+            this.updateSkillsDisplay();
+        }
+        
+        modal.querySelector('.modal-title').textContent = `Add ${modalId.replace('Modal', '')}`;
+    } else if (mode === 'edit' && data) {
+        this.populateForm(form, data);
+        
+        // Populate hidden ID field
+        if (modalId === 'portfolioModal' && data._id) {
+            document.getElementById('portfolioId').value = data._id;
+        }
+        
+        // Load existing skills if editing team member
+        if (data.skills && modalId === 'teamModal') {
+            this.skills = data.skills;
+            this.updateSkillsDisplay();
+        }
+        
+        modal.querySelector('.modal-title').textContent = `Edit ${modalId.replace('Modal', '')}`;
     }
+    
+    modal.style.display = 'block';
+}
 
-    closeModal(modalId) {
-        document.getElementById(modalId).style.display = 'none';
-    }
 
     populateForm(form, data) {
-        Object.keys(data).forEach(key => {
-            const input = form.querySelector(`[name="${key}"], #${form.id.replace('Form', '')}${key.charAt(0).toUpperCase() + key.slice(1)}`);
-            if (input) {
-                input.value = data[key];
-            }
-        });
+    Object.keys(data).forEach(key => {
+        // Try to find input by name attribute first
+        let input = form.querySelector(`[name="${key}"]`);
         
-        if (data._id) {
-            const hiddenInput = form.querySelector('input[type="hidden"]');
-            if (hiddenInput) {
-                hiddenInput.value = data._id;
+        // If not found, try by ID (legacy support)
+        if (!input) {
+            const formPrefix = form.id.replace('Form', '');
+            const inputId = `${formPrefix}${key.charAt(0).toUpperCase() + key.slice(1)}`;
+            input = document.getElementById(inputId);
+        }
+        
+        if (input) {
+            // Handle date fields specially
+            if (input.type === 'date' && data[key]) {
+                const dateValue = new Date(data[key]);
+                if (!isNaN(dateValue.getTime())) {
+                    // Format date as YYYY-MM-DD for date input
+                    input.value = dateValue.toISOString().split('T')[0];
+                }
+            } 
+            // Handle file inputs (skip them)
+            else if (input.type === 'file') {
+                // Don't set value for file inputs
+                console.log(`Skipping file input: ${key}`);
+            }
+            // Handle all other inputs
+            else {
+                input.value = data[key] || '';
             }
         }
+    });
+    
+    // Set hidden ID field if present
+    if (data._id) {
+        const hiddenInput = form.querySelector('input[type="hidden"]');
+        if (hiddenInput) {
+            hiddenInput.value = data._id;
+        }
     }
-
+}
     // CRUD Operations
     async handlePropertySubmit(e) {
         e.preventDefault();
@@ -2737,32 +2779,102 @@ updateSkillsHidden() {
     }
 
     async handlePortfolioSubmit(e) {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        const isEdit = formData.get('portfolioId');
+    e.preventDefault();
+    
+    console.log('📝 Starting portfolio submission...');
+    
+    const formData = new FormData(e.target);
+    const portfolioId = document.getElementById('portfolioId').value;
+    const isEdit = portfolioId && portfolioId.trim() !== '';
 
-        try {
-            const url = isEdit ? `/portfolio/${formData.get('portfolioId')}` : '/portfolio';
-            const method = isEdit ? 'PUT' : 'POST';
-            
-            const response = await this.authenticatedFetch(url, {
-                method,
-                body: formData
-            });
-
-            if (response.ok) {
-                this.showMessage('portfolioMessage', `Portfolio ${isEdit ? 'updated' : 'added'} successfully!`, 'success');
-                this.closeModal('portfolioModal');
-                this.loadPortfolio();
-                this.loadStats();
-            } else {
-                const error = await response.json();
-                this.showMessage('portfolioMessage', error.message, 'error');
-            }
-        } catch (error) {
-            this.showMessage('portfolioMessage', 'Error saving portfolio item', 'error');
-        }
+    // Debug: Log all form data
+    console.log('Form data entries:');
+    for (let [key, value] of formData.entries()) {
+        console.log(`  ${key}:`, value);
     }
+
+    // ✅ IMPORTANT: Validate required fields before submission
+    const title = formData.get('title');
+    const category = formData.get('category');
+    const description = formData.get('description');
+    const date = formData.get('date');
+
+    if (!title || !category || !description || !date) {
+        console.error('❌ Missing required fields');
+        this.showMessage('portfolioMessage', 'Please fill in all required fields (Title, Category, Description, Date)', 'error');
+        return;
+    }
+
+    // ✅ Validate date format
+    const dateObj = new Date(date);
+    if (isNaN(dateObj.getTime())) {
+        console.error('❌ Invalid date:', date);
+        this.showMessage('portfolioMessage', 'Please provide a valid date', 'error');
+        return;
+    }
+
+    console.log('✅ Validation passed');
+    console.log('Date parsed as:', dateObj.toISOString());
+
+    try {
+        const url = isEdit ? `/api/portfolio/${portfolioId}` : '/api/portfolio';
+        const method = isEdit ? 'PUT' : 'POST';
+        
+        console.log(`📤 Sending ${method} request to:`, url);
+
+        const response = await this.authenticatedFetch(url, {
+            method,
+            body: formData
+        });
+
+        console.log('📥 Response status:', response.status);
+
+        const result = await response.json();
+        console.log('📥 Response data:', result);
+
+        if (response.ok) {
+            console.log('✅ Portfolio saved successfully');
+            this.showMessage(
+                'portfolioMessage', 
+                `Portfolio ${isEdit ? 'updated' : 'added'} successfully!`, 
+                'success'
+            );
+            this.closeModal('portfolioModal');
+            
+            // Reset form
+            e.target.reset();
+            document.getElementById('portfolioId').value = '';
+            
+            // Reload data
+            await this.loadPortfolio();
+            await this.loadStats();
+        } else {
+            console.error('❌ Server returned error:', result);
+            
+            // Show detailed error message
+            let errorMessage = result.message || 'Failed to save portfolio item';
+            
+            if (result.errors && Array.isArray(result.errors)) {
+                errorMessage += '\n\nDetails:\n';
+                result.errors.forEach(err => {
+                    errorMessage += `- ${err.field}: ${err.message}\n`;
+                });
+            }
+            
+            this.showMessage('portfolioMessage', errorMessage, 'error');
+        }
+    } catch (error) {
+        console.error('❌ Portfolio submission error:', error);
+        console.error('Error details:', error.message);
+        console.error('Error stack:', error.stack);
+        
+        this.showMessage(
+            'portfolioMessage', 
+            'Network error. Please check your connection and try again.', 
+            'error'
+        );
+    }
+}
 
     // Edit methods
     async editProperty(id) {

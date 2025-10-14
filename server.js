@@ -1469,8 +1469,13 @@ app.get('/api/public/portfolio', async (req, res) => {
 
 
 
+// FIXED Portfolio POST endpoint - Replace in your server.js
+
 app.post('/api/portfolio', authenticateToken, upload.array('images', 5), async (req, res) => {
     try {
+        console.log('📝 Portfolio creation request body:', req.body);
+        console.log('📸 Uploaded files:', req.files?.length || 0);
+
         const portfolioData = { ...req.body };
 
         // Handle Cloudinary file uploads
@@ -1478,52 +1483,85 @@ app.post('/api/portfolio', authenticateToken, upload.array('images', 5), async (
             portfolioData.images = req.files
                 .map(file => file.path || file.url)
                 .filter(url => typeof url === 'string');
+            console.log('✅ Images processed:', portfolioData.images.length);
         } else {
             portfolioData.images = [];
         }
 
-        // ✅ FIX 1: Keep value as STRING (schema expects string)
+        // ✅ FIX 1: Ensure value is a string (not a number)
         if (portfolioData.value) {
             portfolioData.value = String(portfolioData.value).trim();
         }
 
         // ✅ FIX 2: Validate and convert date properly
         if (portfolioData.date) {
+            // Try to parse the date
             const dateObj = new Date(portfolioData.date);
+            
+            // Check if the date is valid
             if (isNaN(dateObj.getTime())) {
-                console.error('Invalid date:', portfolioData.date);
-                return res.status(400).json({ message: 'Invalid date format provided' });
+                console.error('❌ Invalid date provided:', portfolioData.date);
+                return res.status(400).json({ 
+                    message: 'Invalid date format. Please provide a valid date.' 
+                });
             }
+            
             portfolioData.date = dateObj;
+            console.log('✅ Date parsed:', dateObj);
         } else {
-            return res.status(400).json({ message: 'Date is required' });
+            console.error('❌ No date provided');
+            return res.status(400).json({ 
+                message: 'Date is required for portfolio items' 
+            });
         }
 
-        // ✅ FIX 3: Validate required enum fields
+        // ✅ FIX 3: Validate category field
         const validCategories = ['valuation', 'management', 'brokerage', 'survey', 'development'];
-        if (!portfolioData.category || !validCategories.includes(portfolioData.category)) {
+        if (!portfolioData.category) {
+            console.error('❌ No category provided');
+            return res.status(400).json({ 
+                message: 'Category is required' 
+            });
+        }
+        
+        if (!validCategories.includes(portfolioData.category)) {
+            console.error('❌ Invalid category:', portfolioData.category);
             return res.status(400).json({ 
                 message: `Invalid category. Must be one of: ${validCategories.join(', ')}` 
             });
         }
 
+        // ✅ FIX 4: Validate status field
         const validStatuses = ['completed', 'ongoing', 'planned'];
         if (portfolioData.status && !validStatuses.includes(portfolioData.status)) {
+            console.error('❌ Invalid status:', portfolioData.status);
             return res.status(400).json({ 
                 message: `Invalid status. Must be one of: ${validStatuses.join(', ')}` 
             });
         }
 
-        // ✅ FIX 4: Validate required fields
+        // ✅ FIX 5: Validate required fields
         if (!portfolioData.title || !portfolioData.description) {
+            console.error('❌ Missing required fields');
             return res.status(400).json({ 
                 message: 'Title and description are required fields' 
             });
         }
 
-        // Save to DB
+        // ✅ FIX 6: Log the data before saving
+        console.log('💾 Attempting to save portfolio with data:', {
+            title: portfolioData.title,
+            category: portfolioData.category,
+            date: portfolioData.date,
+            status: portfolioData.status,
+            hasImages: portfolioData.images.length > 0
+        });
+
+        // Create and save portfolio
         const portfolio = new Portfolio(portfolioData);
         await portfolio.save();
+
+        console.log('✅ Portfolio created successfully:', portfolio._id);
 
         // Log activity (wrapped to prevent failure)
         try {
@@ -1534,25 +1572,51 @@ app.post('/api/portfolio', authenticateToken, upload.array('images', 5), async (
                 req.admin?.adminId
             );
         } catch (logError) {
-            console.error('Activity logging failed:', logError.message);
+            console.error('⚠️ Activity logging failed:', logError.message);
+            // Don't fail the request if activity logging fails
         }
 
-        res.status(201).json(portfolio);
+        res.status(201).json({
+            success: true,
+            portfolio,
+            message: 'Portfolio item created successfully'
+        });
+
     } catch (error) {
-        console.error('Portfolio creation error:', error.message);
-        console.error('Error details:', error);
+        console.error('❌ Portfolio creation error:', error);
+        console.error('Error name:', error.name);
+        console.error('Error message:', error.message);
+        console.error('Error stack:', error.stack);
         
         // Handle Mongoose validation errors
         if (error.name === 'ValidationError') {
-            const errors = Object.values(error.errors).map(err => err.message);
+            const errors = Object.values(error.errors).map(err => ({
+                field: err.path,
+                message: err.message
+            }));
+            
+            console.error('Validation errors:', errors);
+            
             return res.status(400).json({ 
+                success: false,
                 message: 'Validation failed', 
                 errors: errors 
             });
         }
 
+        // Handle duplicate key errors
+        if (error.code === 11000) {
+            return res.status(400).json({ 
+                success: false,
+                message: 'A portfolio item with this data already exists' 
+            });
+        }
+
+        // Generic error response
         res.status(500).json({ 
-            message: error.message || 'Error creating portfolio item',
+            success: false,
+            message: 'Error creating portfolio item',
+            error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error',
             details: process.env.NODE_ENV === 'development' ? error.stack : undefined
         });
     }
