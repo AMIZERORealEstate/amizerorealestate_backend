@@ -1472,40 +1472,76 @@ app.get('/api/public/portfolio', async (req, res) => {
 
 app.post('/api/portfolio', authenticateToken, upload.array('images', 5), async (req, res) => {
     try {
+        console.log('📥 Portfolio Request body:', req.body);
+        console.log('📸 Portfolio Files:', req.files);
+        console.log('👤 Admin:', req.admin);
+
         const portfolioData = { ...req.body };
 
         // Handle Cloudinary file uploads
         if (req.files && req.files.length > 0) {
             portfolioData.images = req.files
-                .map(file => file.path || file.url)   // Cloudinary gives `path` or `url`
+                .map(file => file.path || file.url)
                 .filter(url => typeof url === 'string');
         } else {
             portfolioData.images = [];
         }
 
-        // (Optional) Convert fields if you expect numbers/dates
-        if (portfolioData.value) portfolioData.value = parseFloat(portfolioData.value);
-        if (portfolioData.date) portfolioData.date = new Date(portfolioData.date);
+        // ⚠️ FIX: Keep value as STRING (schema expects string, not number)
+        // Don't convert to number - schema is type: String
+        if (portfolioData.value) {
+            portfolioData.value = String(portfolioData.value);
+        }
+
+        // ⚠️ FIX: Validate date before conversion
+        if (portfolioData.date) {
+            const dateObj = new Date(portfolioData.date);
+            if (isNaN(dateObj.getTime())) {
+                return res.status(400).json({ message: 'Invalid date format' });
+            }
+            portfolioData.date = dateObj;
+        }
+
+        // Validate required fields
+        if (!portfolioData.title || !portfolioData.category || !portfolioData.description || !portfolioData.date) {
+            return res.status(400).json({ 
+                message: 'Missing required fields: title, category, description, and date are required' 
+            });
+        }
+
+        console.log('💾 Portfolio data to save:', portfolioData);
 
         // Save to DB
         const portfolio = new Portfolio(portfolioData);
         await portfolio.save();
 
-        // Log activity (if you want like properties)
-        await logActivity(
-            'Portfolio Created',
-            `New portfolio item "${portfolio.title}" was added`,
-            'portfolio',
-            req.admin.adminId
-        );
+        console.log('✅ Portfolio saved:', portfolio._id);
+
+        // Log activity (wrapped in try-catch to prevent it from breaking the response)
+        try {
+            await logActivity(
+                'Portfolio Created',
+                `New portfolio item "${portfolio.title}" was added`,
+                'portfolio',
+                req.admin?.adminId || null
+            );
+        } catch (logError) {
+            console.error('⚠️ Activity logging failed (non-critical):', logError);
+        }
 
         res.status(201).json(portfolio);
     } catch (error) {
-        console.error('Portfolio creation error:', error);
-        res.status(400).json({ message: error.message || 'Error creating portfolio item' });
+        console.error('❌ Portfolio creation error:', error);
+        console.error('Error stack:', error.stack);
+        
+        // Send 500 for server errors, 400 for validation errors
+        const statusCode = error.name === 'ValidationError' ? 400 : 500;
+        res.status(statusCode).json({ 
+            message: error.message || 'Error creating portfolio item',
+            error: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        });
     }
 });
-
 
 app.put('/api/portfolio/:id', authenticateToken, upload.array('images', 5), async (req, res) => {
     try {
