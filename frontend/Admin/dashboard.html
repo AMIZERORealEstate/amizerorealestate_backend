@@ -2630,93 +2630,51 @@ updateSkillsHidden() {
     }
 
     // Modal management
-  openModal(modalId, mode, data = null) {
-    const modal = document.getElementById(modalId);
-    const form = modal.querySelector('form');
-    
-    if (mode === 'add') {
-        form.reset();
+    openModal(modalId, mode, data = null) {
+        const modal = document.getElementById(modalId);
+        const form = modal.querySelector('form');
         
-        // Reset hidden ID fields based on modal type
-        if (modalId === 'portfolioModal') {
-            document.getElementById('portfolioId').value = '';
-        } else if (modalId === 'propertyModal') {
-            const hiddenInput = form.querySelector('input[name="propertyId"]');
-            if (hiddenInput) hiddenInput.value = '';
-        } else if (modalId === 'teamModal') {
-            const hiddenInput = form.querySelector('input[name="teamId"]');
-            if (hiddenInput) hiddenInput.value = '';
+        if (mode === 'add') {
+            form.reset();
+            this.skills = []; // Reset skills array
+            this.updateSkillsDisplay(); // Clear skills display
+            modal.querySelector('.modal-title').textContent = `Add ${modalId.replace('Modal', '')}`;
+            if (form.querySelector('input[type="hidden"]')) {
+                form.querySelector('input[type="hidden"]').value = '';
+            }
+        } else if (mode === 'edit' && data) {
+            this.populateForm(form, data);
+            // Load existing skills if editing team member
+            if (data.skills && modalId === 'teamModal') {
+                this.skills = data.skills;
+                this.updateSkillsDisplay();
+            }
+            modal.querySelector('.modal-title').textContent = `Edit ${modalId.replace('Modal', '')}`;
         }
         
-        // Reset skills for team modal
-        if (modalId === 'teamModal') {
-            this.skills = [];
-            this.updateSkillsDisplay();
-        }
-        
-        modal.querySelector('.modal-title').textContent = `Add ${modalId.replace('Modal', '')}`;
-    } else if (mode === 'edit' && data) {
-        this.populateForm(form, data);
-        
-        // Populate hidden ID field
-        if (modalId === 'portfolioModal' && data._id) {
-            document.getElementById('portfolioId').value = data._id;
-        }
-        
-        // Load existing skills if editing team member
-        if (data.skills && modalId === 'teamModal') {
-            this.skills = data.skills;
-            this.updateSkillsDisplay();
-        }
-        
-        modal.querySelector('.modal-title').textContent = `Edit ${modalId.replace('Modal', '')}`;
+        modal.style.display = 'block';
     }
-    
-    modal.style.display = 'block';
-}
 
+    closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
 
     populateForm(form, data) {
-    Object.keys(data).forEach(key => {
-        // Try to find input by name attribute first
-        let input = form.querySelector(`[name="${key}"]`);
-        
-        // If not found, try by ID (legacy support)
-        if (!input) {
-            const formPrefix = form.id.replace('Form', '');
-            const inputId = `${formPrefix}${key.charAt(0).toUpperCase() + key.slice(1)}`;
-            input = document.getElementById(inputId);
-        }
-        
-        if (input) {
-            // Handle date fields specially
-            if (input.type === 'date' && data[key]) {
-                const dateValue = new Date(data[key]);
-                if (!isNaN(dateValue.getTime())) {
-                    // Format date as YYYY-MM-DD for date input
-                    input.value = dateValue.toISOString().split('T')[0];
-                }
-            } 
-            // Handle file inputs (skip them)
-            else if (input.type === 'file') {
-                // Don't set value for file inputs
-                console.log(`Skipping file input: ${key}`);
+        Object.keys(data).forEach(key => {
+            const input = form.querySelector(`[name="${key}"], #${form.id.replace('Form', '')}${key.charAt(0).toUpperCase() + key.slice(1)}`);
+            if (input) {
+                input.value = data[key];
             }
-            // Handle all other inputs
-            else {
-                input.value = data[key] || '';
+        });
+        
+        if (data._id) {
+            const hiddenInput = form.querySelector('input[type="hidden"]');
+            if (hiddenInput) {
+                hiddenInput.value = data._id;
             }
-        }
-    });
-    
-    // Set hidden ID field if present
-    if (data._id) {
-        const hiddenInput = form.querySelector('input[type="hidden"]');
-        if (hiddenInput) {
-            hiddenInput.value = data._id;
         }
     }
-}
+
     // CRUD Operations
     async handlePropertySubmit(e) {
         e.preventDefault();
@@ -2876,6 +2834,8 @@ updateSkillsHidden() {
         );
     }
 }
+
+
     // Edit methods
     async editProperty(id) {
         try {
