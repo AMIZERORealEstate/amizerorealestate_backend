@@ -1469,13 +1469,8 @@ app.get('/api/public/portfolio', async (req, res) => {
 
 
 
-
 app.post('/api/portfolio', authenticateToken, upload.array('images', 5), async (req, res) => {
     try {
-        console.log('📥 Portfolio Request body:', req.body);
-        console.log('📸 Portfolio Files:', req.files);
-        console.log('👤 Admin:', req.admin);
-
         const portfolioData = { ...req.body };
 
         // Handle Cloudinary file uploads
@@ -1487,58 +1482,78 @@ app.post('/api/portfolio', authenticateToken, upload.array('images', 5), async (
             portfolioData.images = [];
         }
 
-        // ⚠️ FIX: Keep value as STRING (schema expects string, not number)
-        // Don't convert to number - schema is type: String
+        // ✅ FIX 1: Keep value as STRING (schema expects string)
         if (portfolioData.value) {
-            portfolioData.value = String(portfolioData.value);
+            portfolioData.value = String(portfolioData.value).trim();
         }
 
-        // ⚠️ FIX: Validate date before conversion
+        // ✅ FIX 2: Validate and convert date properly
         if (portfolioData.date) {
             const dateObj = new Date(portfolioData.date);
             if (isNaN(dateObj.getTime())) {
-                return res.status(400).json({ message: 'Invalid date format' });
+                console.error('Invalid date:', portfolioData.date);
+                return res.status(400).json({ message: 'Invalid date format provided' });
             }
             portfolioData.date = dateObj;
+        } else {
+            return res.status(400).json({ message: 'Date is required' });
         }
 
-        // Validate required fields
-        if (!portfolioData.title || !portfolioData.category || !portfolioData.description || !portfolioData.date) {
+        // ✅ FIX 3: Validate required enum fields
+        const validCategories = ['valuation', 'management', 'brokerage', 'survey', 'development'];
+        if (!portfolioData.category || !validCategories.includes(portfolioData.category)) {
             return res.status(400).json({ 
-                message: 'Missing required fields: title, category, description, and date are required' 
+                message: `Invalid category. Must be one of: ${validCategories.join(', ')}` 
             });
         }
 
-        console.log('💾 Portfolio data to save:', portfolioData);
+        const validStatuses = ['completed', 'ongoing', 'planned'];
+        if (portfolioData.status && !validStatuses.includes(portfolioData.status)) {
+            return res.status(400).json({ 
+                message: `Invalid status. Must be one of: ${validStatuses.join(', ')}` 
+            });
+        }
+
+        // ✅ FIX 4: Validate required fields
+        if (!portfolioData.title || !portfolioData.description) {
+            return res.status(400).json({ 
+                message: 'Title and description are required fields' 
+            });
+        }
 
         // Save to DB
         const portfolio = new Portfolio(portfolioData);
         await portfolio.save();
 
-        console.log('✅ Portfolio saved:', portfolio._id);
-
-        // Log activity (wrapped in try-catch to prevent it from breaking the response)
+        // Log activity (wrapped to prevent failure)
         try {
             await logActivity(
                 'Portfolio Created',
                 `New portfolio item "${portfolio.title}" was added`,
                 'portfolio',
-                req.admin?.adminId || null
+                req.admin?.adminId
             );
         } catch (logError) {
-            console.error('⚠️ Activity logging failed (non-critical):', logError);
+            console.error('Activity logging failed:', logError.message);
         }
 
         res.status(201).json(portfolio);
     } catch (error) {
-        console.error('❌ Portfolio creation error:', error);
-        console.error('Error stack:', error.stack);
+        console.error('Portfolio creation error:', error.message);
+        console.error('Error details:', error);
         
-        // Send 500 for server errors, 400 for validation errors
-        const statusCode = error.name === 'ValidationError' ? 400 : 500;
-        res.status(statusCode).json({ 
+        // Handle Mongoose validation errors
+        if (error.name === 'ValidationError') {
+            const errors = Object.values(error.errors).map(err => err.message);
+            return res.status(400).json({ 
+                message: 'Validation failed', 
+                errors: errors 
+            });
+        }
+
+        res.status(500).json({ 
             message: error.message || 'Error creating portfolio item',
-            error: process.env.NODE_ENV === 'development' ? error.stack : undefined
+            details: process.env.NODE_ENV === 'development' ? error.stack : undefined
         });
     }
 });
