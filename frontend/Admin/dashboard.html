@@ -2817,7 +2817,8 @@ updateSkillsHidden() {
     console.log('Date parsed as:', dateObj.toISOString());
 
     try {
-        const url = isEdit ? `/api/portfolio/${portfolioId}` : '/api/portfolio';
+        // ✅ FIX: Don't include /api prefix - authenticatedFetch adds it
+        const url = isEdit ? `/portfolio/${portfolioId}` : '/portfolio';
         const method = isEdit ? 'PUT' : 'POST';
         
         console.log(`📤 Sending ${method} request to:`, url);
@@ -2875,7 +2876,6 @@ updateSkillsHidden() {
         );
     }
 }
-
     // Edit methods
     async editProperty(id) {
         try {
