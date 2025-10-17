@@ -198,10 +198,9 @@
 
         /* Image Gallery */
         .image-gallery {
-            background: white;
-            border-radius: 20px;
+           
+            
             overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             margin-bottom: 40px;
         }
 
@@ -209,6 +208,7 @@
             height: 400px;
             position: relative;
             overflow: hidden;
+            border-radius: 20px;
         }
 
         .main-image img {
@@ -338,8 +338,10 @@
         .sidebar-section {
             background: white;
             border-radius: 20px;
-            padding: 30px;
+            padding: 27px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 1000px !important;
+            
         }
 
         .sidebar-section h3 {
@@ -458,6 +460,8 @@
             .hero-info h1 {
                 font-size: 2.5rem;
             }
+
+          
         }
 
         
@@ -471,6 +475,10 @@
                 
             }
             
+            .main-image{
+                width: 350px;
+                height: 350px;
+            }
 
             .hero-section {
                 padding: 60px 0 40px;
@@ -515,7 +523,7 @@
     <!-- Navigation Header -->
     <nav class="header-nav">
         <div class="nav-container">
-            <a href="javascript:history.back()" class="back-btn">
+            <a href="portfolio.html?=portfolio" class="back-btn">
                 <i class="fas fa-arrow-left"></i>
                 Back to Portfolio
             </a>

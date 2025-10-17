@@ -75,15 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Close modals when clicking outside
-    const successModalOverlay = document.getElementById('successModalOverlay');
-    if (successModalOverlay) {
-        successModalOverlay.addEventListener('click', function(e) {
-            if (e.target === this) {
-                hideModal('successModalOverlay');
-            }
-        });
-    }
+  
 
     const errorModalOverlay = document.getElementById('errorModalOverlay');
     if (errorModalOverlay) {

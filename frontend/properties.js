@@ -72,9 +72,11 @@ async function loadProperties() {
        
 
        
-
+        applySavedFavorites();
         hideLoading();
         renderProperties(currentProperties);
+        
+
 
     } catch (err) {
         console.error("Error loading properties:", err);
@@ -205,6 +207,71 @@ document.addEventListener("click", function (e) {
 
 
 
+// ======= FAVORITES SYSTEM =======
+
+// Load favorites from localStorage
+let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+
+// Apply favorites to currentProperties on load
+function applySavedFavorites() {
+    currentProperties.forEach(p => {
+        p.favorite = favorites.includes(p.id.toString());
+    });
+}
+
+// Save current favorites to localStorage
+function saveFavorites() {
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+}
+
+// Toggle favorite state (UI + storage)
+function toggleFavorite(propertyId) {
+    const property = currentProperties.find(p => p.id.toString() === propertyId);
+    if (property) {
+        property.favorite = !property.favorite;
+
+        if (property.favorite) {
+            favorites.push(property.id.toString());
+        } else {
+            favorites = favorites.filter(id => id !== property.id.toString());
+        }
+        saveFavorites();
+    }
+}
+
+// ======= CARD INTERACTIONS =======
+
+function setupCardInteractions() {
+    document.querySelectorAll('.property-favorite').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            toggleFavorite(this.dataset.id);
+            this.classList.toggle('active');
+        });
+    });
+}
+
+// ======= FAVORITE INSIDE MODAL =======
+
+function toggleModalFavorite(propertyId) {
+    const property = currentProperties.find(p => p.id.toString() === propertyId);
+    if (property) {
+        property.favorite = !property.favorite;
+
+        if (property.favorite) {
+            favorites.push(property.id.toString());
+        } else {
+            favorites = favorites.filter(id => id !== property.id.toString());
+        }
+        saveFavorites();
+
+        showPropertyDetails(propertyId);
+        const favoriteBtn = document.querySelector(`.property-favorite[data-id="${propertyId}"]`);
+        if (favoriteBtn) {
+            favoriteBtn.classList.toggle('active', property.favorite);
+        }
+    }
+}
 
 
 
@@ -225,15 +292,7 @@ function formatPrice(price, type) {
     return type === 'rent' ? `${formatted}/month` : formatted;
 }
 
-// ------------------- CARD INTERACTIONS -------------------
-function setupCardInteractions() {
-    document.querySelectorAll('.property-favorite').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            toggleFavorite(this.dataset.id);
-            this.classList.toggle('active');
-        });
-    });
+
 
     // UPDATED: Replace alert with modal
     document.querySelectorAll('.view-details').forEach(btn => {
@@ -250,13 +309,10 @@ function setupCardInteractions() {
             }
         });
     });
-}
 
 
-function toggleFavorite(propertyId) {
-    const property = currentProperties.find(p => p.id.toString() === propertyId);
-    if (property) property.favorite = !property.favorite;
-}
+
+
 
 // ------------------- LOADING STATES -------------------
 function showLoading() {
@@ -485,6 +541,9 @@ function showPropertyDetails(propertyId) {
     }
 }
 
+
+
+
 function closeModal() {
     document.getElementById('propertyModal').style.display = 'none';
     document.body.style.overflow = 'auto';
@@ -493,21 +552,8 @@ function closeModal() {
     stopImageCarousel();
 }
 
-// ===============================================
-// 6. KEEP YOUR EXISTING FUNCTIONS (unchanged)
-// ===============================================
 
-function toggleModalFavorite(propertyId) {
-    const property = currentProperties.find(p => p.id.toString() === propertyId);
-    if (property) {
-        property.favorite = !property.favorite;
-        showPropertyDetails(propertyId);
-        const favoriteBtn = document.querySelector(`.property-favorite[data-id="${propertyId}"]`);
-        if (favoriteBtn) {
-            favoriteBtn.classList.toggle('active', property.favorite);
-        }
-    }
-}
+
 
 
 
