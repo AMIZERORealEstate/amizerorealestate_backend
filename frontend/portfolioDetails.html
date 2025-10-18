@@ -205,7 +205,7 @@
         }
 
         .main-image {
-            height: 400px;
+            height: 600px;
             position: relative;
             overflow: hidden;
             border-radius: 20px;
@@ -1318,26 +1318,26 @@ renderProjectInfo(project) {
     }).join('');
 }
 
-    renderRelatedProjects(project) {
-        const self = this;
-        const relatedProjects = this.allProjects
-            .filter(function(item) { return item.category === project.category && item.title !== project.title; })
-            .slice(0, 3);
+   renderRelatedProjects(project) {
+    const self = this;
+    const relatedProjects = this.allProjects
+        .filter(function(item) { return item.category === project.category && item.title !== project.title; })
+        .slice(0, 3);
 
-        if (relatedProjects.length > 0) {
-            document.getElementById('related-projects').style.display = 'block';
+    if (relatedProjects.length > 0) {
+        document.getElementById('related-projects').style.display = 'block';
+        
+        const relatedHTML = relatedProjects.map(function(item) {
+            const imageContent = item.images && item.images.length > 0 
+                ? '<img src="' + item.images[0] + '" alt="' + item.title + '" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">'
+                : '<div style="width: 60px; height: 60px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;"><i class="' + self.getCategoryIcon(item.category) + '"></i></div>';
             
-            const relatedHTML = relatedProjects.map(function(item) {
-                const imageContent = item.images && item.images.length > 0 
-                    ? '<img src="' + item.images[0] + '" alt="' + item.title + '" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">'
-                    : '<div style="width: 60px; height: 60px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;"><i class="' + self.getCategoryIcon(item.category) + '"></i></div>';
-                
-                return '<div class="related-project-item" onclick="window.location.href=\'portfolioDetails.html?id=' + (item.id || item._id) + '\'" style="display: flex; gap: 15px; padding: 15px; background: #f8f9fa; border-radius: 10px; margin-bottom: 15px; cursor: pointer; transition: all 0.3s ease;">' + imageContent + '<div style="flex: 1;"><h4 style="margin: 0 0 5px 0; font-size: 14px; color: #2c3e50;">' + item.title + '</h4><p style="margin: 0; font-size: 12px; color: #7f8c8d; line-height: 1.4;">' + item.description.substring(0, 60) + '...</p></div></div>';
-            }).join('');
+            return '<div class="related-project-item" onclick="window.location.href=\'portfolioDetails.html?id=' + (item.id || item._id) + '\'" style="display: flex; gap: 15px; padding: 15px; background: #f8f9fa; border-radius: 10px; margin-bottom: 15px; cursor: pointer; transition: all 0.3s ease;">' + imageContent + '<div style="flex: 1;"><h4 style="margin: 0 0 5px 0; font-size: 14px; color: #2c3e50;">' + item.title + '</h4><p style="margin: 0; font-size: 12px; color: #7f8c8d; line-height: 1.4;">' + item.description.substring(0, 60) + '...</p></div></div>';
+        }).join('');
 
-            document.getElementById('related-projects-list').innerHTML = relatedHTML;
-        }
+        document.getElementById('related-projects-list').innerHTML = relatedHTML;
     }
+}
 
     formatValue(value) {
         if (!value) return null;
