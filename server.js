@@ -58,6 +58,23 @@ emailTransporter.verify(function(error, success) {
   }
 });
 
+app.get("/test-email", async (req, res) => {
+  try {
+    const info = await emailTransporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: "yourpersonalemail@gmail.com", // test target
+      subject: "Render Email Test",
+      text: "If you see this email, Render SMTP is working."
+    });
+    console.log("📨 Email send result:", info);
+    res.json({ success: true, info });
+  } catch (err) {
+    console.error("❌ Email send failed:", err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+
 
 // Cloudinary Storage Configuration
 const storage = new CloudinaryStorage({
