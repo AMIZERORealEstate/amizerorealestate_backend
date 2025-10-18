@@ -1483,32 +1483,34 @@ app.get('/api/public/portfolio', async (req, res) => {
 
 app.post('/api/portfolio', authenticateToken, upload.array('images', 5), async (req, res) => {
     try {
-        console.log('📝 Portfolio creation request body:', req.body);
-        console.log('📸 Uploaded files:', req.files?.length || 0);
 
         const portfolioData = { ...req.body };
 
-        // Handle Cloudinary file uploads
+        // ✅ CRITICAL FIX: Handle Cloudinary file uploads properly
         if (req.files && req.files.length > 0) {
-            portfolioData.images = req.files
-                .map(file => file.path || file.url)
-                .filter(url => typeof url === 'string');
-            console.log('✅ Images processed:', portfolioData.images.length);
+            // Extract image URLs from Cloudinary response
+            portfolioData.images = req.files.map(file => {
+                // Cloudinary stores the URL in file.path
+                const imageUrl = file.path || file.url || file.secure_url;
+                console.log('🖼️ Processing image:', imageUrl);
+                return imageUrl;
+            }).filter(url => url && typeof url === 'string'); // Remove any invalid URLs
+            
+            
         } else {
+            
             portfolioData.images = [];
         }
 
-        // ✅ FIX 1: Ensure value is a string (not a number)
+        // ✅ Ensure value is a string (not a number)
         if (portfolioData.value) {
             portfolioData.value = String(portfolioData.value).trim();
         }
 
-        // ✅ FIX 2: Validate and convert date properly
+        // ✅ Validate and convert date properly
         if (portfolioData.date) {
-            // Try to parse the date
             const dateObj = new Date(portfolioData.date);
             
-            // Check if the date is valid
             if (isNaN(dateObj.getTime())) {
                 console.error('❌ Invalid date provided:', portfolioData.date);
                 return res.status(400).json({ 
@@ -1525,7 +1527,7 @@ app.post('/api/portfolio', authenticateToken, upload.array('images', 5), async (
             });
         }
 
-        // ✅ FIX 3: Validate category field
+        // ✅ Validate category field
         const validCategories = ['valuation', 'management', 'brokerage', 'survey', 'development'];
         if (!portfolioData.category) {
             console.error('❌ No category provided');
@@ -1541,7 +1543,7 @@ app.post('/api/portfolio', authenticateToken, upload.array('images', 5), async (
             });
         }
 
-        // ✅ FIX 4: Validate status field
+        // ✅ Validate status field
         const validStatuses = ['completed', 'ongoing', 'planned'];
         if (portfolioData.status && !validStatuses.includes(portfolioData.status)) {
             console.error('❌ Invalid status:', portfolioData.status);
@@ -1550,7 +1552,7 @@ app.post('/api/portfolio', authenticateToken, upload.array('images', 5), async (
             });
         }
 
-        // ✅ FIX 5: Validate required fields
+        // ✅ Validate required fields
         if (!portfolioData.title || !portfolioData.description) {
             console.error('❌ Missing required fields');
             return res.status(400).json({ 
@@ -1558,38 +1560,28 @@ app.post('/api/portfolio', authenticateToken, upload.array('images', 5), async (
             });
         }
 
-        // ✅ FIX 6: Log the data before saving
-        console.log('💾 Attempting to save portfolio with data:', {
-            title: portfolioData.title,
-            category: portfolioData.category,
-            date: portfolioData.date,
-            status: portfolioData.status,
-            hasImages: portfolioData.images.length > 0
-        });
+       
 
         // Create and save portfolio
         const portfolio = new Portfolio(portfolioData);
         await portfolio.save();
 
-        console.log('✅ Portfolio created successfully:', portfolio._id);
-
         // Log activity (wrapped to prevent failure)
         try {
             await logActivity(
                 'Portfolio Created',
-                `New portfolio item "${portfolio.title}" was added`,
+                `New portfolio item "${portfolio.title}" was added with ${portfolio.images.length} image(s)`,
                 'portfolio',
                 req.admin?.adminId
             );
         } catch (logError) {
             console.error('⚠️ Activity logging failed:', logError.message);
-            // Don't fail the request if activity logging fails
         }
 
         res.status(201).json({
             success: true,
             portfolio,
-            message: 'Portfolio item created successfully'
+            message: `Portfolio item created successfully with ${portfolio.images.length} image(s)`
         });
 
     } catch (error) {

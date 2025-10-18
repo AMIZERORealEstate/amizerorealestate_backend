@@ -692,66 +692,233 @@
         </div>
     </div>
 
+
+
     <script>
-        // Portfolio Details Manager
-        class PortfolioDetailsManager {
-            constructor() {
-                this.currentProject = null;
-                this.allProjects = [];
-                this.currentImageIndex = 0;
-                this.init();
+       // COMPLETE PORTFOLIO DETAILS MANAGER - WITH PDF DOWNLOAD
+// Replace ONLY the PortfolioDetailsManager class in your portfolioDetails.html
+
+class PortfolioDetailsManager {
+    constructor() {
+        this.currentProject = null;
+        this.allProjects = [];
+        this.currentImageIndex = 0;
+        this.init();
+    }
+
+    async init() {
+        try {
+            await this.loadProjectData();
+            this.renderProjectDetails();
+        } catch (error) {
+            console.error('❌ Error loading project details:', error);
+            this.showError();
+        }
+    }
+
+    async loadProjectData() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const projectId = urlParams.get('id');
+
+        console.log('🔍 Loading project with ID:', projectId);
+
+        if (!projectId) {
+            console.error('❌ No project ID specified in URL');
+            throw new Error('No project ID specified');
+        }
+
+        if (window.portfolioDetailsData) {
+            console.log('✅ Using cached portfolio data');
+            this.currentProject = window.portfolioDetailsData.selectedItem;
+            this.allProjects = window.portfolioDetailsData.allItems;
+            console.log('📦 Current project:', this.currentProject);
+            return;
+        }
+
+        console.log('🌐 Fetching portfolio data from API...');
+        try {
+            const response = await fetch('/api/public/portfolio');
+            
+            if (!response.ok) {
+                console.error('❌ API response not OK:', response.status);
+                throw new Error('Failed to fetch portfolio data');
+            }
+            
+            this.allProjects = await response.json();
+            console.log('✅ Fetched', this.allProjects.length, 'portfolio items');
+            
+            this.currentProject = this.allProjects.find(item => 
+                (item._id && item._id === projectId) || 
+                (item.id && item.id === projectId)
+            );
+            
+            if (!this.currentProject) {
+                console.log('⚠️ Not found by ID, trying title slug match...');
+                this.currentProject = this.allProjects.find(item => {
+                    const itemSlug = item.title.replace(/\s+/g, '-').toLowerCase();
+                    const searchSlug = projectId.toLowerCase();
+                    return itemSlug === searchSlug;
+                });
             }
 
-            async init() {
-                try {
-                    await this.loadProjectData();
-                    this.renderProjectDetails();
-                } catch (error) {
-                    console.error('Error loading project details:', error);
-                    this.showError();
+            if (!this.currentProject) {
+                console.error('❌ Project not found with ID:', projectId);
+                throw new Error('Project not found');
+            }
+            
+            console.log('✅ Found project:', this.currentProject.title);
+            
+        } catch (error) {
+            console.error('❌ Error fetching portfolio data:', error);
+            throw new Error('Failed to load project data: ' + error.message);
+        }
+    }
+
+    renderProjectDetails() {
+        if (!this.currentProject) {
+            console.error('❌ No current project to render');
+            this.showError();
+            return;
+        }
+
+        const project = this.currentProject;
+        console.log('🎨 Rendering project details for:', project.title);
+
+        try {
+            document.getElementById('loading-state').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+
+            document.title = project.title + ' - Portfolio Details';
+            
+            const breadcrumbTitle = document.getElementById('breadcrumb-title');
+            if (breadcrumbTitle) breadcrumbTitle.textContent = project.title;
+
+            const categoryEl = document.getElementById('project-category');
+            const titleEl = document.getElementById('project-title');
+            const descEl = document.getElementById('project-description');
+            
+            if (categoryEl) categoryEl.textContent = this.getCategoryDisplayName(project.category);
+            if (titleEl) titleEl.textContent = project.title;
+            if (descEl) descEl.textContent = project.description;
+
+            this.renderHeroStats(project);
+            this.renderImageGallery(project);
+            this.renderProjectInfo(project);
+            this.renderRelatedProjects(project);
+            
+            console.log('✅ Project details rendered successfully');
+            
+        } catch (error) {
+            console.error('❌ Error rendering project details:', error);
+            this.showError();
+        }
+    }
+
+    renderImageGallery(project) {
+        const mainImage = document.getElementById('main-image');
+        const thumbnailGrid = document.getElementById('thumbnail-grid');
+        const imageCounter = document.getElementById('image-counter');
+
+        if (!mainImage) {
+            console.error('❌ Main image container not found');
+            return;
+        }
+
+        console.log('🖼️ Rendering gallery for project:', project.title);
+        console.log('🖼️ Project images:', project.images);
+
+        if (project.images && Array.isArray(project.images) && project.images.length > 0) {
+            console.log('✅ Found', project.images.length, 'images');
+            
+            mainImage.innerHTML = `
+                <img src="${project.images[0]}" 
+                     alt="${project.title}" 
+                     onerror="this.parentElement.innerHTML='<div class=\\'image-placeholder\\'><i class=\\'fas fa-image\\'></i></div>'">
+            `;
+            
+            if (project.images.length > 1) {
+                if (imageCounter) {
+                    imageCounter.style.display = 'block';
+                    
+                    const currentImageEl = document.getElementById('current-image');
+                    const totalImagesEl = document.getElementById('total-images');
+                    
+                    if (currentImageEl) currentImageEl.textContent = '1';
+                    if (totalImagesEl) totalImagesEl.textContent = project.images.length.toString();
                 }
+
+                if (thumbnailGrid) {
+                    thumbnailGrid.style.display = 'grid';
+                    
+                    const thumbnailsHTML = project.images.map((image, index) => `
+                        <div class="thumbnail ${index === 0 ? 'active' : ''}" 
+                             onclick="window.portfolioDetails.showImage(${index})"
+                             data-index="${index}">
+                            <img src="${image}" 
+                                 alt="${project.title} ${index + 1}"
+                                 onerror="this.parentElement.innerHTML='<div class=\\'thumbnail-placeholder\\'><i class=\\'fas fa-image\\'></i></div>'">
+                        </div>
+                    `).join('');
+
+                    thumbnailGrid.innerHTML = thumbnailsHTML;
+                    console.log('✅ Thumbnails rendered');
+                }
+            } else {
+                console.log('ℹ️ Single image, hiding thumbnails');
+                if (imageCounter) imageCounter.style.display = 'none';
+                if (thumbnailGrid) thumbnailGrid.style.display = 'none';
             }
+        } else {
+            console.log('ℹ️ No images found, showing placeholder');
+            const categoryIcon = this.getCategoryIcon(project.category);
+            mainImage.innerHTML = `
+                <div class="image-placeholder">
+                    <i class="${categoryIcon}"></i>
+                </div>
+            `;
+            
+            if (imageCounter) imageCounter.style.display = 'none';
+            if (thumbnailGrid) thumbnailGrid.style.display = 'none';
+        }
+    }
 
+    showImage(index) {
+        if (!this.currentProject.images || index >= this.currentProject.images.length) return;
 
-         downloadBrochure() {
+        this.currentImageIndex = index;
+        
+        const mainImage = document.getElementById('main-image');
+        mainImage.innerHTML = `<img src="${this.currentProject.images[index]}" alt="${this.currentProject.title}">`;
+        
+        const currentImageEl = document.getElementById('current-image');
+        if (currentImageEl) {
+            currentImageEl.textContent = (index + 1).toString();
+        }
+        
+        document.querySelectorAll('.thumbnail').forEach((thumb, i) => {
+            thumb.classList.toggle('active', i === index);
+        });
+    }
+
+    // ✅ DOWNLOAD BROCHURE METHOD WITH IMAGES
+async downloadBrochure() {
     if (!this.currentProject) return;
     
     const project = this.currentProject;
-    
-    // Create a new jsPDF instance
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     
-    // Set up colors and fonts
-    const primaryColor = [102, 126, 234]; // #667eea
-    const textColor = [44, 62, 80];       // #2c3e50
-    const lightGray = [127, 140, 141];    // #7f8c8d
+    const primaryColor = [102, 126, 234];
+    const textColor = [44, 62, 80];
+    const lightGray = [127, 140, 141];
     
     let yPosition = 15;
     const leftMargin = 20;
     const pageWidth = doc.internal.pageSize.width;
     
-    // Helper function to add text with proper spacing and page breaks
-    const addText = (text, fontSize = 10, color = textColor, isBold = false) => {
-        // Check if we need a new page
-        if (yPosition > doc.internal.pageSize.height - 40) {
-            doc.addPage();
-            yPosition = 15;
-        }
+    const addSection = (title, spacing) => {
+        spacing = spacing || 15;
         
-        doc.setFontSize(fontSize);
-        doc.setTextColor(...color);
-        if (isBold) {
-            doc.setFont(undefined, 'bold');
-        } else {
-            doc.setFont(undefined, 'normal');
-        }
-        doc.text(text, leftMargin, yPosition);
-        yPosition += fontSize * 0.4 + 2;
-    };
-    
-    const addSection = (title, spacing = 15) => {
-        // Check if we need a new page for the section
         if (yPosition > doc.internal.pageSize.height - 60) {
             doc.addPage();
             yPosition = 15;
@@ -759,33 +926,33 @@
         
         yPosition += spacing;
         doc.setFontSize(12);
-        doc.setTextColor(...primaryColor);
-        doc.setFont(undefined, 'bold');
-        doc.text(title, leftMargin, yPosition);
+        doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+        doc.setFont('helvetica', 'bold');
+        // Clean the title text
+        const cleanTitle = title.replace(/[^\x00-\x7F]/g, '').trim();
+        doc.text(cleanTitle, leftMargin, yPosition);
         
-        // Add underline
-        const textWidth = doc.getTextWidth(title);
-        doc.setDrawColor(...primaryColor);
+        const textWidth = doc.getTextWidth(cleanTitle);
+        doc.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2]);
         doc.line(leftMargin, yPosition + 2, leftMargin + textWidth, yPosition + 2);
         yPosition += 9;
     };
     
-    // Header with logo area
-    doc.setFillColor(...primaryColor);
+    // Header
+    doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
     doc.rect(0, 0, pageWidth, 25, 'F');
     
-    // Add logo to header
     try {
         const logoPath = 'images/AMR_LOGO_white_color-removebg-preview.png';
-        doc.addImage(logoPath, 'PNG', leftMargin, 5, 15, 15); // x, y, width, height
+        doc.addImage(logoPath, 'PNG', leftMargin, 5, 15, 15);
     } catch (error) {
-        console.warn('Logo not found, using text fallback');
+        console.warn('Logo not found');
     }
     
     doc.setFontSize(18);
     doc.setTextColor(255, 255, 255);
     doc.setFont(undefined, 'bold');
-    doc.text('AMIZERO REAL ESTATE', leftMargin + 20, 15); // Adjusted position for logo
+    doc.text('AMIZERO REAL ESTATE', leftMargin + 20, 15);
     
     doc.setFontSize(10);
     doc.setFont(undefined, 'normal');
@@ -794,33 +961,89 @@
     // Project Title
     yPosition = 35;
     doc.setFontSize(20);
-    doc.setTextColor(...textColor);
-    doc.setFont(undefined, 'bold');
-    doc.text(project.title, leftMargin, yPosition);
+    doc.setTextColor(textColor[0], textColor[1], textColor[2]);
+    doc.setFont('helvetica', 'bold');
+    const cleanTitle = project.title.replace(/[^\x00-\x7F]/g, '').trim();
+    doc.text(cleanTitle, leftMargin, yPosition);
     yPosition += 10;
     
-    // Category badge
     doc.setFontSize(10);
-    doc.setTextColor(...primaryColor);
-    doc.setFont(undefined, 'bold');
+    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+    doc.setFont('helvetica', 'bold');
     doc.text(this.getCategoryDisplayName(project.category).toUpperCase(), leftMargin, yPosition);
-    yPosition += 5;
+    yPosition += 15;
     
-    // Overview Section
+    // Add Project Images
+    if (project.images && project.images.length > 0) {
+        addSection('PROJECT IMAGES', 5);
+        
+        try {
+            const imagesToShow = project.images.slice(0, 4); // Show up to 4 images
+            const imagesPerRow = 2;
+            const imageWidth = 75;
+            const imageHeight = 55;
+            const imageSpacing = 10;
+            
+            for (let i = 0; i < imagesToShow.length; i++) {
+                const col = i % imagesPerRow;
+                const row = Math.floor(i / imagesPerRow);
+                
+                const xPos = leftMargin + (col * (imageWidth + imageSpacing));
+                const yPos = yPosition + (row * (imageHeight + imageSpacing));
+                
+                // Check if we need a new page
+                if (yPos + imageHeight > doc.internal.pageSize.height - 40) {
+                    doc.addPage();
+                    yPosition = 15;
+                    const newYPos = yPosition + (row * (imageHeight + imageSpacing));
+                    
+                    try {
+                        const imgData = await this.loadImageAsBase64(imagesToShow[i]);
+                        doc.addImage(imgData, 'JPEG', xPos, newYPos, imageWidth, imageHeight);
+                    } catch (err) {
+                        console.warn('Could not load image:', imagesToShow[i]);
+                    }
+                } else {
+                    try {
+                        const imgData = await this.loadImageAsBase64(imagesToShow[i]);
+                        doc.addImage(imgData, 'JPEG', xPos, yPos, imageWidth, imageHeight);
+                    } catch (err) {
+                        console.warn('Could not load image:', imagesToShow[i]);
+                    }
+                }
+            }
+            
+            yPosition += Math.ceil(imagesToShow.length / imagesPerRow) * (imageHeight + imageSpacing) + 5;
+            
+        } catch (error) {
+            console.warn('Error adding images to PDF:', error);
+        }
+    }
+    
+    // Overview
     addSection('PROJECT OVERVIEW');
     doc.setFontSize(10);
-    doc.setTextColor(...textColor);
-    doc.setFont(undefined, 'normal');
+    doc.setTextColor(textColor[0], textColor[1], textColor[2]);
+    doc.setFont('helvetica', 'normal');
     
-    // Split description into lines to fit page width
     const maxLineWidth = pageWidth - 40;
-    const descriptionLines = doc.splitTextToSize(project.description, maxLineWidth);
-    descriptionLines.forEach(line => {
+    // Clean and encode the description text properly
+    const cleanDescription = project.description
+        .replace(/[^\x00-\x7F]/g, '') // Remove non-ASCII characters
+        .replace(/\s+/g, ' ') // Normalize whitespace
+        .trim();
+    
+    const descriptionLines = doc.splitTextToSize(cleanDescription, maxLineWidth);
+    descriptionLines.forEach(function(line) {
+        if (yPosition > doc.internal.pageSize.height - 40) {
+            doc.addPage();
+            yPosition = 20;
+        }
         doc.text(line, leftMargin, yPosition);
-        yPosition += 9;
+        yPosition += 6;
     });
     
-    // Project Details Section
+    // Project Details
     addSection('PROJECT DETAILS');
     
     const details = [
@@ -832,58 +1055,24 @@
         { label: 'Status:', value: project.status || 'N/A' }
     ];
     
-    // Show ALL details, including N/A values to ensure completeness
-    details.forEach(detail => {
-        doc.setFont(undefined, 'bold');
-        doc.setTextColor(...textColor);
+    details.forEach(function(detail) {
+        if (yPosition > doc.internal.pageSize.height - 40) {
+            doc.addPage();
+            yPosition = 20;
+        }
+        
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(textColor[0], textColor[1], textColor[2]);
         doc.text(detail.label, leftMargin, yPosition);
         
-        doc.setFont(undefined, 'normal');
-        doc.setTextColor(...lightGray);
-        doc.text(detail.value, leftMargin + 50, yPosition);
-        yPosition += 9;
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(lightGray[0], lightGray[1], lightGray[2]);
+        const cleanValue = (detail.value || '').replace(/[^\x00-\x7F]/g, '').trim();
+        doc.text(cleanValue, leftMargin + 50, yPosition);
+        yPosition += 7;
     });
     
-    // Add specifications if available
-    const specs = [];
-    if (project.area) specs.push({ label: 'Total Area:', value: project.area });
-    if (project.floors) specs.push({ label: 'Floors:', value: project.floors });
-    if (project.units) specs.push({ label: 'Units:', value: project.units });
-    if (project.bedrooms) specs.push({ label: 'Bedrooms:', value: project.bedrooms });
-    if (project.bathrooms) specs.push({ label: 'Bathrooms:', value: project.bathrooms });
-    if (project.parking) specs.push({ label: 'Parking Spaces:', value: project.parking });
-    
-    // Add any additional project fields that might exist
-    if (project.architect) specs.push({ label: 'Architect:', value: project.architect });
-    if (project.contractor) specs.push({ label: 'Contractor:', value: project.contractor });
-    if (project.engineer) specs.push({ label: 'Engineer:', value: project.engineer });
-    if (project.features) specs.push({ label: 'Key Features:', value: Array.isArray(project.features) ? project.features.join(', ') : project.features });
-    if (project.amenities) specs.push({ label: 'Amenities:', value: Array.isArray(project.amenities) ? project.amenities.join(', ') : project.amenities });
-    
-    if (specs.length > 0) {
-        addSection('SPECIFICATIONS & ADDITIONAL DETAILS');
-        specs.forEach(spec => {
-            doc.setFont(undefined, 'bold');
-            doc.setTextColor(...textColor);
-            
-            // Handle long text that might wrap
-            const maxLabelWidth = 50;
-            const labelLines = doc.splitTextToSize(spec.label, maxLabelWidth);
-            const valueLines = doc.splitTextToSize(spec.value, pageWidth - leftMargin - 60);
-            
-            doc.text(labelLines[0], leftMargin, yPosition);
-            doc.setFont(undefined, 'normal');
-            doc.setTextColor(...lightGray);
-            
-            valueLines.forEach((line, index) => {
-                doc.text(line, leftMargin + 50, yPosition + (index * 12));
-            });
-            
-            yPosition += Math.max(labelLines.length, valueLines.length) * 12 + 3;
-        });
-    }
-    
-    // Contact Information Section
+    // Contact Information
     addSection('CONTACT INFORMATION');
     
     const contacts = [
@@ -892,34 +1081,69 @@
         { label: 'Office:', value: 'Kigali, Rwanda' }
     ];
     
-    contacts.forEach(contact => {
-        doc.setFont(undefined, 'bold');
-        doc.setTextColor(...textColor);
+    contacts.forEach(function(contact) {
+        if (yPosition > doc.internal.pageSize.height - 40) {
+            doc.addPage();
+            yPosition = 20;
+        }
+        
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(textColor[0], textColor[1], textColor[2]);
         doc.text(contact.label, leftMargin, yPosition);
         
-        doc.setFont(undefined, 'normal');
-        doc.setTextColor(...lightGray);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(lightGray[0], lightGray[1], lightGray[2]);
         doc.text(contact.value, leftMargin + 30, yPosition);
-        yPosition += 9;
+        yPosition += 7;
     });
     
     // Footer
     const footerY = doc.internal.pageSize.height - 20;
-    doc.setFillColor(...primaryColor);
+    doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
     doc.rect(0, footerY - 5, pageWidth, 25, 'F');
     
     doc.setFontSize(8);
     doc.setTextColor(255, 255, 255);
     doc.setFont(undefined, 'normal');
-    doc.text(`Generated on ${new Date().toLocaleDateString()}`, leftMargin, footerY + 5);
+    doc.text('Generated on ' + new Date().toLocaleDateString(), leftMargin, footerY + 5);
     doc.text('Amizero Real Estate - Your Trusted Property Partner', pageWidth - 100, footerY + 5);
     
-    // Show preview modal instead of auto-downloading
+    // Show preview
     this.showBrochurePreview(doc, project);
 }
 
+// ✅ HELPER METHOD TO LOAD IMAGES AS BASE64
+loadImageAsBase64(url) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'Anonymous';
+        
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            
+            try {
+                const dataURL = canvas.toDataURL('image/jpeg', 0.8);
+                resolve(dataURL);
+            } catch (err) {
+                reject(err);
+            }
+        };
+        
+        img.onerror = function() {
+            reject(new Error('Failed to load image'));
+        };
+        
+        img.src = url;
+    });
+}
+
+// ✅ SHOW BROCHURE PREVIEW METHOD
 showBrochurePreview(doc, project) {
-    // Create modal for preview
     const modal = document.createElement('div');
     modal.className = 'pdf-preview-modal';
     modal.innerHTML = `
@@ -944,530 +1168,215 @@ showBrochurePreview(doc, project) {
         </div>
     `;
     
-    // Add modal styles
     const style = document.createElement('style');
     style.textContent = `
         .pdf-preview-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8); display: flex;
+            justify-content: center; align-items: center; z-index: 10000;
         }
-        
         .pdf-preview-content {
-            background: white;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 900px;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            background: white; border-radius: 12px; width: 90%;
+            max-width: 900px; height: 90%; display: flex;
+            flex-direction: column; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
-        
         .pdf-preview-header {
-            padding: 20px 25px;
-            border-bottom: 2px solid #f0f2f5;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            padding: 20px 25px; border-bottom: 2px solid #f0f2f5;
+            display: flex; justify-content: space-between; align-items: center;
             background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border-radius: 12px 12px 0 0;
+            color: white; border-radius: 12px 12px 0 0;
         }
-        
-        .pdf-preview-header h3 {
-            margin: 0;
-            font-size: 1.3em;
-            font-weight: 600;
-        }
-        
+        .pdf-preview-header h3 { margin: 0; font-size: 1.3em; font-weight: 600; }
         .close-preview {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background 0.3s;
+            background: rgba(255, 255, 255, 0.2); border: none;
+            color: white; width: 35px; height: 35px; border-radius: 50%;
+            cursor: pointer; font-size: 16px; transition: background 0.3s;
         }
-        
-        .close-preview:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-        
-        .pdf-preview-body {
-            flex: 1;
-            padding: 20px;
-            overflow: hidden;
-        }
-        
+        .close-preview:hover { background: rgba(255, 255, 255, 0.3); }
+        .pdf-preview-body { flex: 1; padding: 20px; overflow: hidden; }
         .pdf-preview-footer {
-            padding: 20px 25px;
-            border-top: 2px solid #f0f2f5;
-            display: flex;
-            justify-content: flex-end;
-            gap: 15px;
-            background: #f8f9fa;
-            border-radius: 0 0 12px 12px;
+            padding: 20px 25px; border-top: 2px solid #f0f2f5;
+            display: flex; justify-content: flex-end; gap: 15px;
+            background: #f8f9fa; border-radius: 0 0 12px 12px;
         }
-        
         .pdf-preview-footer button {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            padding: 12px 24px; border: none; border-radius: 8px;
+            cursor: pointer; font-weight: 500; font-size: 14px;
+            display: flex; align-items: center; gap: 8px;
             transition: all 0.3s ease;
         }
-        
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-        
-        .btn-secondary:hover {
-            background: #5a6268;
-            transform: translateY(-1px);
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-        }
-        
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-secondary:hover { background: #5a6268; transform: translateY(-1px); }
+        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
         .btn-primary:hover {
             background: linear-gradient(135deg, #5a6fd8, #6a4190);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-        
-        @media (max-width: 768px) {
-            .pdf-preview-content {
-                width: 95%;
-                height: 90%;
-            }
-            
-            .pdf-preview-footer {
-                flex-direction: column;
-            }
-            
-            .pdf-preview-footer button {
-                width: 100%;
-                justify-content: center;
-            }
+            transform: translateY(-1px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
     `;
     
     document.head.appendChild(style);
     document.body.appendChild(modal);
     
-    // Store doc reference for download
     window.currentPdfDoc = doc;
     
-    // Generate PDF blob for preview
     const pdfBlob = doc.output('blob');
     const pdfUrl = URL.createObjectURL(pdfBlob);
     
-    // Set iframe source
     const iframe = document.getElementById('pdf-preview-frame');
     iframe.src = pdfUrl;
     
-    // Show feedback on button
     const btn = document.getElementById('download-btn');
-    const originalHTML = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-eye"></i> Preview Generated!';
-    btn.style.background = 'linear-gradient(135deg, #27ae60, #2ecc71)';
+    if (btn) {
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-eye"></i> Preview Generated!';
+        btn.style.background = 'linear-gradient(135deg, #27ae60, #2ecc71)';
+        
+        setTimeout(function() {
+            btn.innerHTML = originalHTML;
+            btn.style.background = '';
+        }, 2000);
+    }
     
-    setTimeout(() => {
-        btn.innerHTML = originalHTML;
-        btn.style.background = '';
-    }, 2000);
-    
-    // Clean up URL when modal is closed
-    modal.addEventListener('DOMNodeRemoved', () => {
+    modal.addEventListener('DOMNodeRemoved', function() {
         URL.revokeObjectURL(pdfUrl);
     });
 }
 
-            async loadProjectData() {
-                // Get project ID from URL
-                const urlParams = new URLSearchParams(window.location.search);
-                const projectId = urlParams.get('id');
+getCategoryDisplayName(category) {
+    const categoryNames = {
+        'valuation': 'Property Valuation',
+        'management': 'Property Management', 
+        'brokerage': 'Real Estate Brokerage',
+        'survey': 'Quantity Survey',
+        'development': 'Property Development'
+    };
+    return categoryNames[category] || category;
+}
 
-                if (!projectId) {
-                    throw new Error('No project ID specified');
-                }
+getCategoryIcon(category) {
+    const icons = {
+        'valuation': 'fas fa-calculator',
+        'management': 'fas fa-building',
+        'brokerage': 'fas fa-handshake',
+        'survey': 'fas fa-chart-line',
+        'development': 'fas fa-hammer'
+    };
+    return icons[category] || 'fas fa-home';
+}
 
-                // Try to get data from global variable first
-                if (window.portfolioDetailsData) {
-                    this.currentProject = window.portfolioDetailsData.selectedItem;
-                    this.allProjects = window.portfolioDetailsData.allItems;
-                    return;
-                }
+renderHeroStats(project) {
+    const statsGrid = document.getElementById('hero-stats-grid');
+    const stats = [];
 
-                // Fallback: Fetch from API
-                try {
-                    const response = await fetch('/api/public/portfolio');
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch portfolio data');
-                    }
-                    this.allProjects = await response.json();
-                    
-                    // Find the specific project
-                    this.currentProject = this.allProjects.find(item => 
-                        (item.id && item.id === projectId) || 
-                        item.title.replace(/\s+/g, '-').toLowerCase() === projectId
-                    );
+    if (project.value) {
+        stats.push({ icon: 'fas fa-dollar-sign', label: 'Project Value', value: this.formatValue(project.value) });
+    }
+    if (project.location) {
+        stats.push({ icon: 'fas fa-map-marker-alt', label: 'Location', value: project.location });
+    }
+    if (project.duration) {
+        stats.push({ icon: 'fas fa-clock', label: 'Duration', value: project.duration });
+    }
+    if (project.date) {
+        stats.push({ icon: 'fas fa-calendar', label: 'Completed', value: this.formatDate(project.date) });
+    }
 
-                    if (!this.currentProject) {
-                        throw new Error('Project not found');
-                    }
-                } catch (error) {
-                    throw new Error('Failed to load project data');
-                }
-            }
-
-            renderProjectDetails() {
-                if (!this.currentProject) {
-                    this.showError();
-                    return;
-                }
-
-                const project = this.currentProject;
-
-                // Hide loading, show content
-                document.getElementById('loading-state').style.display = 'none';
-                document.getElementById('main-content').style.display = 'block';
-
-                // Update page title and breadcrumb
-                document.title = project.title + ' - Portfolio Details';
-                document.getElementById('breadcrumb-title').textContent = project.title;
-
-                // Update hero section
-                document.getElementById('project-category').textContent = this.getCategoryDisplayName(project.category);
-                document.getElementById('project-title').textContent = project.title;
-                document.getElementById('project-description').textContent = project.description;
-
-                // Render hero stats
-                this.renderHeroStats(project);
-
-                // Render image gallery
-                this.renderImageGallery(project);
-
-                // Render project details
-                this.renderProjectInfo(project);
-
-                // Setup related projects
-                this.renderRelatedProjects(project);
-            }
-
-            getCategoryDisplayName(category) {
-                const categoryNames = {
-                    'valuation': 'Property Valuation',
-                    'management': 'Property Management', 
-                    'brokerage': 'Real Estate Brokerage',
-                    'survey': 'Quantity Survey',
-                    'development': 'Property Development'
-                };
-                return categoryNames[category] || category;
-            }
-
-            renderHeroStats(project) {
-                const statsGrid = document.getElementById('hero-stats-grid');
-                const stats = [];
-
-                // Generate key stats for hero section
-                if (project.value) {
-                    stats.push({
-                        icon: 'fas fa-dollar-sign',
-                        label: 'Project Value',
-                        value: this.formatValue(project.value)
-                    });
-                }
-
-                if (project.location) {
-                    stats.push({
-                        icon: 'fas fa-map-marker-alt',
-                        label: 'Location',
-                        value: project.location
-                    });
-                }
-
-                if (project.duration) {
-                    stats.push({
-                        icon: 'fas fa-clock',
-                        label: 'Duration',
-                        value: project.duration
-                    });
-                }
-
-                if (project.date) {
-                    stats.push({
-                        icon: 'fas fa-calendar',
-                        label: 'Completed',
-                        value: this.formatDate(project.date)
-                    });
-                }
-
-                const statsHTML = stats.map(stat => `
-                    <div class="stat-item">
-                        <div class="stat-icon">
-                            <i class="${stat.icon}"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="label">${stat.label}</div>
-                            <div class="value">${stat.value}</div>
-                        </div>
-                    </div>
-                `).join('');
-
-                statsGrid.innerHTML = statsHTML;
-            }
-
-            renderImageGallery(project) {
-                const mainImage = document.getElementById('main-image');
-                const thumbnailGrid = document.getElementById('thumbnail-grid');
-                const imageCounter = document.getElementById('image-counter');
-
-                if (project.images && project.images.length > 0) {
-                    // Show first image
-                    mainImage.innerHTML = `<img src="${project.images[0]}" alt="${project.title}">`;
-                    
-                    if (project.images.length > 1) {
-                        // Show counter and thumbnails
-                        imageCounter.style.display = 'block';
-                        thumbnailGrid.style.display = 'grid';
-                        
-                        document.getElementById('current-image').textContent = '1';
-                        document.getElementById('total-images').textContent = project.images.length.toString();
-
-                        // Generate thumbnails
-                        const thumbnailsHTML = project.images.map((image, index) => `
-                            <div class="thumbnail ${index === 0 ? 'active' : ''}" onclick="window.portfolioDetails.showImage(${index})">
-                                <img src="${image}" alt="${project.title} ${index + 1}">
-                            </div>
-                        `).join('');
-
-                        thumbnailGrid.innerHTML = thumbnailsHTML;
-                    }
-                } else {
-                    // Show category icon
-                    const categoryIcon = this.getCategoryIcon(project.category);
-                    mainImage.innerHTML = `
-                        <div class="image-placeholder">
-                            <i class="${categoryIcon}"></i>
-                        </div>
-                    `;
-                }
-            }
-
-            showImage(index) {
-                if (!this.currentProject.images || index >= this.currentProject.images.length) return;
-
-                this.currentImageIndex = index;
-                
-                // Update main image
-                const mainImage = document.getElementById('main-image');
-                mainImage.innerHTML = `<img src="${this.currentProject.images[index]}" alt="${this.currentProject.title}">`;
-                
-                // Update counter
-                document.getElementById('current-image').textContent = (index + 1).toString();
-                
-                // Update thumbnail active state
-                document.querySelectorAll('.thumbnail').forEach((thumb, i) => {
-                    thumb.classList.toggle('active', i === index);
-                });
-            }
-
-            getCategoryIcon(category) {
-                const icons = {
-                    'valuation': 'fas fa-calculator',
-                    'management': 'fas fa-building',
-                    'brokerage': 'fas fa-handshake',
-                    'survey': 'fas fa-chart-line',
-                    'development': 'fas fa-hammer'
-                };
-                return icons[category] || 'fas fa-home';
-            }
-
-            renderProjectInfo(project) {
-                // Overview details
-                const overviewDetails = document.getElementById('overview-details');
-                const overviewItems = [];
-
-                if (project.title) overviewItems.push({ label: 'Project Name', value: project.title });
-                if (project.category) overviewItems.push({ label: 'Category', value: this.getCategoryDisplayName(project.category) });
-                if (project.location) overviewItems.push({ label: 'Location', value: project.location });
-                if (project.date) overviewItems.push({ label: 'Date Completed', value: this.formatDate(project.date) });
-                if (project.duration) overviewItems.push({ label: 'Duration', value: project.duration });
-                if (project.client) overviewItems.push({ label: 'Client', value: project.client });
-                if (project.status) overviewItems.push({ label: 'Status', value: project.status });
-
-                overviewDetails.innerHTML = overviewItems.map(item => `
-                    <div class="detail-item">
-                        <span class="detail-label">${item.label}</span>
-                        <span class="detail-value">${item.value}</span>
-                    </div>
-                `).join('');
-
-                // Financial details (if available)
-                const financialItems = [];
-                if (project.value) financialItems.push({ label: 'Project Value', value: this.formatValue(project.value) });
-                if (project.budget) financialItems.push({ label: 'Budget', value: this.formatValue(project.budget) });
-                if (project.cost) financialItems.push({ label: 'Total Cost', value: this.formatValue(project.cost) });
-
-                if (financialItems.length > 0) {
-                    document.getElementById('financial-section').style.display = 'block';
-                    document.getElementById('financial-details').innerHTML = financialItems.map(item => `
-                        <div class="detail-item">
-                            <span class="detail-label">${item.label}</span>
-                            <span class="detail-value">${item.value}</span>
-                        </div>
-                    `).join('');
-                }
-
-                // Specifications (if available)
-                const specItems = [];
-                if (project.area) specItems.push({ label: 'Total Area', value: project.area });
-                if (project.floors) specItems.push({ label: 'Number of Floors', value: project.floors });
-                if (project.units) specItems.push({ label: 'Total Units', value: project.units });
-                if (project.bedrooms) specItems.push({ label: 'Bedrooms', value: project.bedrooms });
-                if (project.bathrooms) specItems.push({ label: 'Bathrooms', value: project.bathrooms });
-                if (project.parking) specItems.push({ label: 'Parking Spaces', value: project.parking });
-
-                if (specItems.length > 0) {
-                    document.getElementById('specifications-section').style.display = 'block';
-                    document.getElementById('specifications-details').innerHTML = specItems.map(item => `
-                        <div class="detail-item">
-                            <span class="detail-label">${item.label}</span>
-                            <span class="detail-value">${item.value}</span>
-                        </div>
-                    `).join('');
-                }
-
-                // Additional information
-                const additionalItems = [];
-                if (project.architect) additionalItems.push({ label: 'Architect', value: project.architect });
-                if (project.contractor) additionalItems.push({ label: 'Contractor', value: project.contractor });
-                if (project.engineer) additionalItems.push({ label: 'Engineer', value: project.engineer });
-                if (project.features) additionalItems.push({ label: 'Key Features', value: Array.isArray(project.features) ? project.features.join(', ') : project.features });
-                if (project.amenities) additionalItems.push({ label: 'Amenities', value: Array.isArray(project.amenities) ? project.amenities.join(', ') : project.amenities });
-
-                if (additionalItems.length > 0) {
-                    document.getElementById('additional-section').style.display = 'block';
-                    document.getElementById('additional-details').innerHTML = additionalItems.map(item => `
-                        <div class="detail-item">
-                            <span class="detail-label">${item.label}</span>
-                            <span class="detail-value">${item.value}</span>
-                        </div>
-                    `).join('');
-                }
-            }
-
-            renderRelatedProjects(project) {
-                // Find related projects (same category, excluding current)
-                const relatedProjects = this.allProjects
-                    .filter(item => item.category === project.category && item.title !== project.title)
-                    .slice(0, 3);
-
-                if (relatedProjects.length > 0) {
-                    document.getElementById('related-projects').style.display = 'block';
-                    
-                    const relatedHTML = relatedProjects.map(item => {
-                        const imageContent = item.images && item.images.length > 0 
-                            ? `<img src="${item.images[0]}" alt="${item.title}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">`
-                            : `<div style="width: 60px; height: 60px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;"><i class="${this.getCategoryIcon(item.category)}"></i></div>`;
-                        
-                        return `
-                            <div class="related-project-item" onclick="window.location.href='portfolioDetails.html?id=${item.id || item.title.replace(/\s+/g, '-').toLowerCase()}'" style="display: flex; gap: 15px; padding: 15px; background: #f8f9fa; border-radius: 10px; margin-bottom: 15px; cursor: pointer; transition: all 0.3s ease;">
-                                ${imageContent}
-                                <div style="flex: 1;">
-                                    <h4 style="margin: 0 0 5px 0; font-size: 14px; color: #2c3e50;">${item.title}</h4>
-                                    <p style="margin: 0; font-size: 12px; color: #7f8c8d; line-height: 1.4;">${item.description.substring(0, 60)}...</p>
-                                </div>
-                            </div>
-                        `;
-                    }).join('');
-
-                    document.getElementById('related-projects-list').innerHTML = relatedHTML;
-
-                    // Add hover effects
-                    document.querySelectorAll('.related-project-item').forEach(item => {
-                        item.addEventListener('mouseenter', () => {
-                            item.style.transform = 'translateX(5px)';
-                            item.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
-                        });
-                        item.addEventListener('mouseleave', () => {
-                            item.style.transform = 'translateX(0)';
-                            item.style.boxShadow = 'none';
-                        });
-                    });
-                }
-            }
-
-            formatValue(value) {
-                if (!value) return null;
-                
-                // If it's already formatted (contains RWF), return as is
-                if (value.includes && value.includes('RWF')) return value;
-                
-                // Try to format as currency if it's a number
-                const numValue = parseFloat(value.toString().replace(/[^\d.]/g, ''));
-                if (!isNaN(numValue)) {
-                    if (numValue >= 1000000000) {
-                        return `RWF ${(numValue / 1000000000).toFixed(1)}B`;
-                    } else if (numValue >= 1000000) {
-                        return `RWF ${(numValue / 1000000).toFixed(1)}M`;
-                    } else if (numValue >= 1000) {
-                        return `RWF ${(numValue / 1000).toFixed(0)}K`;
-                    }
-                    return `RWF ${numValue.toLocaleString()}`;
-                }
-                
-                return value;
-            }
-
-            formatDate(dateString) {
-                try {
-                    const date = new Date(dateString);
-                    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-                    return date.toLocaleDateString('en-US', options);
-                } catch (error) {
-                    return dateString;
-                }
-            }
-
-            showError() {
-                document.getElementById('loading-state').style.display = 'none';
-                document.getElementById('error-state').style.display = 'block';
-                document.getElementById('main-content').style.display = 'none';
-            }
-        }
-
-        // Initialize portfolio details manager
-        window.portfolioDetails = new PortfolioDetailsManager();
-
-        // Add CSS for related projects hover effect
-        const style = document.createElement('style');
-        style.textContent = `
-            .related-project-item:hover {
-                background: #e9ecef !important;
-            }
+    const statsHTML = stats.map(function(stat) {
+        return `
+            <div class="stat-item">
+                <div class="stat-icon"><i class="${stat.icon}"></i></div>
+                <div class="stat-content">
+                    <div class="label">${stat.label}</div>
+                    <div class="value">${stat.value}</div>
+                </div>
+            </div>
         `;
-        document.head.appendChild(style);
-    </script>
+    }).join('');
+
+    statsGrid.innerHTML = statsHTML;
+}
+
+renderProjectInfo(project) {
+    const overviewDetails = document.getElementById('overview-details');
+    const overviewItems = [];
+
+    if (project.title) overviewItems.push({ label: 'Project Name', value: project.title });
+    if (project.category) overviewItems.push({ label: 'Category', value: this.getCategoryDisplayName(project.category) });
+    if (project.location) overviewItems.push({ label: 'Location', value: project.location });
+    if (project.date) overviewItems.push({ label: 'Date Completed', value: this.formatDate(project.date) });
+    if (project.duration) overviewItems.push({ label: 'Duration', value: project.duration });
+    if (project.client) overviewItems.push({ label: 'Client', value: project.client });
+    if (project.status) overviewItems.push({ label: 'Status', value: project.status });
+
+    overviewDetails.innerHTML = overviewItems.map(function(item) {
+        return `
+            <div class="detail-item">
+                <span class="detail-label">${item.label}</span>
+                <span class="detail-value">${item.value}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+    renderRelatedProjects(project) {
+        const self = this;
+        const relatedProjects = this.allProjects
+            .filter(function(item) { return item.category === project.category && item.title !== project.title; })
+            .slice(0, 3);
+
+        if (relatedProjects.length > 0) {
+            document.getElementById('related-projects').style.display = 'block';
+            
+            const relatedHTML = relatedProjects.map(function(item) {
+                const imageContent = item.images && item.images.length > 0 
+                    ? '<img src="' + item.images[0] + '" alt="' + item.title + '" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">'
+                    : '<div style="width: 60px; height: 60px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;"><i class="' + self.getCategoryIcon(item.category) + '"></i></div>';
+                
+                return '<div class="related-project-item" onclick="window.location.href=\'portfolioDetails.html?id=' + (item.id || item._id) + '\'" style="display: flex; gap: 15px; padding: 15px; background: #f8f9fa; border-radius: 10px; margin-bottom: 15px; cursor: pointer; transition: all 0.3s ease;">' + imageContent + '<div style="flex: 1;"><h4 style="margin: 0 0 5px 0; font-size: 14px; color: #2c3e50;">' + item.title + '</h4><p style="margin: 0; font-size: 12px; color: #7f8c8d; line-height: 1.4;">' + item.description.substring(0, 60) + '...</p></div></div>';
+            }).join('');
+
+            document.getElementById('related-projects-list').innerHTML = relatedHTML;
+        }
+    }
+
+    formatValue(value) {
+        if (!value) return null;
+        if (value.includes && value.includes('RWF')) return value;
+        
+        const numValue = parseFloat(value.toString().replace(/[^\d.]/g, ''));
+        if (!isNaN(numValue)) {
+            if (numValue >= 1000000000) return 'RWF ' + (numValue / 1000000000).toFixed(1) + 'B';
+            else if (numValue >= 1000000) return 'RWF ' + (numValue / 1000000).toFixed(1) + 'M';
+            else if (numValue >= 1000) return 'RWF ' + (numValue / 1000).toFixed(0) + 'K';
+            return 'RWF ' + numValue.toLocaleString();
+        }
+        return value;
+    }
+
+    formatDate(dateString) {
+        try {
+            const date = new Date(dateString);
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        } catch (error) {
+            return dateString;
+        }
+    }
+
+    showError() {
+        document.getElementById('loading-state').style.display = 'none';
+        document.getElementById('error-state').style.display = 'block';
+        document.getElementById('main-content').style.display = 'none';
+    }
+}
+
+// Initialize
+window.portfolioDetails = new PortfolioDetailsManager();
+
+// Add CSS for related projects hover effect
+const style = document.createElement('style');
+style.textContent = '.related-project-item:hover { background: #e9ecef !important; }';
+document.head.appendChild(style);
+</script>
 </body>
 </html>
