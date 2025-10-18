@@ -6,7 +6,7 @@ const { MongoClient, ObjectId } = require('mongodb');
 const cors = require('cors');
 const path = require('path');
 const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 require('dotenv').config();
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
@@ -34,47 +34,21 @@ app.use(express.static('public'));
 let db;
 let mongoClient;
 
+// Resend Configuration
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Email Configuration
-const emailTransporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,  
-  secure: false,  
-  auth: {
-    user: process.env.EMAIL_USER || "amizerorealestate@gmail.com",
-    pass: process.env.EMAIL_PASS
-  },
-  tls: {
-    rejectUnauthorized: false  // Disable SSL verification
-  }
-});
-
-// Verify connection on startup
-emailTransporter.verify(function(error, success) {
-  if (error) {
-    console.error('❌ Email configuration error:', error);
-  } else {
-    console.log('✅ Email server is ready to send messages');
-  }
-});
-
-app.get("/test-email", async (req, res) => {
-  try {
-    const info = await emailTransporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: "yourpersonalemail@gmail.com", // test target
-      subject: "Render Email Test",
-      text: "If you see this email, Render SMTP is working."
-    });
-    console.log("📨 Email send result:", info);
-    res.json({ success: true, info });
-  } catch (err) {
-    console.error("❌ Email send failed:", err);
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
-
+// Verify Resend configuration on startup
+(async () => {
+    try {
+        if (!process.env.RESEND_API_KEY) {
+            console.error('❌ RESEND_API_KEY not found in environment variables');
+        } else {
+            console.log('✅ Resend API is configured');
+        }
+    } catch (error) {
+        console.error('❌ Resend configuration error:', error);
+    }
+})();
 
 // Cloudinary Storage Configuration
 const storage = new CloudinaryStorage({
@@ -125,9 +99,6 @@ async function createDefaultAdmin() {
     }
 }
 
-
-
-
 // Contact Form Submission
 app.post('/api/contact', async (req, res) => {
     try {
@@ -177,9 +148,30 @@ app.post('/api/contact', async (req, res) => {
         const collection = db.collection('contacts');
         const result = await collection.insertOne(contactData);
 
-        // Email content for admin
-        const adminEmailContent = {
-            from: process.env.EMAIL_USER,
+        // Send emails using Resend (don't wait for completion)
+        sendContactEmails(name, email, phone, service, message, result.insertedId)
+            .catch(err => console.error('Email sending error:', err));
+
+        res.json({
+            success: true,
+            contactId: result.insertedId
+        });
+
+    } catch (error) {
+        console.error('Contact form error:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to submit contact form. Please try again later.'
+        });
+    }
+});
+
+// Helper function to send contact emails using Resend
+async function sendContactEmails(name, email, phone, service, message, contactId) {
+    try {
+        // Send admin notification email
+        await resend.emails.send({
+            from: 'AMIZERO Real Estate <onboarding@resend.dev>', // Use your verified domain
             to: 'amizerorealestate@gmail.com',
             subject: '🏠 New Contact Request - AMIZERO Real Estate',
             html: `
@@ -202,16 +194,18 @@ app.post('/api/contact', async (req, res) => {
                         </div>
                         
                         <p style="margin-top: 20px; color: #7f8c8d; font-size: 0.9em;">
-                            Contact ID: ${result.insertedId}
+                            Contact ID: ${contactId}
                         </p>
                     </div>
                 </div>
             `
-        };
+        });
 
-        // Email content for customer
-        const customerEmailContent = {
-            from: process.env.EMAIL_USER,
+        console.log('✅ Admin notification email sent');
+
+        // Send customer confirmation email
+        await resend.emails.send({
+            from: 'AMIZERO Real Estate <onboarding@resend.dev>', // Use your verified domain
             to: email,
             subject: 'Thank you for contacting AMIZERO Real Estate',
             html: `
@@ -240,29 +234,15 @@ app.post('/api/contact', async (req, res) => {
                     </div>
                 </div>
             `
-        };
-
-        // Send emails (don't wait for completion)
-        emailTransporter.sendMail(adminEmailContent).catch(err => 
-            console.error('Admin email error:', err)
-        );
-        emailTransporter.sendMail(customerEmailContent).catch(err => 
-            console.error('Customer email error:', err)
-        );
-
-        res.json({
-            success: true,
-            contactId: result.insertedId
         });
+
+        console.log('✅ Customer confirmation email sent');
 
     } catch (error) {
-        console.error('Contact form error:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to submit contact form. Please try again later.'
-        });
+        console.error('❌ Error sending emails via Resend:', error);
+        throw error;
     }
-});
+}
 
 // Get all contacts (admin endpoint)
 app.get('/api/contacts', async (req, res) => {
