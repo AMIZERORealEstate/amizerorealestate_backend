@@ -14,6 +14,8 @@ const fs = require('fs');
 const multer = require('multer');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const cloudinary = require('./cloudinary');
+const cookieParser = require('cookie-parser');
+const { v4: uuidv4 } = require('uuid');
 
 const app = express();
 const PORT = process.env.PORT || 2000;
@@ -27,6 +29,7 @@ const mongoConfig = {
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
@@ -2322,6 +2325,131 @@ app.get('/api/export/properties', authenticateToken, async (req, res) => {
         res.status(500).json({ message: 'Error exporting properties data' });
     }
 });
+
+
+// In-memory storage (use database in production)
+let visitorStats = {
+  totalVisitors: 0,
+  uniqueVisitors: new Set(),
+  visitsByDate: {}
+};
+
+// Middleware to track visitors
+app.use((req, res, next) => {
+  // Skip tracking for API endpoints
+  if (req.path.startsWith('/api/')) {
+    return next();
+  }
+
+  let visitorId = req.cookies.visitor_id;
+  const isNewVisitor = !visitorId;
+
+  // Generate new visitor ID if doesn't exist
+  if (!visitorId) {
+    visitorId = uuidv4();
+    // Set cookie to expire in 2 years
+    res.cookie('visitor_id', visitorId, {
+      maxAge: 1000 * 60 * 60 * 24 * 365 * 2,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax'
+    });
+  }
+
+  // Track unique visitor
+  if (isNewVisitor) {
+    visitorStats.uniqueVisitors.add(visitorId);
+    visitorStats.totalVisitors++;
+
+    // Track by date
+    const today = new Date().toISOString().split('T')[0];
+    if (!visitorStats.visitsByDate[today]) {
+      visitorStats.visitsByDate[today] = 0;
+    }
+    visitorStats.visitsByDate[today]++;
+  }
+
+  next();
+});
+
+// API endpoint to get visitor statistics
+app.get('/api/visitor-stats', (req, res) => {
+  const today = new Date().toISOString().split('T')[0];
+  const todayVisitors = visitorStats.visitsByDate[today] || 0;
+
+  res.json({
+    totalVisitors: visitorStats.totalVisitors,
+    uniqueVisitors: visitorStats.uniqueVisitors.size,
+    todayVisitors: todayVisitors,
+    visitsByDate: visitorStats.visitsByDate
+  });
+});
+
+// API endpoint to manually increment (optional)
+app.post('/api/track-visit', (req, res) => {
+  let visitorId = req.cookies.visitor_id;
+  
+  if (!visitorId) {
+    visitorId = uuidv4();
+    res.cookie('visitor_id', visitorId, {
+      maxAge: 1000 * 60 * 60 * 24 * 365 * 2,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax'
+    });
+
+    visitorStats.uniqueVisitors.add(visitorId);
+    visitorStats.totalVisitors++;
+
+    const today = new Date().toISOString().split('T')[0];
+    if (!visitorStats.visitsByDate[today]) {
+      visitorStats.visitsByDate[today] = 0;
+    }
+    visitorStats.visitsByDate[today]++;
+  }
+
+  res.json({
+    success: true,
+    visitorId: visitorId,
+    isNewVisitor: !req.cookies.visitor_id
+  });
+});
+
+// Optional: Persist data to file/database
+
+const DATA_FILE = './visitor-data.json';
+
+// Load existing data on startup
+function loadVisitorData() {
+  try {
+    if (fs.existsSync(DATA_FILE)) {
+      const data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+      visitorStats.totalVisitors = data.totalVisitors || 0;
+      visitorStats.uniqueVisitors = new Set(data.uniqueVisitors || []);
+      visitorStats.visitsByDate = data.visitsByDate || {};
+    }
+  } catch (error) {
+    console.error('Error loading visitor data:', error);
+  }
+}
+
+// Save data periodically
+function saveVisitorData() {
+  try {
+    const data = {
+      totalVisitors: visitorStats.totalVisitors,
+      uniqueVisitors: Array.from(visitorStats.uniqueVisitors),
+      visitsByDate: visitorStats.visitsByDate
+    };
+    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+  } catch (error) {
+    console.error('Error saving visitor data:', error);
+  }
+}
+
+// Load data on startup
+loadVisitorData();
+setInterval(saveVisitorData, 5 * 60 * 1000);
 
 
 // ==================== FRONTEND SERVING (ADD HERE!) ====================

@@ -1388,6 +1388,18 @@
         .badge-brokerage { background: #f3e5f5; color: #7b1fa2; }
         .badge-survey { background: #fff3e0; color: #f57c00; }
 
+
+
+
+ /* Add styling for the visitors card icon */
+    .stat-icon.visitors {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .stat-info small {
+        display: block;
+        margin-top: 5px;
+    }
     </style>
 </head>
 <body>
@@ -1458,119 +1470,136 @@
 
         <main class="dashboard-content">
             <!-- Overview Section -->
-            <section id="overview" class="content-section active">
-
-
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon properties">
-                            <i class="fas fa-home"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3 id="propertiesCount">24</h3>
-                            <p>Total Properties</p>
-                        </div>
-                    </div>
-                 <!-- Total Scheduled Visits -->
-    <div class="stat-card">
-        <div class="stat-icon visits">
-            <i class="fas fa-calendar-alt"></i>
+<section id="overview" class="content-section active">
+    <div class="stats-grid">
+        <!-- Existing Properties Card -->
+        <div class="stat-card">
+            <div class="stat-icon properties">
+                <i class="fas fa-home"></i>
+            </div>
+            <div class="stat-info">
+                <h3 id="propertiesCount">24</h3>
+                <p>Total Properties</p>
+            </div>
         </div>
-        <div class="stat-info">
-            <h3 id="totalVisits">0</h3>
-            <p>Total Scheduled Visits</p>
+
+        <!-- NEW: Website Visitors Card -->
+        <div class="stat-card">
+            <div class="stat-icon visitors">
+                <i class="fas fa-eye"></i>
+            </div>
+            <div class="stat-info">
+                <h3 id="websiteVisitors">0</h3>
+                <p>Website Visitors</p>
+                <small id="todayVisitors" style="color: #000a9c; font-size: 1.5em;">Today: 0</small>
+            </div>
+        </div>
+
+        <!-- Total Scheduled Visits -->
+        <div class="stat-card">
+            <div class="stat-icon visits">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+            <div class="stat-info">
+                <h3 id="totalVisits">0</h3>
+                <p>Total Scheduled Visits</p>
+            </div>
+        </div>
+
+        <!-- Confirmed Visits -->
+        <div class="stat-card">
+            <div class="stat-icon confirmed">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-info">
+                <h3 id="confirmedVisits">0</h3>
+                <p>Confirmed Visits</p>
+            </div>
+        </div>
+
+        <!-- Pending Visits -->
+        <div class="stat-card">
+            <div class="stat-icon pending">
+                <i class="fas fa-hourglass-half"></i>
+            </div>
+            <div class="stat-info">
+                <h3 id="pendingVisits">0</h3>
+                <p>Pending Visits</p>
+            </div>
+        </div>
+
+        <!-- Team Members Card -->
+        <div class="stat-card">
+            <div class="stat-icon team">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-info">
+                <h3 id="teamCount">8</h3>
+                <p>Team Members</p>
+            </div>
+        </div>
+
+        <!-- Portfolio Card -->
+        <div class="stat-card">
+            <div class="stat-icon portfolio">
+                <i class="fas fa-briefcase"></i>
+            </div>
+            <div class="stat-info">
+                <h3 id="portfolioCount">16</h3>
+                <p>Portfolio Items</p>
+            </div>
         </div>
     </div>
 
-    <!-- Confirmed Visits -->
-    <div class="stat-card">
-        <div class="stat-icon confirmed">
-            <i class="fas fa-check-circle"></i>
+    <!-- Recent Activity Section -->
+    <div class="content-section active">
+        <div class="section-header">
+            <h2 class="section-title">Recent Activity</h2>
         </div>
-        <div class="stat-info">
-            <h3 id="confirmedVisits">0</h3>
-            <p>Confirmed Visits</p>
-        </div>
-    </div>
-
-    <!-- Pending Visits -->
-    <div class="stat-card">
-        <div class="stat-icon pending">
-            <i class="fas fa-hourglass-half"></i>
-        </div>
-        <div class="stat-info">
-            <h3 id="pendingVisits">0</h3>
-            <p>Pending Visits</p>
-        </div>
-    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon team">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3 id="teamCount">8</h3>
-                            <p>Team Members</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon portfolio">
-                            <i class="fas fa-briefcase"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3 id="portfolioCount">16</h3>
-                            <p>Portfolio Items</p>
-                        </div>
-                    </div>
+        <div id="recentActivity">
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class="fas fa-plus"></i>
                 </div>
-
-                <div class="content-section active">
-                    <div class="section-header">
-                        <h2 class="section-title">Recent Activity</h2>
-                    </div>
-                    <div id="recentActivity">
-                        <div class="activity-item">
-                            <div class="activity-icon">
-                                <i class="fas fa-plus"></i>
-                            </div>
-                            <div class="activity-content">
-                                <h4>New Property Added</h4>
-                                <p>Luxury Villa in Kicukiro has been added to the listings</p>
-                            </div>
-                            <div class="activity-time">2 hours ago</div>
-                        </div>
-                        <div class="activity-item">
-                            <div class="activity-icon">
-                                <i class="fas fa-envelope"></i>
-                            </div>
-                            <div class="activity-content">
-                                <h4>New Inquiry Received</h4>
-                                <p>Property valuation request from John Doe</p>
-                            </div>
-                            <div class="activity-time">4 hours ago</div>
-                        </div>
-                        <div class="activity-item">
-                            <div class="activity-icon">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div class="activity-content">
-                                <h4>Team Member Updated</h4>
-                                <p>Sarah Johnson's profile information updated</p>
-                            </div>
-                            <div class="activity-time">6 hours ago</div>
-                        </div>
-                        <div class="activity-item">
-                            <div class="activity-icon">
-                                <i class="fas fa-check"></i>
-                            </div>
-                            <div class="activity-content">
-                                <h4>Property Sale Completed</h4>
-                                <p>Apartment in Remera successfully sold</p>
-                            </div>
-                            <div class="activity-time">1 day ago</div>
-                        </div>
-                    </div>
+                <div class="activity-content">
+                    <h4>New Property Added</h4>
+                    <p>Luxury Villa in Kicukiro has been added to the listings</p>
                 </div>
-            </section>
+                <div class="activity-time">2 hours ago</div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div class="activity-content">
+                    <h4>New Inquiry Received</h4>
+                    <p>Property valuation request from John Doe</p>
+                </div>
+                <div class="activity-time">4 hours ago</div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="activity-content">
+                    <h4>Team Member Updated</h4>
+                    <p>Sarah Johnson's profile information updated</p>
+                </div>
+                <div class="activity-time">6 hours ago</div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="activity-content">
+                    <h4>Property Sale Completed</h4>
+                    <p>Apartment in Remera successfully sold</p>
+                </div>
+                <div class="activity-time">1 day ago</div>
+            </div>
+        </div>
+    </div>
+</section>
 
             <!-- Properties Section -->
             <section id="properties" class="content-section">
@@ -3663,6 +3692,42 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, 30000);
 });
+</script>
+
+
+<script>
+    // Fetch and update visitor statistics
+    async function updateVisitorStats() {
+        try {
+            const response = await fetch('/api/visitor-stats');
+            const data = await response.json();
+            
+            // Update the visitor count
+            document.getElementById('websiteVisitors').textContent = data.totalVisitors;
+            document.getElementById('todayVisitors').textContent = `Today: ${data.todayVisitors}`;
+        } catch (error) {
+            console.error('Error fetching visitor stats:', error);
+        }
+    }
+
+    // Track visitor on page load (optional - middleware already tracks)
+    async function trackVisit() {
+        try {
+            await fetch('/api/track-visit', {
+                method: 'POST',
+                credentials: 'include' // Important for cookies
+            });
+        } catch (error) {
+            console.error('Error tracking visit:', error);
+        }
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        updateVisitorStats();
+        // Refresh stats every 30 seconds
+        setInterval(updateVisitorStats, 30000);
+    });
 </script>
 
 </body>
