@@ -680,6 +680,12 @@
     }
 }
 
+@media (max-width: 480px){
+    .property-details-grid{
+        background-color: #007bff;
+    }
+}
+
 
 /* Modal contact Agent */
 /* Enhanced Contact Agent Modal Styles */

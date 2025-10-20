@@ -1,12 +1,12 @@
 // AMIZERO Real Estate Backend Server
-// Node.js + Express + MongoDB
+// Node.js + Express + MongoDB + Nodemailer
 
 const express = require('express');
 const { MongoClient, ObjectId } = require('mongodb');
 const cors = require('cors');
 const path = require('path');
 const jwt = require('jsonwebtoken');
-const { Resend } = require('resend');
+const nodemailer = require('nodemailer');
 require('dotenv').config();
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
@@ -37,19 +37,64 @@ app.use(express.static('public'));
 let db;
 let mongoClient;
 
-// Resend Configuration
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Nodemailer Configuration
+let transporter;
 
-// Verify Resend configuration on startup
+function createMailTransporter() {
+    // Configure based on your email provider
+    // Example configurations for different providers:
+    
+    // Gmail Configuration
+    if (process.env.EMAIL_SERVICE === 'gmail') {
+        transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS // Use App Password for Gmail
+            }
+        });
+    }
+    // Custom SMTP Configuration (recommended for production)
+    else {
+        transporter = nodemailer.createTransport({
+            host: process.env.SMTP_HOST || 'smtp.gmail.com',
+            port: process.env.SMTP_PORT || 587,
+            secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
+            },
+            tls: {
+                rejectUnauthorized: false
+            }
+        });
+    }
+
+    return transporter;
+}
+
+// Verify Nodemailer configuration on startup
 (async () => {
     try {
-        if (!process.env.RESEND_API_KEY) {
-            console.error('❌ RESEND_API_KEY not found in environment variables');
+        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+            console.error('❌ EMAIL_USER or EMAIL_PASSWORD not found in environment variables');
+            console.log('📝 Please add the following to your .env file:');
+            console.log('   EMAIL_SERVICE=gmail (or leave empty for custom SMTP)');
+            console.log('   EMAIL_USER=your-email@gmail.com');
+            console.log('   EMAIL_PASSWORD=your-app-password');
+            console.log('   SMTP_HOST=smtp.gmail.com (if using custom SMTP)');
+            console.log('   SMTP_PORT=587 (if using custom SMTP)');
         } else {
-            console.log('✅ Resend API is configured');
+            transporter = createMailTransporter();
+            await transporter.verify();
+            console.log('✅ Nodemailer is configured and ready to send emails');
         }
     } catch (error) {
-        console.error('❌ Resend configuration error:', error);
+        console.error('❌ Nodemailer configuration error:', error.message);
+        console.log('💡 If using Gmail, make sure to:');
+        console.log('   1. Enable 2-Factor Authentication');
+        console.log('   2. Generate an App Password at: https://myaccount.google.com/apppasswords');
+        console.log('   3. Use the App Password in EMAIL_PASSWORD (not your regular password)');
     }
 })();
 
@@ -94,7 +139,6 @@ async function connectToMongoDB() {
 // Create default admin function
 async function createDefaultAdmin() {
     try {
-        // This function should be implemented based on your admin schema
         console.log('📝 Checking for default admin...');
         // Add your admin creation logic here if needed
     } catch (error) {
@@ -151,7 +195,7 @@ app.post('/api/contact', async (req, res) => {
         const collection = db.collection('contacts');
         const result = await collection.insertOne(contactData);
 
-        // Send emails using Resend (don't wait for completion)
+        // Send emails using Nodemailer (don't wait for completion)
         sendContactEmails(name, email, phone, service, message, result.insertedId)
             .catch(err => console.error('Email sending error:', err));
 
@@ -169,13 +213,22 @@ app.post('/api/contact', async (req, res) => {
     }
 });
 
-// Helper function to send contact emails using Resend
+// Helper function to send contact emails using Nodemailer
 async function sendContactEmails(name, email, phone, service, message, contactId) {
     try {
+        if (!transporter) {
+            console.error('❌ Email transporter not configured');
+            return;
+        }
+
+        const fromEmail = process.env.EMAIL_USER;
+        const fromName = process.env.EMAIL_FROM_NAME || 'AMIZERO Real Estate';
+        const adminEmail = process.env.ADMIN_EMAIL || 'amizerorealestate@gmail.com';
+
         // Send admin notification email
-        await resend.emails.send({
-            from: 'AMIZERO Real Estate <onboarding@resend.dev>', // Use your verified domain
-            to: 'amizerorealestate@gmail.com',
+        const adminMailOptions = {
+            from: `"${fromName}" <${fromEmail}>`,
+            to: adminEmail,
             subject: '🏠 New Contact Request - AMIZERO Real Estate',
             html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -202,13 +255,14 @@ async function sendContactEmails(name, email, phone, service, message, contactId
                     </div>
                 </div>
             `
-        });
+        };
 
+        await transporter.sendMail(adminMailOptions);
         console.log('✅ Admin notification email sent');
 
         // Send customer confirmation email
-        await resend.emails.send({
-            from: 'AMIZERO Real Estate <onboarding@resend.dev>', // Use your verified domain
+        const customerMailOptions = {
+            from: `"${fromName}" <${fromEmail}>`,
             to: email,
             subject: 'Thank you for contacting AMIZERO Real Estate',
             html: `
@@ -230,19 +284,20 @@ async function sendContactEmails(name, email, phone, service, message, contactId
                         <p>In the meantime, feel free to explore our services or contact us directly:</p>
                         <ul>
                             <li>Phone: +250 725 502 317</li>
-                            <li>Email: amizerorealestate@gmail.com</li>
+                            <li>Email: ${adminEmail}</li>
                         </ul>
                         
                         <p style="margin-top: 30px;">Best regards,<br><strong>AMIZERO Real Estate Team</strong></p>
                     </div>
                 </div>
             `
-        });
+        };
 
+        await transporter.sendMail(customerMailOptions);
         console.log('✅ Customer confirmation email sent');
 
     } catch (error) {
-        console.error('❌ Error sending emails via Resend:', error);
+        console.error('❌ Error sending emails via Nodemailer:', error);
         throw error;
     }
 }
@@ -353,24 +408,17 @@ app.put('/api/contacts/:id/status', async (req, res) => {
     }
 });
 
-
-
-
-
-
-
 // Health check endpoint
 app.get('/api/health', async (req, res) => {
     const health = {
         status: 'OK',
         timestamp: new Date().toISOString(),
         database: db ? 'Connected' : 'Disconnected',
-        email: 'Configured'
+        email: transporter ? 'Configured' : 'Not Configured'
     };
     
     res.json(health);
 });
-
 
 
 
