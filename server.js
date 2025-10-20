@@ -59,7 +59,7 @@ function createMailTransporter() {
         transporter = nodemailer.createTransport({
             host: process.env.SMTP_HOST || 'smtp.gmail.com',
             port: process.env.SMTP_PORT || 587,
-            secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
+            secure: process.env.SMTP_SECURE === 'false', // true for 465, false for other ports
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS
@@ -91,10 +91,7 @@ function createMailTransporter() {
         }
     } catch (error) {
         console.error('❌ Nodemailer configuration error:', error.message);
-        console.log('💡 If using Gmail, make sure to:');
-        console.log('   1. Enable 2-Factor Authentication');
-        console.log('   2. Generate an App Password at: https://myaccount.google.com/apppasswords');
-        console.log('   3. Use the App Password in EMAIL_PASSWORD (not your regular password)');
+        
     }
 })();
 
