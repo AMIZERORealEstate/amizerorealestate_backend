@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        :root {
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+    --accent-color: #e74c3c;
+    --text-dark: #2c3e50;
+    --text-light: #7f8c8d;
+    --bg-light: #f8f9fa;
+    --white: #ffffff;
+    --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f8f9fa;
+            line-height: 1.6;
+        }
+
+        /* Header Navigation */
+        .header-nav {
+            background: white;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items:center;
+            justify-content: space-between;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 25px;
+            background: rgba(102, 126, 234, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateX(-5px);
+        }
+
+        .breadcrumb {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 80px 0 60px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient);
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 40px;
+            align-items: start;
+        }
+
+        .hero-info h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .project-category {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+        }
+
+        .hero-description {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .hero-stats {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-stats h3 {
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        .stat-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .stat-content .label {
+            font-size: 12px;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-content .value {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 40px;
+        }
+
+        /* Image Gallery */
+        .image-gallery {
+           
+            
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+
+        .main-image {
+            height: 600px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+        }
+
+        .main-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-placeholder {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 4rem;
+        }
+
+        .image-counter {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .thumbnail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 10px;
+            padding: 20px;
+        }
+
+        .thumbnail {
+            aspect-ratio: 1;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .thumbnail:hover,
+        .thumbnail.active {
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .thumbnail-placeholder {
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #adb5bd;
+        }
+
+        /* Project Details */
+        .project-details {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+        }
+
+        .project-details h2 {
+            font-size: 2rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .detail-sections {
+            display: grid;
+            gap: 30px;
+        }
+
+        .detail-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            border-bottom: 2px solid #f8f9fa;
+            padding-bottom: 10px;
+        }
+
+        .detail-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .detail-value {
+            color: #7f8c8d;
+            text-align: right;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: grid;
+            gap: 30px;
+        }
+
+        .sidebar-section {
+            background: white;
+            border-radius: 20px;
+            padding: 27px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 1000px !important;
+            
+        }
+
+        .sidebar-section h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+
+        .contact-info {
+            display: grid;
+            gap: 15px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .contact-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cta-buttons {
+            display: grid;
+            gap: 15px;
+        }
+
+        .cta-btn {
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .cta-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .cta-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Loading State */
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            color: #667eea;
+        }
+
+        .loading-container i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-container h2 {
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
+        /* Error State */
+        .error-container {
+            text-align: center;
+            padding: 60px 20px;
+            color: #e74c3c;
+        }
+
+        .error-container i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .error-container h2 {
+            margin-bottom: 15px;
+            font-size: 2rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-info h1 {
+                font-size: 2.5rem;
+            }
+
+          
+        }
+
+        
+
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 10px;
+                align-items: left !important;
+                justify-content: left;
+                
+            }
+            
+            .main-image{
+                width: 350px;
+                height: 350px;
+            }
+
+            .hero-section {
+                padding: 60px 0 40px;
+            }
+
+            .hero-info h1 {
+                font-size: 2rem;
+            }
+
+            .main-content {
+                padding: 40px 20px;
+            }
+
+            .project-details {
+                padding: 25px;
+            }
+
+            .thumbnail-grid {
+                grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            }
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .logo {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    text-decoration: none;
+   
+}
+.logo img{
+ width: 100px;
+}
+
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="header-nav">
+        <div class="nav-container">
+            <a href="portfolio.html?=portfolio" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Back to Portfolio
+            </a>
+           <a href="portfolio.html" class="logo"><img src="images/company logo.png" alt=""></a>
+            <div class="breadcrumb">
+                <a href="#portfolio">Portfolio</a> > <span id="breadcrumb-title">Project Details</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Loading State -->
+    <div id="loading-state" class="loading-container">
+        <i class="fas fa-spinner"></i>
+        <h2>Loading Project Details...</h2>
+        <p>Please wait while we fetch the project information.</p>
+    </div>
+
+    <!-- Error State -->
+    <div id="error-state" class="error-container" style="display: none;">
+        <i class="fas fa-exclamation-triangle"></i>
+        <h2>Project Not Found</h2>
+        <p>The requested project could not be found or loaded.</p>
+        <button onclick="window.history.back()" class="cta-btn cta-primary" style="margin-top: 20px;">
+            <i class="fas fa-arrow-left"></i>
+            Go Back
+        </button>
+    </div>
+
+    <!-- Main Content -->
+    <div id="main-content" style="display: none;">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-container">
+                <div class="hero-content">
+                    <div class="hero-info">
+                        <div class="project-category" id="project-category"></div>
+                        <h1 id="project-title"></h1>
+                        <p class="hero-description" id="project-description"></p>
+                    </div>
+                    <div class="hero-stats">
+                        <h3>Project Overview</h3>
+                        <div class="stat-grid" id="hero-stats-grid">
+                            <!-- Stats will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="content-grid">
+                <!-- Left Column - Images and Details -->
+                <div class="main-column">
+                    <!-- Image Gallery -->
+                    <div class="image-gallery" id="image-gallery">
+                        <div class="main-image" id="main-image">
+                            <div class="image-placeholder">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            <div class="image-counter" id="image-counter" style="display: none;">
+                                <i class="fas fa-images"></i> <span id="current-image">1</span>/<span id="total-images">1</span>
+                            </div>
+                        </div>
+                        <div class="thumbnail-grid" id="thumbnail-grid" style="display: none;">
+                            <!-- Thumbnails will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Project Details -->
+                    <div class="project-details">
+                        <h2>Project Information</h2>
+                        <div class="detail-sections">
+                            <div class="detail-section">
+                                <h3>Overview</h3>
+                                <div class="detail-list" id="overview-details">
+                                    <!-- Overview details will be populated here -->
+                                </div>
+                            </div>
+                            
+                            <div class="detail-section" id="financial-section" style="display: none;">
+                                <h3>Financial Details</h3>
+                                <div class="detail-list" id="financial-details">
+                                    <!-- Financial details will be populated here -->
+                                </div>
+                            </div>
+
+                            <div class="detail-section" id="specifications-section" style="display: none;">
+                                <h3>Specifications</h3>
+                                <div class="detail-list" id="specifications-details">
+                                    <!-- Specifications will be populated here -->
+                                </div>
+                            </div>
+
+                            <div class="detail-section" id="additional-section" style="display: none;">
+                                <h3>Additional Information</h3>
+                                <div class="detail-list" id="additional-details">
+                                    <!-- Additional details will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column - Sidebar -->
+                <div class="sidebar">
+                    <!-- Contact Information -->
+                    <div class="sidebar-section">
+                        <h3>Contact Information</h3>
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <div class="contact-icon">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600;">Phone</div>
+                                    <div style="color: #7f8c8d;">+250 725 502 317</div>
+                                </div>
+                            </div>
+                            <div class="contact-item">
+                                <div class="contact-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600;">Email</div>
+                                    <div style="color: #7f8c8d;">amizerorealestate@gmail.com</div>
+                                </div>
+                            </div>
+                            <div class="contact-item">
+                                <div class="contact-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600;">Office</div>
+                                    <div style="color: #7f8c8d;">Kigali, Rwanda</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="sidebar-section">
+                        <h3>Get In Touch</h3>
+                        <div class="cta-buttons">
+                            <a href="contact.html" class="cta-btn cta-primary" id="inquire-btn">
+                                <i class="fas fa-envelope"></i>
+                                Make Inquiry
+                            </a>
+                    
+                             <a href="#" class="cta-btn cta-secondary" id="download-btn" onclick="window.portfolioDetails.downloadBrochure()">
+                                <i class="fas fa-download"></i>
+                                Download Brochure
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Related Projects -->
+                    <div class="sidebar-section" id="related-projects" style="display: none;">
+                        <h3>Related Projects</h3>
+                        <div id="related-projects-list">
+                            <!-- Related projects will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script>
+       // COMPLETE PORTFOLIO DETAILS MANAGER - WITH PDF DOWNLOAD
+// Replace ONLY the PortfolioDetailsManager class in your portfolioDetails.html
+
+class PortfolioDetailsManager {
+    constructor() {
+        this.currentProject = null;
+        this.allProjects = [];
+        this.currentImageIndex = 0;
+        this.init();
+    }
+
+    async init() {
+        try {
+            await this.loadProjectData();
+            this.renderProjectDetails();
+        } catch (error) {
+            console.error('❌ Error loading project details:', error);
+            this.showError();
+        }
+    }
+
+    async loadProjectData() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const projectId = urlParams.get('id');
+
+        console.log('🔍 Loading project with ID:', projectId);
+
+        if (!projectId) {
+            console.error('❌ No project ID specified in URL');
+            throw new Error('No project ID specified');
+        }
+
+        if (window.portfolioDetailsData) {
+            console.log('✅ Using cached portfolio data');
+            this.currentProject = window.portfolioDetailsData.selectedItem;
+            this.allProjects = window.portfolioDetailsData.allItems;
+            console.log('📦 Current project:', this.currentProject);
+            return;
+        }
+
+        console.log('🌐 Fetching portfolio data from API...');
+        try {
+            const response = await fetch('/api/public/portfolio');
+            
+            if (!response.ok) {
+                console.error('❌ API response not OK:', response.status);
+                throw new Error('Failed to fetch portfolio data');
+            }
+            
+            this.allProjects = await response.json();
+            console.log('✅ Fetched', this.allProjects.length, 'portfolio items');
+            
+            this.currentProject = this.allProjects.find(item => 
+                (item._id && item._id === projectId) || 
+                (item.id && item.id === projectId)
+            );
+            
+            if (!this.currentProject) {
+                console.log('⚠️ Not found by ID, trying title slug match...');
+                this.currentProject = this.allProjects.find(item => {
+                    const itemSlug = item.title.replace(/\s+/g, '-').toLowerCase();
+                    const searchSlug = projectId.toLowerCase();
+                    return itemSlug === searchSlug;
+                });
+            }
+
+            if (!this.currentProject) {
+                console.error('❌ Project not found with ID:', projectId);
+                throw new Error('Project not found');
+            }
+            
+            console.log('✅ Found project:', this.currentProject.title);
+            
+        } catch (error) {
+            console.error('❌ Error fetching portfolio data:', error);
+            throw new Error('Failed to load project data: ' + error.message);
+        }
+    }
+
+    renderProjectDetails() {
+        if (!this.currentProject) {
+            console.error('❌ No current project to render');
+            this.showError();
+            return;
+        }
+
+        const project = this.currentProject;
+        console.log('🎨 Rendering project details for:', project.title);
+
+        try {
+            document.getElementById('loading-state').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+
+            document.title = project.title + ' - Portfolio Details';
+            
+            const breadcrumbTitle = document.getElementById('breadcrumb-title');
+            if (breadcrumbTitle) breadcrumbTitle.textContent = project.title;
+
+            const categoryEl = document.getElementById('project-category');
+            const titleEl = document.getElementById('project-title');
+            const descEl = document.getElementById('project-description');
+            
+            if (categoryEl) categoryEl.textContent = this.getCategoryDisplayName(project.category);
+            if (titleEl) titleEl.textContent = project.title;
+            if (descEl) descEl.textContent = project.description;
+
+            this.renderHeroStats(project);
+            this.renderImageGallery(project);
+            this.renderProjectInfo(project);
+            this.renderRelatedProjects(project);
+            
+            console.log('✅ Project details rendered successfully');
+            
+        } catch (error) {
+            console.error('❌ Error rendering project details:', error);
+            this.showError();
+        }
+    }
+
+    renderImageGallery(project) {
+        const mainImage = document.getElementById('main-image');
+        const thumbnailGrid = document.getElementById('thumbnail-grid');
+        const imageCounter = document.getElementById('image-counter');
+
+        if (!mainImage) {
+            console.error('❌ Main image container not found');
+            return;
+        }
+
+        console.log('🖼️ Rendering gallery for project:', project.title);
+        console.log('🖼️ Project images:', project.images);
+
+        if (project.images && Array.isArray(project.images) && project.images.length > 0) {
+            console.log('✅ Found', project.images.length, 'images');
+            
+            mainImage.innerHTML = `
+                <img src="${project.images[0]}" 
+                     alt="${project.title}" 
+                     onerror="this.parentElement.innerHTML='<div class=\\'image-placeholder\\'><i class=\\'fas fa-image\\'></i></div>'">
+            `;
+            
+            if (project.images.length > 1) {
+                if (imageCounter) {
+                    imageCounter.style.display = 'block';
+                    
+                    const currentImageEl = document.getElementById('current-image');
+                    const totalImagesEl = document.getElementById('total-images');
+                    
+                    if (currentImageEl) currentImageEl.textContent = '1';
+                    if (totalImagesEl) totalImagesEl.textContent = project.images.length.toString();
+                }
+
+                if (thumbnailGrid) {
+                    thumbnailGrid.style.display = 'grid';
+                    
+                    const thumbnailsHTML = project.images.map((image, index) => `
+                        <div class="thumbnail ${index === 0 ? 'active' : ''}" 
+                             onclick="window.portfolioDetails.showImage(${index})"
+                             data-index="${index}">
+                            <img src="${image}" 
+                                 alt="${project.title} ${index + 1}"
+                                 onerror="this.parentElement.innerHTML='<div class=\\'thumbnail-placeholder\\'><i class=\\'fas fa-image\\'></i></div>'">
+                        </div>
+                    `).join('');
+
+                    thumbnailGrid.innerHTML = thumbnailsHTML;
+                    console.log('✅ Thumbnails rendered');
+                }
+            } else {
+                console.log('ℹ️ Single image, hiding thumbnails');
+                if (imageCounter) imageCounter.style.display = 'none';
+                if (thumbnailGrid) thumbnailGrid.style.display = 'none';
+            }
+        } else {
+            console.log('ℹ️ No images found, showing placeholder');
+            const categoryIcon = this.getCategoryIcon(project.category);
+            mainImage.innerHTML = `
+                <div class="image-placeholder">
+                    <i class="${categoryIcon}"></i>
+                </div>
+            `;
+            
+            if (imageCounter) imageCounter.style.display = 'none';
+            if (thumbnailGrid) thumbnailGrid.style.display = 'none';
+        }
+    }
+
+    showImage(index) {
+        if (!this.currentProject.images || index >= this.currentProject.images.length) return;
+
+        this.currentImageIndex = index;
+        
+        const mainImage = document.getElementById('main-image');
+        mainImage.innerHTML = `<img src="${this.currentProject.images[index]}" alt="${this.currentProject.title}">`;
+        
+        const currentImageEl = document.getElementById('current-image');
+        if (currentImageEl) {
+            currentImageEl.textContent = (index + 1).toString();
+        }
+        
+        document.querySelectorAll('.thumbnail').forEach((thumb, i) => {
+            thumb.classList.toggle('active', i === index);
+        });
+    }
+
+    // ✅ DOWNLOAD BROCHURE METHOD WITH IMAGES
+async downloadBrochure() {
+    if (!this.currentProject) return;
+    
+    const project = this.currentProject;
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    const primaryColor = [102, 126, 234];
+    const textColor = [44, 62, 80];
+    const lightGray = [127, 140, 141];
+    
+    let yPosition = 15;
+    const leftMargin = 20;
+    const pageWidth = doc.internal.pageSize.width;
+    
+    const addSection = (title, spacing) => {
+        spacing = spacing || 15;
+        
+        if (yPosition > doc.internal.pageSize.height - 60) {
+            doc.addPage();
+            yPosition = 15;
+        }
+        
+        yPosition += spacing;
+        doc.setFontSize(12);
+        doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+        doc.setFont('helvetica', 'bold');
+        // Clean the title text
+        const cleanTitle = title.replace(/[^\x00-\x7F]/g, '').trim();
+        doc.text(cleanTitle, leftMargin, yPosition);
+        
+        const textWidth = doc.getTextWidth(cleanTitle);
+        doc.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+        doc.line(leftMargin, yPosition + 2, leftMargin + textWidth, yPosition + 2);
+        yPosition += 9;
+    };
+    
+    // Header
+    doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+    doc.rect(0, 0, pageWidth, 25, 'F');
+    
+    try {
+        const logoPath = 'images/AMR_LOGO_white_color-removebg-preview.png';
+        doc.addImage(logoPath, 'PNG', leftMargin, 5, 15, 15);
+    } catch (error) {
+        console.warn('Logo not found');
+    }
+    
+    doc.setFontSize(18);
+    doc.setTextColor(255, 255, 255);
+    doc.setFont(undefined, 'bold');
+    doc.text('AMIZERO REAL ESTATE', leftMargin + 20, 15);
+    
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.text('PROJECT BROCHURE', pageWidth - 60, 15);
+    
+    // Project Title
+    yPosition = 35;
+    doc.setFontSize(20);
+    doc.setTextColor(textColor[0], textColor[1], textColor[2]);
+    doc.setFont('helvetica', 'bold');
+    const cleanTitle = project.title.replace(/[^\x00-\x7F]/g, '').trim();
+    doc.text(cleanTitle, leftMargin, yPosition);
+    yPosition += 10;
+    
+    doc.setFontSize(10);
+    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+    doc.setFont('helvetica', 'bold');
+    doc.text(this.getCategoryDisplayName(project.category).toUpperCase(), leftMargin, yPosition);
+    yPosition += 15;
+    
+    // Add Project Images
+    if (project.images && project.images.length > 0) {
+        addSection('PROJECT IMAGES', 5);
+        
+        try {
+            const imagesToShow = project.images.slice(0, 4); // Show up to 4 images
+            const imagesPerRow = 2;
+            const imageWidth = 75;
+            const imageHeight = 55;
+            const imageSpacing = 10;
+            
+            for (let i = 0; i < imagesToShow.length; i++) {
+                const col = i % imagesPerRow;
+                const row = Math.floor(i / imagesPerRow);
+                
+                const xPos = leftMargin + (col * (imageWidth + imageSpacing));
+                const yPos = yPosition + (row * (imageHeight + imageSpacing));
+                
+                // Check if we need a new page
+                if (yPos + imageHeight > doc.internal.pageSize.height - 40) {
+                    doc.addPage();
+                    yPosition = 15;
+                    const newYPos = yPosition + (row * (imageHeight + imageSpacing));
+                    
+                    try {
+                        const imgData = await this.loadImageAsBase64(imagesToShow[i]);
+                        doc.addImage(imgData, 'JPEG', xPos, newYPos, imageWidth, imageHeight);
+                    } catch (err) {
+                        console.warn('Could not load image:', imagesToShow[i]);
+                    }
+                } else {
+                    try {
+                        const imgData = await this.loadImageAsBase64(imagesToShow[i]);
+                        doc.addImage(imgData, 'JPEG', xPos, yPos, imageWidth, imageHeight);
+                    } catch (err) {
+                        console.warn('Could not load image:', imagesToShow[i]);
+                    }
+                }
+            }
+            
+            yPosition += Math.ceil(imagesToShow.length / imagesPerRow) * (imageHeight + imageSpacing) + 5;
+            
+        } catch (error) {
+            console.warn('Error adding images to PDF:', error);
+        }
+    }
+    
+    // Overview
+    addSection('PROJECT OVERVIEW');
+    doc.setFontSize(10);
+    doc.setTextColor(textColor[0], textColor[1], textColor[2]);
+    doc.setFont('helvetica', 'normal');
+    
+    const maxLineWidth = pageWidth - 40;
+    // Clean and encode the description text properly
+    const cleanDescription = project.description
+        .replace(/[^\x00-\x7F]/g, '') // Remove non-ASCII characters
+        .replace(/\s+/g, ' ') // Normalize whitespace
+        .trim();
+    
+    const descriptionLines = doc.splitTextToSize(cleanDescription, maxLineWidth);
+    descriptionLines.forEach(function(line) {
+        if (yPosition > doc.internal.pageSize.height - 40) {
+            doc.addPage();
+            yPosition = 20;
+        }
+        doc.text(line, leftMargin, yPosition);
+        yPosition += 6;
+    });
+    
+    // Project Details
+    addSection('PROJECT DETAILS');
+    
+    const details = [
+        { label: 'Location:', value: project.location || 'N/A' },
+        { label: 'Date Completed:', value: project.date ? this.formatDate(project.date) : 'N/A' },
+        { label: 'Duration:', value: project.duration || 'N/A' },
+        { label: 'Project Value:', value: project.value ? this.formatValue(project.value) : 'N/A' },
+        { label: 'Client:', value: project.client || 'N/A' },
+        { label: 'Status:', value: project.status || 'N/A' }
+    ];
+    
+    details.forEach(function(detail) {
+        if (yPosition > doc.internal.pageSize.height - 40) {
+            doc.addPage();
+            yPosition = 20;
+        }
+        
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(textColor[0], textColor[1], textColor[2]);
+        doc.text(detail.label, leftMargin, yPosition);
+        
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(lightGray[0], lightGray[1], lightGray[2]);
+        const cleanValue = (detail.value || '').replace(/[^\x00-\x7F]/g, '').trim();
+        doc.text(cleanValue, leftMargin + 50, yPosition);
+        yPosition += 7;
+    });
+    
+    // Contact Information
+    addSection('CONTACT INFORMATION');
+    
+    const contacts = [
+        { label: 'Phone:', value: '+250 725 502 317' },
+        { label: 'Email:', value: 'amizerorealestate@gmail.com' },
+        { label: 'Office:', value: 'Kigali, Rwanda' }
+    ];
+    
+    contacts.forEach(function(contact) {
+        if (yPosition > doc.internal.pageSize.height - 40) {
+            doc.addPage();
+            yPosition = 20;
+        }
+        
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(textColor[0], textColor[1], textColor[2]);
+        doc.text(contact.label, leftMargin, yPosition);
+        
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(lightGray[0], lightGray[1], lightGray[2]);
+        doc.text(contact.value, leftMargin + 30, yPosition);
+        yPosition += 7;
+    });
+    
+    // Footer
+    const footerY = doc.internal.pageSize.height - 20;
+    doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+    doc.rect(0, footerY - 5, pageWidth, 25, 'F');
+    
+    doc.setFontSize(8);
+    doc.setTextColor(255, 255, 255);
+    doc.setFont(undefined, 'normal');
+    doc.text('Generated on ' + new Date().toLocaleDateString(), leftMargin, footerY + 5);
+    doc.text('Amizero Real Estate - Your Trusted Property Partner', pageWidth - 100, footerY + 5);
+    
+    // Show preview
+    this.showBrochurePreview(doc, project);
+}
+
+// ✅ HELPER METHOD TO LOAD IMAGES AS BASE64
+loadImageAsBase64(url) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'Anonymous';
+        
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            
+            try {
+                const dataURL = canvas.toDataURL('image/jpeg', 0.8);
+                resolve(dataURL);
+            } catch (err) {
+                reject(err);
+            }
+        };
+        
+        img.onerror = function() {
+            reject(new Error('Failed to load image'));
+        };
+        
+        img.src = url;
+    });
+}
+
+// ✅ SHOW BROCHURE PREVIEW METHOD
+showBrochurePreview(doc, project) {
+    const modal = document.createElement('div');
+    modal.className = 'pdf-preview-modal';
+    modal.innerHTML = `
+        <div class="pdf-preview-content">
+            <div class="pdf-preview-header">
+                <h3>Brochure Preview - ${project.title}</h3>
+                <button class="close-preview" onclick="this.closest('.pdf-preview-modal').remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="pdf-preview-body">
+                <iframe id="pdf-preview-frame" width="100%" height="600px"></iframe>
+            </div>
+            <div class="pdf-preview-footer">
+                <button class="btn-secondary" onclick="this.closest('.pdf-preview-modal').remove()">
+                    <i class="fas fa-times"></i> Close Preview
+                </button>
+                <button class="btn-primary" onclick="window.currentPdfDoc.save('${project.title.replace(/[^a-zA-Z0-9]/g, '_')}_Brochure.pdf'); this.closest('.pdf-preview-modal').remove();">
+                    <i class="fas fa-download"></i> Download PDF
+                </button>
+            </div>
+        </div>
+    `;
+    
+    const style = document.createElement('style');
+    style.textContent = `
+        .pdf-preview-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8); display: flex;
+            justify-content: center; align-items: center; z-index: 10000;
+        }
+        .pdf-preview-content {
+            background: white; border-radius: 12px; width: 90%;
+            max-width: 900px; height: 90%; display: flex;
+            flex-direction: column; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        .pdf-preview-header {
+            padding: 20px 25px; border-bottom: 2px solid #f0f2f5;
+            display: flex; justify-content: space-between; align-items: center;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white; border-radius: 12px 12px 0 0;
+        }
+        .pdf-preview-header h3 { margin: 0; font-size: 1.3em; font-weight: 600; }
+        .close-preview {
+            background: rgba(255, 255, 255, 0.2); border: none;
+            color: white; width: 35px; height: 35px; border-radius: 50%;
+            cursor: pointer; font-size: 16px; transition: background 0.3s;
+        }
+        .close-preview:hover { background: rgba(255, 255, 255, 0.3); }
+        .pdf-preview-body { flex: 1; padding: 20px; overflow: hidden; }
+        .pdf-preview-footer {
+            padding: 20px 25px; border-top: 2px solid #f0f2f5;
+            display: flex; justify-content: flex-end; gap: 15px;
+            background: #f8f9fa; border-radius: 0 0 12px 12px;
+        }
+        .pdf-preview-footer button {
+            padding: 12px 24px; border: none; border-radius: 8px;
+            cursor: pointer; font-weight: 500; font-size: 14px;
+            display: flex; align-items: center; gap: 8px;
+            transition: all 0.3s ease;
+        }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-secondary:hover { background: #5a6268; transform: translateY(-1px); }
+        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a6fd8, #6a4190);
+            transform: translateY(-1px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+    `;
+    
+    document.head.appendChild(style);
+    document.body.appendChild(modal);
+    
+    window.currentPdfDoc = doc;
+    
+    const pdfBlob = doc.output('blob');
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+    
+    const iframe = document.getElementById('pdf-preview-frame');
+    iframe.src = pdfUrl;
+    
+    const btn = document.getElementById('download-btn');
+    if (btn) {
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-eye"></i> Preview Generated!';
+        btn.style.background = 'linear-gradient(135deg, #27ae60, #2ecc71)';
+        
+        setTimeout(function() {
+            btn.innerHTML = originalHTML;
+            btn.style.background = '';
+        }, 2000);
+    }
+    
+    modal.addEventListener('DOMNodeRemoved', function() {
+        URL.revokeObjectURL(pdfUrl);
+    });
+}
+
+getCategoryDisplayName(category) {
+    const categoryNames = {
+        'valuation': 'Property Valuation',
+        'management': 'Property Management', 
+        'brokerage': 'Real Estate Brokerage',
+        'survey': 'Quantity Survey',
+        'development': 'Property Development'
+    };
+    return categoryNames[category] || category;
+}
+
+getCategoryIcon(category) {
+    const icons = {
+        'valuation': 'fas fa-calculator',
+        'management': 'fas fa-building',
+        'brokerage': 'fas fa-handshake',
+        'survey': 'fas fa-chart-line',
+        'development': 'fas fa-hammer'
+    };
+    return icons[category] || 'fas fa-home';
+}
+
+renderHeroStats(project) {
+    const statsGrid = document.getElementById('hero-stats-grid');
+    const stats = [];
+
+    if (project.value) {
+        stats.push({ icon: 'fas fa-dollar-sign', label: 'Project Value', value: this.formatValue(project.value) });
+    }
+    if (project.location) {
+        stats.push({ icon: 'fas fa-map-marker-alt', label: 'Location', value: project.location });
+    }
+    if (project.duration) {
+        stats.push({ icon: 'fas fa-clock', label: 'Duration', value: project.duration });
+    }
+    if (project.date) {
+        stats.push({ icon: 'fas fa-calendar', label: 'Completed', value: this.formatDate(project.date) });
+    }
+
+    const statsHTML = stats.map(function(stat) {
+        return `
+            <div class="stat-item">
+                <div class="stat-icon"><i class="${stat.icon}"></i></div>
+                <div class="stat-content">
+                    <div class="label">${stat.label}</div>
+                    <div class="value">${stat.value}</div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    statsGrid.innerHTML = statsHTML;
+}
+
+renderProjectInfo(project) {
+    const overviewDetails = document.getElementById('overview-details');
+    const overviewItems = [];
+
+    if (project.title) overviewItems.push({ label: 'Project Name', value: project.title });
+    if (project.category) overviewItems.push({ label: 'Category', value: this.getCategoryDisplayName(project.category) });
+    if (project.location) overviewItems.push({ label: 'Location', value: project.location });
+    if (project.date) overviewItems.push({ label: 'Date Completed', value: this.formatDate(project.date) });
+    if (project.duration) overviewItems.push({ label: 'Duration', value: project.duration });
+    if (project.client) overviewItems.push({ label: 'Client', value: project.client });
+    if (project.status) overviewItems.push({ label: 'Status', value: project.status });
+
+    overviewDetails.innerHTML = overviewItems.map(function(item) {
+        return `
+            <div class="detail-item">
+                <span class="detail-label">${item.label}</span>
+                <span class="detail-value">${item.value}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+   renderRelatedProjects(project) {
+    const self = this;
+    const relatedProjects = this.allProjects
+        .filter(function(item) { return item.category === project.category && item.title !== project.title; })
+        .slice(0, 3);
+
+    if (relatedProjects.length > 0) {
+        document.getElementById('related-projects').style.display = 'block';
+        
+        const relatedHTML = relatedProjects.map(function(item) {
+            const imageContent = item.images && item.images.length > 0 
+                ? '<img src="' + item.images[0] + '" alt="' + item.title + '" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">'
+                : '<div style="width: 60px; height: 60px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;"><i class="' + self.getCategoryIcon(item.category) + '"></i></div>';
+            
+            return '<div class="related-project-item" onclick="window.location.href=\'portfolioDetails.html?id=' + (item.id || item._id) + '\'" style="display: flex; gap: 15px; padding: 15px; background: #f8f9fa; border-radius: 10px; margin-bottom: 15px; cursor: pointer; transition: all 0.3s ease;">' + imageContent + '<div style="flex: 1;"><h4 style="margin: 0 0 5px 0; font-size: 14px; color: #2c3e50;">' + item.title + '</h4><p style="margin: 0; font-size: 12px; color: #7f8c8d; line-height: 1.4;">' + item.description.substring(0, 60) + '...</p></div></div>';
+        }).join('');
+
+        document.getElementById('related-projects-list').innerHTML = relatedHTML;
+    }
+}
+
+    formatValue(value) {
+        if (!value) return null;
+        if (value.includes && value.includes('RWF')) return value;
+        
+        const numValue = parseFloat(value.toString().replace(/[^\d.]/g, ''));
+        if (!isNaN(numValue)) {
+            if (numValue >= 1000000000) return 'RWF ' + (numValue / 1000000000).toFixed(1) + 'B';
+            else if (numValue >= 1000000) return 'RWF ' + (numValue / 1000000).toFixed(1) + 'M';
+            else if (numValue >= 1000) return 'RWF ' + (numValue / 1000).toFixed(0) + 'K';
+            return 'RWF ' + numValue.toLocaleString();
+        }
+        return value;
+    }
+
+    formatDate(dateString) {
+        try {
+            const date = new Date(dateString);
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        } catch (error) {
+            return dateString;
+        }
+    }
+
+    showError() {
+        document.getElementById('loading-state').style.display = 'none';
+        document.getElementById('error-state').style.display = 'block';
+        document.getElementById('main-content').style.display = 'none';
+    }
+}
+
+// Initialize
+window.portfolioDetails = new PortfolioDetailsManager();
+
+// Add CSS for related projects hover effect
+const style = document.createElement('style');
+style.textContent = '.related-project-item:hover { background: #e9ecef !important; }';
+document.head.appendChild(style);
+</script>
+</body>
+</html>
