@@ -1,7 +1,3 @@
-// Use existing API_BASE_URL if already declared, otherwise declare it
-const API_BASE_URL = window.API_BASE_URL || 'https://amizerorealestate.onrender.com';
-window.API_BASE_URL = API_BASE_URL; // Make it globally available
-
 class PortfolioManager {
     constructor() {
         this.portfolioItems = [];
