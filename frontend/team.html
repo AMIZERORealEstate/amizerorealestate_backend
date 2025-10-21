@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Team - AMIZERO Real Estate Ltd</title>
+    <link rel="icon" type="image/x-icon" href="images/company_logo_blue_color-removebg-preview.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="about.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div id="contact-info">
+            <h1 id="company-name">AMIZERO Real Estate Ltd</h1>
+            <div class="contact-item" id="contact-item">
+                <span class="icon">📞</span>
+                <div class="contact-text" id="contact-text">
+                    <span class="label">CALL:</span>
+                    <a style="text-decoration: none;" href="tel:+250725502317"><span class="value">+250 725 502 317</span></a>
+                </div>
+            </div>
+            <div class="contact-item" id="contact-item">
+                <span class="icon">⏰</span>
+                <div class="contact-text" id="contact-text">
+                    <span class="label">OPENING HOURS:</span>
+                    <span class="value">Mon - Fri 8:00AM - 6:00PM</span>
+                </div>
+            </div>
+        </div>
+
+        <nav>
+            <a href="index.html" class="logo"><img src="images/company_logo_blue_color-removebg-preview.png" alt=""></a>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="listing.html">Listing</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li><a href="portfolio.html">Portfolio</a></li>
+                <li><a href="team.html" class="active">Team</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="close-menu">&times;</div>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+
+   <!-- Team Section -->
+<section id="team" class="team">
+  <div class="section-header fade-in">
+    <h2>Our Team</h2>
+    <p>Meet the experienced professionals driving AMIZERO's success</p>
+  </div>
+
+  <div class="team-grid">
+    <!-- This will be populated by JavaScript -->
+</div>
+
+  </section>
+
+
+
+<!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <!-- Company Information -->
+            <div class="footer-section company-info">
+                <div class="footer-logo">AMIZERO Real Estate</div>
+                <p class="company-description">
+                    Rwanda's premier real estate company with over 2 years of experience. 
+                    We specialize in residential, commercial, and investment properties across 
+                    Kigali and beyond, providing exceptional service and expert guidance.
+                </p>
+                <div class="company-certifications">
+                    <div class="certification-item">Licensed Real Estate Company</div>
+                    <div class="certification-item">Member of Rwanda Real Estate Association</div>
+                    <div class="certification-item">2+ Years Market Experience</div>
+                </div>
+            </div>
+
+            <!-- Our Partners -->
+            <div class="footer-section our-partners">
+                <h3>Our Partners</h3>
+                <div class="partners-grid">
+                    <div class="partner-item">
+                        <div class="partner-logo">
+                            <img src="images/La_Riqueza_logo-01-removebg-preview.png" alt="">
+                        </div>
+                        <div class="partner-name">Lariqueza Ltd</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Newsletter Subscription -->
+            <div class="footer-section newsletter">
+                <h3>Stay Updated</h3>
+                <p>Subscribe to our newsletter for the latest property listings, market insights, and exclusive offers.</p>
+                <form class="newsletter-form" action="#" method="POST">
+                    <input type="email" class="newsletter-input" placeholder="Enter your email address" required>
+                    <button type="submit" class="newsletter-btn">Subscribe</button>
+                </form>
+            </div>
+
+            <!-- Social Media & Awards -->
+            <div class="footer-section social-awards">
+                <h3>Connect & Recognize</h3>
+                <div class="social-links">
+                    <a href="https://www.facebook.com/profile.php?id=100079745410953" aria-label="Facebook" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://x.com/AMIZERO_RealEst?t=e2BML0ybqgVfdY9Xkyz5cw&s=09" aria-label="Twitter" target="_blank"><i class="fab fa-twitter"></i></a>
+                    <a href="https://www.linkedin.com/in/aphrodis-amizero-523280243?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" aria-label="LinkedIn" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="https://www.instagram.com/amizero_realestate?igsh=MWZ0bW0ydDRya3Y0Yw==" aria-label="Instagram" target="_blank"><i class="fab fa-instagram"></i></a>
+                    <a href="https://wa.me/250725502317" aria-label="WhatsApp" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                    <a href="https://www.youtube.com/@Amizero_RealEstate" aria-label="YouTube" target="_blank"><i class="fab fa-youtube"></i></a>
+                </div>
+                
+                <div class="awards-list">
+                    <div class="award-item">
+                        <div class="award-icon">🏆</div>
+                        <span>Best Real Estate Company in Rwanda</span>
+                    </div>
+                    <div class="award-item">
+                        <div class="award-icon">🎖️</div>
+                        <span>Excellence in Service</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Bottom -->
+        <div class="footer-bottom">
+            <div class="footer-bottom-left">
+                <p>&copy; <span id="year"></span> AMIZERO Real Estate Ltd. All rights reserved.</p>
+                <div class="footer-links">
+                    <a href="https://docs.google.com/document/d/1oM2efPSQ6FOW38egru1eOc53FVCkeQW_7VKy5Rabmjk/edit?usp=sharing" target="_blank">Privacy Policy</a>
+                    <a href="https://docs.google.com/document/d/1JNCxnBGV89Wz_YTmbVT7vn6Ui4iBDwhYWG8qBi8QHXc/edit?usp=sharing" target="_blank">Terms of Service</a>
+                </div>
+            </div>
+            <div class="footer-bottom-right">
+                <a href="#team" class="back-to-top" aria-label="Back to top">
+                    <i class="fas fa-chevron-up"></i>
+                </a>
+            </div>
+        </div>
+    </footer>
+    
+
+
+    <script>
+        document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+
+    <script src="script.js"></script>
+
+    <script>
+        // Mobile Navigation Toggle
+document.addEventListener("DOMContentLoaded", () => {
+    const hamburger = document.querySelector('.hamburger');
+    const navMenu = document.querySelector('.nav-menu');
+    const closeMenu = document.querySelector('.close-menu');
+
+    if (hamburger && navMenu) {
+        // Toggle menu on hamburger click
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+        });
+    }
+
+    if (closeMenu) {
+        // Close menu on close icon click
+        closeMenu.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+        });
+    }
+
+    // Close menu when clicking a nav link
+    document.querySelectorAll('.nav-menu a').forEach(link => {
+        link.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+        });
+    });
+});
+
+    </script>
+
+    <script>
+      // Function to load team members from public API
+async function loadTeamMembers() {
+    try {
+        // Get the team grid container
+        const teamGrid = document.querySelector('.team-grid');
+        
+        if (!teamGrid) {
+            console.error('Team grid container not found');
+            return;
+        }
+
+        // Show loading state
+        teamGrid.innerHTML = '<div class="loading">Loading team members...</div>';
+
+        // Fetch team data from public API (no authentication needed)
+        const response = await fetch('/api/public/team', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const teamMembers = await response.json();
+
+        // Clear the container
+        teamGrid.innerHTML = '';
+
+        // Handle different response formats
+        const members = teamMembers.data || teamMembers; // Support both formats
+
+        // Generate HTML for each team member
+        members.forEach(member => {
+            const teamMemberHTML = `
+                <div class="team-member fade-in">
+                    <div class="team-avatar">
+                        <img src="${member.image || 'images/default-avatar.jpg'}" alt="${member.name || 'Team Member'}" onerror="this.src='images/default-avatar.jpg'">
+                    </div>
+                    <h3>${member.name || 'Name not available'}</h3>
+                    <div class="team-position">${member.position || 'Position not specified'}</div>
+                    <p class="team-bio">${member.bio || 'Bio not available'}</p>
+                    <div class="team-skills">
+                        ${member.skills && member.skills.length > 0 ? 
+                            member.skills.map(skills => `<span class="skill-tag">${skills}</span>`).join('') : 
+                            '<span class="skill-tag">No skills listed</span>'
+                        }
+                    </div>
+                    <p style="margin-bottom: 20px; color:rgb(115, 115, 115);" >${member.phone || 'No Phone Number'}</p>
+                    <div class="team-contact">
+                        ${member.email ? 
+  `<a href="https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(member.email)}&su=${encodeURIComponent('Project Inquiry ')}&body=${encodeURIComponent('Hi ' + member.name + ',\n\nI would like to get in touch with you regarding our project.\n\nBest regards,\n[Your Name]')}" 
+     class="contact-link" target="_blank" rel="noopener noreferrer">
+      <i class="fas fa-envelope"></i>
+   </a>` 
+: '' }
+
+
+    
+    ${member.socialLinks?.linkedin ? `<a href="${member.socialLinks.linkedin}" class="contact-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin-in"></i></a>` : ''}
+    ${member.socialLinks?.twitter ? `<a href="${member.socialLinks.twitter}" class="contact-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-twitter"></i></a>` : ''}
+</div>
+
+                </div>
+            `;
+            
+            teamGrid.innerHTML += teamMemberHTML;
+        });
+
+        // If no team members found
+        if (members.length === 0) {
+            teamGrid.innerHTML = '<div class="no-team-members">No team members found.</div>';
+        }
+
+        // Trigger fade-in animations if you have CSS for it
+        const teamMemberElements = document.querySelectorAll('.team-member.fade-in');
+        teamMemberElements.forEach((element, index) => {
+            setTimeout(() => {
+                element.style.opacity = '1';
+                element.style.transform = 'translateY(0)';
+            }, index * 100); // Stagger the animations
+        });
+
+    } catch (error) {
+        console.error('Error loading team members:', error);
+        
+        // Show error message
+        const teamGrid = document.querySelector('.team-grid');
+        if (teamGrid) {
+            teamGrid.innerHTML = `
+                <div class="error-message" style="text-align: center; padding: 2rem;">
+                    <p>Unable to load team members. Please try again later.</p>
+                    <button onclick="loadTeamMembers()" class="retry-btn" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Retry</button>
+                </div>
+            `;
+        }
+    }
+}
+
+// Alternative function with filtering capability
+async function loadTeamMembersByPosition(position = null) {
+    try {
+        const teamGrid = document.querySelector('.team-grid');
+        
+        if (!teamGrid) {
+            console.error('Team grid container not found');
+            return;
+        }
+
+        teamGrid.innerHTML = '<div class="loading">Loading team members...</div>';
+
+        // Build URL with query parameters if needed
+        let url = '/api/public/team';
+        if (position) {
+            url += `?position=${encodeURIComponent(position)}`;
+        }
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const members = data.data || data;
+
+        teamGrid.innerHTML = '';
+
+        members.forEach(member => {
+            const teamMemberHTML = `
+                <div class="team-member fade-in">
+                    <div class="team-avatar">
+                        <img src="${member.image || 'images/default-avatar.jpg'}" alt="${member.name || 'Team Member'}" onerror="this.src='images/default-avatar.jpg'">
+                    </div>
+                    <h3>${member.name || 'Name not available'}</h3>
+                    <div class="team-position">${member.position || 'Position not specified'}</div>
+                    <p class="team-bio">${member.bio || 'Bio not available'}</p>
+                    <div class="team-skills">
+                        ${member.skills && member.skills.length > 0 ? 
+                            member.skills.map(skills => `<span class="skill-tag">${skills}</span>`).join('') : 
+                            '<span class="skill-tag">No skills listed</span>'
+                        }
+                    </div>
+                   <div class="team-contact">
+  ${member.email ? 
+  `<a href="https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(member.email)}&su=${encodeURIComponent('Project Inquiry')}&body=${encodeURIComponent('Hi ' + member.name + ',\n\nI would like to get in touch with you regarding our project.\n\nBest regards,\n[Your Name]')}" 
+     class="contact-link" target="_blank" rel="noopener noreferrer">
+      <i class="fas fa-envelope"></i>
+   </a>` 
+: '' }
+
+
+
+
+    <p style="margin-bottom: 20px; color:rgb(115, 115, 115);" >${member.phone || 'No Phone Number'}</p>
+    ${member.socialLinks?.linkedin ? `<a href="${member.socialLinks.linkedin}" class="contact-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin-in"></i></a>` : ''}
+    ${member.socialLinks?.twitter ? `<a href="${member.socialLinks.twitter}" class="contact-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-twitter"></i></a>` : ''}
+</div>
+
+                </div>
+            `;
+            
+            teamGrid.innerHTML += teamMemberHTML;
+        });
+
+        if (members.length === 0) {
+            teamGrid.innerHTML = '<div class="no-team-members">No team members found.</div>';
+        }
+
+    } catch (error) {
+        console.error('Error loading team members:', error);
+        const teamGrid = document.querySelector('.team-grid');
+        if (teamGrid) {
+            teamGrid.innerHTML = `
+                <div class="error-message" style="text-align: center; padding: 2rem;">
+                    <p>Unable to load team members. Please try again later.</p>
+                    <button onclick="loadTeamMembers()" class="retry-btn" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Retry</button>
+                </div>
+            `;
+        }
+    }
+}
+
+
+
+// Load team members when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    loadTeamMembers();
+});
+
+// Utility function to refresh team data
+function refreshTeamMembers() {
+    loadTeamMembers();
+}
+
+// Export functions if using modules
+// export { loadTeamMembers, loadTeamMembersByPosition, refreshTeamMembers };
+    </script>
+</body>
+</html>
