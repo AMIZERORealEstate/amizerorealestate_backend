@@ -1,3 +1,6 @@
+// Backend API Base URL
+const API_BASE_URL = 'https://amizerorealestate.onrender.com';
+
 class PortfolioManager {
     constructor() {
         this.portfolioItems = [];
@@ -13,7 +16,7 @@ class PortfolioManager {
 
     async fetchPortfolioData() {
         try {
-            const response = await fetch('/api/public/portfolio');
+            const response = await fetch(`${API_BASE_URL}/api/public/portfolio`);
             if (!response.ok) {
                 throw new Error('Failed to fetch portfolio data');
             }
