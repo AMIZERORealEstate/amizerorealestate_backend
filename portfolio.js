@@ -1,5 +1,6 @@
-// Backend API Base URL
-const API_BASE_URL = 'https://amizerorealestate.onrender.com';
+// Use existing API_BASE_URL if already declared, otherwise declare it
+const API_BASE_URL = window.API_BASE_URL || 'https://amizerorealestate.onrender.com';
+window.API_BASE_URL = API_BASE_URL; // Make it globally available
 
 class PortfolioManager {
     constructor() {
@@ -174,7 +175,6 @@ class PortfolioManager {
         `;
     }
 
-    // ADD THIS MISSING METHOD
     clearLoadingMessage() {
         const portfolioGrid = document.querySelector('.portfolio-grid');
         if (portfolioGrid) {
@@ -248,7 +248,6 @@ class PortfolioManager {
         }
     }
 
-    // Optional: Show loading message while fetching data
     showLoadingMessage() {
         const portfolioGrid = document.querySelector('.portfolio-grid');
         if (portfolioGrid) {
@@ -264,17 +263,15 @@ class PortfolioManager {
         }
     }
 
-    // Public method to refresh portfolio data
     async refresh() {
-        this.showLoadingMessage(); // Optional: show loading during refresh
+        this.showLoadingMessage();
         await this.fetchPortfolioData();
         this.renderPortfolio();
     }
 }
 
-// ============================================
-// INITIALIZATION CODE
-// ============================================
+// Make PortfolioManager globally available
+window.PortfolioManager = PortfolioManager;
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
