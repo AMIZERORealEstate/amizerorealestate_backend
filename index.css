@@ -650,7 +650,6 @@ footer::before {
   text-align: center;
   transition: all 0.3s ease;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
 }
 
 .partner-item:hover {
