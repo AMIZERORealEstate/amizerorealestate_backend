@@ -7,7 +7,7 @@ let currentFilters = {
     minPrice: '',
     maxPrice: ''
 };
-
+const API_BASE_URL = 'https://amizerorealestate.onrender.com';
 // DOM Elements
 const propertiesGrid = document.getElementById('propertiesGrid');
 const resultsCount = document.getElementById('resultsCount');
@@ -17,7 +17,7 @@ const filterTabs = document.querySelectorAll('.filter-tab');
 const applyFiltersBtn = document.getElementById('applyFilters');
 const clearFiltersBtn = document.getElementById('clearFilters');
 
-const API_URL = `${window.location.origin}/api/public/properties`;
+const API_URL = `${API_BASE_URL}/api/public/properties`;
 
 // ------------------- RENDER PROPERTIES -------------------
 function renderProperties(properties) {
