@@ -1881,6 +1881,7 @@
                     <th>Email</th>
                     <th>Subscribed At</th>
                     <th>Status</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody id="newsletterTableBody">
@@ -3098,7 +3099,7 @@ async function loadNewsletterSubscribers() {
         tbody.innerHTML = '';
 
         if (!data.success || !data.subscribers || data.subscribers.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;">No subscribers found</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">No subscribers found</td></tr>`;
             return;
         }
 
@@ -3108,6 +3109,11 @@ async function loadNewsletterSubscribers() {
                 <td>${sub.email}</td>
                 <td>${new Date(sub.subscribedAt).toLocaleString()}</td>
                 <td>${sub.status || 'active'}</td>
+                <td>
+                    <button class="delete-btn" onclick="deleteSubscriber('${sub._id}', '${sub.email}')">
+                        Delete
+                    </button>
+                </td>
             `;
             tbody.appendChild(tr);
         });
@@ -3116,7 +3122,46 @@ async function loadNewsletterSubscribers() {
     } catch (err) {
         console.error("Failed to load newsletter subscribers", err);
         const tbody = document.getElementById('newsletterTableBody');
-        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;color:#e53e3e;">Error loading subscribers</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:#e53e3e;">Error loading subscribers</td></tr>`;
+    }
+}
+
+async function deleteSubscriber(subscriberId, email) {
+    // Confirm deletion
+    if (!confirm(`Are you sure you want to delete subscriber: ${email}?`)) {
+        return;
+    }
+
+    const token = localStorage.getItem('adminToken');
+    
+    if (!token) {
+        alert('Authentication required');
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API_BASE_URL}/newsletter/${subscriberId}`, {
+            method: 'DELETE',
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            throw new Error(data.error || 'Failed to delete subscriber');
+        }
+
+        if (data.success) {
+            alert('Subscriber deleted successfully');
+            // Reload the subscribers list
+            loadNewsletterSubscribers();
+        }
+    } catch (err) {
+        console.error("Failed to delete subscriber", err);
+        alert(`Error: ${err.message}`);
     }
 }
 
