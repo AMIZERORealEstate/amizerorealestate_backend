@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AMIZERO Admin Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <style>
         :root {
             --primary-color: #2563eb;
@@ -1399,6 +1401,152 @@
         display: block;
         margin-top: 5px;
     }
+
+
+ /* Preview Modal */
+.pdf-preview-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 9999;
+    overflow: auto;
+}
+
+.pdf-preview-modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pdf-preview-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    max-width: 900px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.pdf-preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.pdf-preview-header h3 {
+    margin: 0;
+    color: #667eea;
+    font-size: 1.5rem;
+}
+
+.preview-close-btn {
+    background: #e53e3e;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.preview-close-btn:hover {
+    background: #c53030;
+}
+
+.pdf-preview-canvas-container {
+    margin: 1.5rem 0;
+    border: 1px solid #e2e8f0;
+    text-align: center;
+    background: #f7fafc;
+    padding: 1rem;
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.pdf-preview-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1.5rem;
+}
+
+.preview-download-btn {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.preview-download-btn:hover {
+    background: #5568d3;
+}
+
+/* Agent Name Input in Table */
+.agent-name-input {
+    padding: 0.4rem 0.6rem;
+    border: 1px solid #cbd5e0;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    width: 150px;
+    margin-bottom: 0.5rem;
+}
+
+.agent-name-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+.action-buttons-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+}
+
+.download-btn, .preview-btn {
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: background-color 0.2s;
+    white-space: nowrap;
+}
+
+.download-btn {
+    background-color: #38a169;
+}
+
+.download-btn:hover {
+    background-color: #2f855a;
+}
+
+.preview-btn {
+    background-color: #667eea;
+}
+
+.preview-btn:hover {
+    background-color: #5568d3;
+}
+
+.download-btn i, .preview-btn i {
+    margin-right: 4px;
+}
     </style>
 </head>
 <body>
@@ -1714,6 +1862,30 @@
         </table>
     </div>
 </section>
+
+<!-- PDF Preview Modal -->
+<div id="pdfPreviewModal" class="pdf-preview-modal">
+    <div class="pdf-preview-content">
+        <div class="pdf-preview-header">
+            <h3>Preview Visit Schedule Report</h3>
+            <button class="preview-close-btn" onclick="closePreviewModal()">
+                <i class="fas fa-times"></i> Close
+            </button>
+        </div>
+        
+        <div class="pdf-preview-canvas-container">
+            <iframe id="pdfPreviewFrame" style="width: 100%; height: 600px; border: none;"></iframe>
+        </div>
+        
+        <div class="pdf-preview-actions">
+            <button class="preview-download-btn" onclick="downloadPreviewedReport()">
+                <i class="fas fa-download"></i> Download PDF
+            </button>
+        </div>
+    </div>
+</div>
+
+
             <!-- Team Section -->
             <section id="team" class="content-section">
                 <div class="message" id="teamMessage"></div>
@@ -3347,6 +3519,8 @@ function animateCounter(elementId, targetValue) {
 // ==============================================
 let scheduledVisitsData = [];
 let propertiesData = {};
+let currentPreviewVisit = null;
+let currentPreviewDoc = null;
 
 function formatDate(dateString) {
     const date = new Date(dateString);
@@ -3499,8 +3673,8 @@ function renderScheduledVisits() {
                 <td>${formatTime(visit.preferredTime)}</td>
                 <td>${getStatusBadge(visit.status || 'pending')}</td>
                 <td>
-                    <button class="action-btn edit-btn" onclick="viewVisitDetails('${visit._id}')">
-                        <i class="fas fa-eye"></i> View
+                    <button class="action-btn download-btn" onclick="downloadVisitReport('${visit._id}')">
+                        <i class="fas fa-download"></i> Download
                     </button>
                     ${visit.status === 'pending' ? `
                         <button class="action-btn confirm-btn" onclick="confirmVisit('${visit._id}')">
@@ -3518,29 +3692,491 @@ function renderScheduledVisits() {
     tableBody.innerHTML = rows;
 }
 
-function viewVisitDetails(visitId) {
-    const visit = scheduledVisitsData.find(v => v._id === visitId);
-    if (!visit) return;
+
+
+function renderScheduledVisits() {
+    const tableBody = document.getElementById('scheduledVisitsTableBody');
     
-    const property = propertiesData[visit.propertyId];
-    const propertyInfo = property ? 
-        `${property.title} - ${property.location}` : 
-        `Property #${visit.propertyId}`;
-    
-    const details = `
-        Client: ${visit.firstName} ${visit.lastName}
-        Email: ${visit.email}
-        Phone: ${visit.phone}
-        Property: ${propertyInfo}
-        Date: ${formatDate(visit.preferredDate)}
-        Time: ${formatTime(visit.preferredTime)}
-        Status: ${(visit.status || 'pending').charAt(0).toUpperCase() + (visit.status || 'pending').slice(1)}
-        ${visit.message ? `\nMessage: ${visit.message}` : ''}
-        Created: ${new Date(visit.createdAt).toLocaleString()}
-    `;
-    
-    alert(details);
+    const rows = scheduledVisitsData.map(visit => {
+        const property = visit.propertyId;
+        const propertyTitle = property ? property.title : `Property #${property?._id || ''}`;
+        const propertyLocation = property ? property.location : 'Unknown location';
+
+        return `
+            <tr>
+                <td>
+                    <div class="client-info">
+                        <div class="client-name">${visit.firstName} ${visit.lastName}</div>
+                        ${visit.message ? `<div class="client-message" title="${visit.message}">${visit.message}</div>` : ''}
+                    </div>
+                </td>
+                <td><a href="mailto:${visit.email}" style="color: #3182ce;">${visit.email}</a></td>
+                <td><a href="tel:${visit.phone}" style="color: #3182ce;">${visit.phone}</a></td>
+                <td>
+                    <div style="display: flex; flex-direction: column; gap: 2px;">
+                        <a href="propertyDetails.html?id=${property ? property._id : ''}" class="property-link" target="_blank">
+                            ${propertyTitle}
+                        </a>
+                        <small style="color: #718096;">${propertyLocation}</small>
+                    </div>
+                </td>
+                <td>${formatDate(visit.preferredDate)}</td>
+                <td>${formatTime(visit.preferredTime)}</td>
+                <td>${getStatusBadge(visit.status || 'pending')}</td>
+                <td>
+                    <div class="action-buttons-container">
+                        <input 
+                            type="text" 
+                            class="agent-name-input" 
+                            id="agentName_${visit._id}" 
+                            placeholder="Agent name (optional)"
+                        />
+                        <button class="action-btn preview-btn" onclick="previewVisitReport('${visit._id}')">
+                            <i class="fas fa-eye"></i> Preview
+                        </button>
+                        <button class="action-btn download-btn" onclick="downloadVisitReport('${visit._id}')">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                        ${visit.status === 'pending' ? `
+                            <button class="action-btn confirm-btn" onclick="confirmVisit('${visit._id}')">
+                                <i class="fas fa-check"></i> Confirm
+                            </button>
+                        ` : ''}
+                        <button class="action-btn delete-btn" onclick="deleteVisit('${visit._id}')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+
+    tableBody.innerHTML = rows;
 }
+
+async function previewVisitReport(visitId) {
+    const visit = scheduledVisitsData.find(v => v._id === visitId);
+    if (!visit) {
+        alert('Visit not found');
+        return;
+    }
+    
+    currentPreviewVisit = visit;
+    
+    // Get agent name from input field
+    const agentNameInput = document.getElementById(`agentName_${visitId}`);
+    const agentName = agentNameInput ? agentNameInput.value.trim() : '';
+    
+    // Open preview modal
+    document.getElementById('pdfPreviewModal').classList.add('active');
+    
+    // Generate preview
+    await generateReportPDF(visit, agentName, true);
+}
+
+async function downloadVisitReport(visitId) {
+    const visit = scheduledVisitsData.find(v => v._id === visitId);
+    if (!visit) {
+        alert('Visit not found');
+        return;
+    }
+    
+    // Get agent name from input field
+    const agentNameInput = document.getElementById(`agentName_${visitId}`);
+    const agentName = agentNameInput ? agentNameInput.value.trim() : '';
+    
+    // Generate and download directly
+    await generateReportPDF(visit, agentName, false);
+    
+    const fileName = `Visit_Schedule_${visit.firstName}_${visit.lastName}_${formatDate(visit.preferredDate).replace(/\//g, '-')}.pdf`;
+    currentPreviewDoc.save(fileName);
+}
+
+function renderScheduledVisits() {
+    const tableBody = document.getElementById('scheduledVisitsTableBody');
+    
+    const rows = scheduledVisitsData.map(visit => {
+        const property = visit.propertyId;
+        const propertyTitle = property ? property.title : `Property #${property?._id || ''}`;
+        const propertyLocation = property ? property.location : 'Unknown location';
+
+        return `
+            <tr>
+                <td>
+                    <div class="client-info">
+                        <div class="client-name">${visit.firstName} ${visit.lastName}</div>
+                        ${visit.message ? `<div class="client-message" title="${visit.message}">${visit.message}</div>` : ''}
+                    </div>
+                </td>
+                <td><a href="mailto:${visit.email}" style="color: #3182ce;">${visit.email}</a></td>
+                <td><a href="tel:${visit.phone}" style="color: #3182ce;">${visit.phone}</a></td>
+                <td>
+                    <div style="display: flex; flex-direction: column; gap: 2px;">
+                        <a href="propertyDetails.html?id=${property ? property._id : ''}" class="property-link" target="_blank">
+                            ${propertyTitle}
+                        </a>
+                        <small style="color: #718096;">${propertyLocation}</small>
+                    </div>
+                </td>
+                <td>${formatDate(visit.preferredDate)}</td>
+                <td>${formatTime(visit.preferredTime)}</td>
+                <td>${getStatusBadge(visit.status || 'pending')}</td>
+                <td>
+                    <div class="action-buttons-container">
+                        <input 
+                            type="text" 
+                            class="agent-name-input" 
+                            id="agentName_${visit._id}" 
+                            placeholder="Agent name (optional)"
+                        />
+                        <button class="action-btn preview-btn" onclick="previewVisitReport('${visit._id}')">
+                            <i class="fas fa-eye"></i> Preview
+                        </button>
+                        <button class="action-btn download-btn" onclick="downloadVisitReport('${visit._id}')">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                        ${visit.status === 'pending' ? `
+                            <button class="action-btn confirm-btn" onclick="confirmVisit('${visit._id}')">
+                                <i class="fas fa-check"></i> Confirm
+                            </button>
+                        ` : ''}
+                        <button class="action-btn delete-btn" onclick="deleteVisit('${visit._id}')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+
+    tableBody.innerHTML = rows;
+}
+
+async function previewVisitReport(visitId) {
+    const visit = scheduledVisitsData.find(v => v._id === visitId);
+    if (!visit) {
+        alert('Visit not found');
+        return;
+    }
+    
+    currentPreviewVisit = visit;
+    
+    // Get agent name from input field
+    const agentNameInput = document.getElementById(`agentName_${visitId}`);
+    const agentName = agentNameInput ? agentNameInput.value.trim() : '';
+    
+    // Open preview modal
+    document.getElementById('pdfPreviewModal').classList.add('active');
+    
+    // Show loading state
+    const iframe = document.getElementById('pdfPreviewFrame');
+    iframe.style.display = 'none';
+    
+    // Generate preview
+    await generateReportPDF(visit, agentName, true);
+    
+    // Show iframe after PDF is loaded
+    iframe.style.display = 'block';
+}
+
+async function downloadVisitReport(visitId) {
+    const visit = scheduledVisitsData.find(v => v._id === visitId);
+    if (!visit) {
+        alert('Visit not found');
+        return;
+    }
+    
+    // Get agent name from input field
+    const agentNameInput = document.getElementById(`agentName_${visitId}`);
+    const agentName = agentNameInput ? agentNameInput.value.trim() : '';
+    
+    // Generate and download directly
+    await generateReportPDF(visit, agentName, false);
+    
+    const fileName = `Visit_Schedule_${visit.firstName}_${visit.lastName}_${formatDate(visit.preferredDate).replace(/\//g, '-')}.pdf`;
+    currentPreviewDoc.save(fileName);
+}
+
+async function generateReportPDF(visit, agentName = '', isPreview = false) {
+    const property = visit.propertyId;
+    const propertyTitle = property ? property.title : `Property #${property?._id || ''}`;
+    const propertyLocation = property ? property.location : 'Unknown location';
+    
+    try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        // Page dimensions
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const margin = 20;
+        let yPosition = 20;
+        
+    
+        const logoPath = '/Admin/company_logo_blue_color-removebg-preview.png'; 
+        
+        try {
+            const logoWidth = 30;
+            const logoHeight = 30;
+            doc.addImage(logoPath, 'PNG', margin, yPosition, logoWidth, logoHeight);
+        } catch (logoError) {
+            console.warn('Logo could not be loaded, using placeholder');
+            doc.setDrawColor(200, 200, 200);
+            doc.setLineWidth(0.5);
+            doc.rect(margin, yPosition, 30, 30);
+            doc.setFontSize(8);
+            doc.setTextColor(150, 150, 150);
+            doc.text('[AMZ]', margin + 15, yPosition + 15, { align: 'center' });
+        }
+        
+        // Header - Company Name and Contact Info (next to logo)
+        const headerX = margin + 40;
+        doc.setFontSize(20);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(102, 126, 234); // #667eea
+        doc.text('AMIZERO Real Estate Ltd', headerX, yPosition + 8);
+        
+        // Contact Info
+        doc.setFontSize(9);
+        doc.setFont(undefined, 'normal');
+        doc.setTextColor(80, 80, 80);
+        doc.text('Tel: 0725502317', headerX, yPosition + 15);
+        doc.text('Email: amizerorealestate@gmail.com', headerX, yPosition + 20);
+        
+
+        
+        yPosition += 35;
+        
+        // Add a line under header
+        doc.setDrawColor(102, 126, 234);
+        doc.setLineWidth(0.5);
+        doc.line(margin, yPosition, pageWidth - margin, yPosition);
+        yPosition += 12;
+        
+        // Report Title with Gradient Background Effect
+        const titleY = yPosition;
+        const titleHeight = 12;
+        
+        // Simulate gradient with rectangles (jsPDF doesn't support real gradients)
+        const gradientSteps = 50;
+        const rectWidth = (pageWidth - 2 * margin) / gradientSteps;
+        for (let i = 0; i < gradientSteps; i++) {
+            const ratio = i / gradientSteps;
+            // Interpolate between #667eea (102, 126, 234) and #764ba2 (118, 75, 162)
+            const r = Math.round(102 + (118 - 102) * ratio);
+            const g = Math.round(126 + (75 - 126) * ratio);
+            const b = Math.round(234 + (162 - 234) * ratio);
+            doc.setFillColor(r, g, b);
+            doc.rect(margin + i * rectWidth, titleY, rectWidth, titleHeight, 'F');
+        }
+        
+        // Title Text
+        doc.setFontSize(18);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(255, 255, 255); // White text
+        doc.text('Property Visit Schedule', pageWidth / 2, titleY + 8, { align: 'center' });
+        
+        yPosition += titleHeight + 12;
+        
+        // Date of Visit
+        doc.setFontSize(12);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(0, 0, 0);
+        doc.text('Date of Visit:', margin, yPosition);
+        doc.setFont(undefined, 'normal');
+        doc.text(formatDate(visit.preferredDate), margin + 35, yPosition);
+        yPosition += 10;
+        
+        // Agent Name
+        doc.setFont(undefined, 'bold');
+        doc.text('Agent Name:', margin, yPosition);
+        doc.setFont(undefined, 'normal');
+        if (agentName) {
+            doc.text(agentName, margin + 35, yPosition);
+        } else {
+            doc.text('_________________________________', margin + 35, yPosition);
+        }
+        yPosition += 15;
+        
+        // Section: Client Information
+        doc.setFontSize(14);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(102, 126, 234); // #667eea
+        doc.text('Client Information', margin, yPosition);
+        yPosition += 10;
+        
+        doc.setFontSize(11);
+        doc.setFont(undefined, 'normal');
+        doc.setTextColor(0, 0, 0);
+        
+        const clientInfo = [
+            ['Name:', `${visit.firstName} ${visit.lastName}`],
+            ['Email:', visit.email],
+            ['Phone:', visit.phone],
+            ['Visit Time:', formatTime(visit.preferredTime)],
+            ['Status:', (visit.status || 'pending').charAt(0).toUpperCase() + (visit.status || 'pending').slice(1)]
+        ];
+        
+        clientInfo.forEach(([label, value]) => {
+            doc.setFont(undefined, 'bold');
+            doc.text(label, margin, yPosition);
+            doc.setFont(undefined, 'normal');
+            doc.text(value, margin + 30, yPosition);
+            yPosition += 7;
+        });
+        
+        yPosition += 10;
+        
+        // Section: Property Information
+        doc.setFontSize(14);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(102, 126, 234); // #667eea
+        doc.text('Property Information', margin, yPosition);
+        yPosition += 10;
+        
+        doc.setFontSize(11);
+        doc.setFont(undefined, 'normal');
+        doc.setTextColor(0, 0, 0);
+        
+        const propertyInfo = [
+            ['Property:', propertyTitle],
+            ['Location:', propertyLocation]
+        ];
+        
+        if (property) {
+            if (property.type) propertyInfo.push(['Type:', property.type]);
+            if (property.price) propertyInfo.push(['Price:', `$${property.price.toLocaleString()}`]);
+            if (property.bedrooms) propertyInfo.push(['Bedrooms:', property.bedrooms.toString()]);
+            if (property.bathrooms) propertyInfo.push(['Bathrooms:', property.bathrooms.toString()]);
+        }
+        
+        propertyInfo.forEach(([label, value]) => {
+            doc.setFont(undefined, 'bold');
+            doc.text(label, margin, yPosition);
+            doc.setFont(undefined, 'normal');
+            doc.text(value, margin + 30, yPosition);
+            yPosition += 7;
+        });
+        
+        yPosition += 10;
+        
+        // Section: Client Message (if exists)
+        if (visit.message) {
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(102, 126, 234); // #667eea
+            doc.text('Client Message', margin, yPosition);
+            yPosition += 10;
+            
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'normal');
+            doc.setTextColor(0, 0, 0);
+            
+            const splitMessage = doc.splitTextToSize(visit.message, pageWidth - 2 * margin);
+            doc.text(splitMessage, margin, yPosition);
+            yPosition += splitMessage.length * 7 + 10;
+        }
+        
+        // Section: Visit Notes (blank space for manual notes)
+        doc.setFontSize(14);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(102, 126, 234); // #667eea
+        doc.text('Visit Notes', margin, yPosition);
+        yPosition += 10;
+        
+        // Draw lines for notes
+        doc.setDrawColor(200, 200, 200);
+        doc.setLineWidth(0.3);
+        for (let i = 0; i < 5; i++) {
+            doc.line(margin, yPosition, pageWidth - margin, yPosition);
+            yPosition += 8;
+        }
+        
+        yPosition += 7;
+        
+        // Footer
+        
+        doc.setFontSize(9);
+        doc.setFont(undefined, 'italic');
+        doc.setTextColor(128, 128, 128);
+        const footerY = doc.internal.pageSize.getHeight() - 15;
+        doc.text(`Generated on: ${new Date().toLocaleString()}`, margin, footerY);
+        doc.text('AMIZERO Real Estate Ltd - "Your Property, Our Priority"', pageWidth / 2, footerY + 5, { align: 'center' });
+        
+        // Store the document
+        currentPreviewDoc = doc;
+        
+        // If preview mode, render to iframe
+        if (isPreview) {
+            const pdfDataUri = doc.output('datauristring');
+            const iframe = document.getElementById('pdfPreviewFrame');
+            if (iframe) {
+                iframe.src = pdfDataUri;
+            } else {
+                console.error('PDF preview iframe not found');
+            }
+        }
+        
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        alert('Failed to generate PDF report. Please try again.');
+    }
+}
+
+function downloadPreviewedReport() {
+    if (!currentPreviewDoc || !currentPreviewVisit) {
+        alert('No report to download');
+        return;
+    }
+    
+    const visit = currentPreviewVisit;
+    const fileName = `Visit_Schedule_${visit.firstName}_${visit.lastName}_${formatDate(visit.preferredDate).replace(/\//g, '-')}.pdf`;
+    currentPreviewDoc.save(fileName);
+    
+    // Close modal after download
+    closePreviewModal();
+}
+
+function closePreviewModal() {
+    const modal = document.getElementById('pdfPreviewModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+    
+    // Clear iframe
+    const iframe = document.getElementById('pdfPreviewFrame');
+    if (iframe) {
+        iframe.src = '';
+    }
+    
+    currentPreviewVisit = null;
+    currentPreviewDoc = null;
+}
+
+// Helper function to format date (add this if not already present)
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+}
+
+// Helper function to format time (add this if not already present)
+function formatTime(timeString) {
+    return timeString || 'Not specified';
+}
+
+// Helper function to get status badge (add this if not already present)
+function getStatusBadge(status) {
+    const statusColors = {
+        'pending': 'orange',
+        'confirmed': 'green',
+        'cancelled': 'red',
+        'completed': 'blue'
+    };
+    const color = statusColors[status] || 'gray';
+    return `<span class="status-badge status-${status}" style="background-color: ${color}; color: white; padding: 4px 8px; border-radius: 4px;">${status.charAt(0).toUpperCase() + status.slice(1)}</span>`;
+}
+
+
+
 
 async function confirmVisit(visitId) {
     if (!confirm('Confirm this visit appointment?')) return;
