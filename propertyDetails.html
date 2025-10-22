@@ -742,21 +742,26 @@
                 <h3 class="form-title">Schedule a Visit</h3>
                 <p class="form-subtitle">Book a personal tour of this property</p>
                 
-                <div class="agent-info">
-                    <div class="agent-title">Property Agent</div>
-                    <div class="agent-contact">
-                        <i class="fas fa-user"></i>
-                        <span>Aphrodis Amizero</span>
-                    </div>
-                    <div class="agent-contact">
-                        <i class="fas fa-phone"></i>
-                        <span>+250 (725) 502-317</span>
-                    </div>
-                    <div class="agent-contact">
-                        <i class="fas fa-envelope"></i>
-                        <span>amizerorealestate@gmail.com</span>
-                    </div>
-                </div>
+              <div class="agent-info">
+  <div class="agent-title">Need Help? Contact Us</div>
+  <div class="agent-contact">
+    <i class="fas fa-user"></i>
+    <span>AMIZERO Real Estate Ltd</span>
+  </div>
+  <div class="agent-contact">
+    <i class="fas fa-phone"></i>
+    <span>+250 (725) 502-317</span>
+  </div>
+  <div class="agent-contact">
+    <i class="fas fa-envelope"></i>
+    <span>amizerorealestate@gmail.com</span>
+  </div>
+  <div class="agent-contact">
+    <i class="fas fa-map-marker-alt"></i>
+    <span>Kigali, Rwanda</span>
+  </div>
+</div>
+
                 
                 <form id="scheduleForm">
                     <div class="form-row">
@@ -1365,7 +1370,7 @@ function showVisitModal(title, message, isSuccess) {
             const formattedTime = formatTime(scheduleData.preferredTime);
             
             showMessage(
-                `Thank you ${scheduleData.firstName}! Your visit for "${propertyTitle}" on ${formattedDate} at ${formattedTime} has been scheduled.`,
+                `Thank you ${scheduleData.firstName}! Your visit for "${propertyTitle}" on ${formattedDate} at ${formattedTime} has been scheduled! One of our agents will review your request and contact you shortly with full visit details and agent information.`,
                 'success'
             );
             
