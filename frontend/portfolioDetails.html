@@ -695,8 +695,10 @@
 
 
     <script>
-       // COMPLETE PORTFOLIO DETAILS MANAGER - WITH PDF DOWNLOAD
-// Replace ONLY the PortfolioDetailsManager class in your portfolioDetails.html
+        // Backend API Base URL
+const API_BASE_URL = 'https://amizerorealestate.onrender.com';
+
+// COMPLETE PORTFOLIO DETAILS MANAGER - WITH PDF DOWNLOAD
 
 class PortfolioDetailsManager {
     constructor() {
@@ -737,7 +739,7 @@ class PortfolioDetailsManager {
 
         console.log('🌐 Fetching portfolio data from API...');
         try {
-            const response = await fetch('/api/public/portfolio');
+            const response = await fetch(`${API_BASE_URL}/api/public/portfolio`);
             
             if (!response.ok) {
                 console.error('❌ API response not OK:', response.status);
@@ -1377,6 +1379,6 @@ window.portfolioDetails = new PortfolioDetailsManager();
 const style = document.createElement('style');
 style.textContent = '.related-project-item:hover { background: #e9ecef !important; }';
 document.head.appendChild(style);
-</script>
+    </script>
 </body>
 </html>

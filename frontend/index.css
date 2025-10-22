@@ -625,62 +625,61 @@ footer::before {
   font-weight: bold;
 }
 
-/* Our Partners Section */
-.our-partners h3 {
-  margin-bottom: 1.5rem;
-  font-size: 1.3rem;
-  color: #667eea;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
+ /* Our Partners Section */
+        .our-partners h3 {
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
 
+        .partners-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
 
+        .partner-item {
+            padding: 0.6rem;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+            height: 100%;
+        }
 
-.partners-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-}
+        .partner-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-3px);
+            border-color: #667eea;
+        }
 
-.partner-item {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 0.5rem;
-  border-radius: 10px;
-  text-align: center;
-  transition: all 0.3s ease;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-}
+        .partner-logo {
+            width: 130px;
+            height: 100px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-.partner-item:hover {
-  background: rgba(255, 255, 255, 0.15);
-  transform: translateY(-3px);
-  border-color: var(--secondary-color);
-}
+        .partner-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
 
-.partner-logo{
-  width: 80px;
-  height: 80px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 0.5rem;
-  font-size: 1.2rem;
-  color: white;
-}
-.partner-logo img{
-width: 100%;
-height: 100%;
-object-fit: contain;
-}
-
-.partner-name {
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: 500;
-}
+       
+    
+        @media (min-width: 768px) {
+            .partners-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
 
 /* Newsletter Section */
 .newsletter h3 {
@@ -1723,8 +1722,8 @@ object-fit: contain;
 
 /* FIXED: Team Avatar with proper image stacking */
 .team-avatar {
-    width: 180px;
-    height: 180px;
+    width: 220px;
+    height: 220px;
     background: var(--gradient);
     border-radius: 50%;
     display: flex;

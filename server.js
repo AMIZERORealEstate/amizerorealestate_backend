@@ -1289,6 +1289,24 @@ app.get('/api/newsletter', authenticateToken, async (req, res) => {
 });
 
 
+// Delete newsletter subscriber (protected)
+app.delete('/api/newsletter/:id', authenticateToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const result = await Newsletter.findByIdAndDelete(id);
+        
+        if (!result) {
+            return res.status(404).json({ success: false, error: 'Subscriber not found' });
+        }
+        
+        res.json({ success: true, message: 'Subscriber deleted successfully' });
+    } catch (error) {
+        console.error("Error deleting newsletter subscriber:", error);
+        res.status(500).json({ success: false, error: 'Failed to delete subscriber' });
+    }
+});
+
+
 
 // Team Routes
 app.get('/api/team', authenticateToken, async (req, res) => {

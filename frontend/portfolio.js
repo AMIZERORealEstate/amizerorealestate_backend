@@ -13,7 +13,7 @@ class PortfolioManager {
 
     async fetchPortfolioData() {
         try {
-            const response = await fetch('/api/public/portfolio');
+            const response = await fetch(`${API_BASE_URL}/api/public/portfolio`);
             if (!response.ok) {
                 throw new Error('Failed to fetch portfolio data');
             }
@@ -171,7 +171,6 @@ class PortfolioManager {
         `;
     }
 
-    // ADD THIS MISSING METHOD
     clearLoadingMessage() {
         const portfolioGrid = document.querySelector('.portfolio-grid');
         if (portfolioGrid) {
@@ -245,7 +244,6 @@ class PortfolioManager {
         }
     }
 
-    // Optional: Show loading message while fetching data
     showLoadingMessage() {
         const portfolioGrid = document.querySelector('.portfolio-grid');
         if (portfolioGrid) {
@@ -261,17 +259,15 @@ class PortfolioManager {
         }
     }
 
-    // Public method to refresh portfolio data
     async refresh() {
-        this.showLoadingMessage(); // Optional: show loading during refresh
+        this.showLoadingMessage();
         await this.fetchPortfolioData();
         this.renderPortfolio();
     }
 }
 
-// ============================================
-// INITIALIZATION CODE
-// ============================================
+// Make PortfolioManager globally available
+window.PortfolioManager = PortfolioManager;
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {

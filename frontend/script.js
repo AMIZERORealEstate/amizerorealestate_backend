@@ -1,4 +1,6 @@
 // AMIZERO Real Estate Website JavaScript
+// Backend API Base URL
+const API_BASE_URL = 'https://amizerorealestate.onrender.com';
 
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
@@ -37,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = Object.fromEntries(formData.entries());
             
             // Send to backend
-            fetch('/api/contact', {
+            fetch(`${API_BASE_URL}/api/contact`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -280,7 +282,7 @@ document.querySelectorAll('.newsletter-form').forEach(form => {
         }
 
         try {
-            const res = await fetch('/api/newsletter', {
+            const res = await fetch(`${API_BASE_URL}/api/newsletter`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email })

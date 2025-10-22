@@ -623,18 +623,17 @@
             </div>
 
             <!-- Our Partners -->
-            <div class="footer-section our-partners">
-                <h3>Our Partners</h3>
-                <div class="partners-grid">
-                    <div class="partner-item">
-                        <div class="partner-logo">
-                            <img src="images/La_Riqueza_logo-01-removebg-preview.png" alt="">
-                        </div>
-                        <div class="partner-name">Lariqueza Ltd</div>
-                    </div>
+    <div class="footer-section our-partners">
+        <h3>Our Partners</h3>
+        <div class="partners-grid">
+            <div class="partner-item">
+                <div class="partner-logo">
+                    <img src="images/La Riqueza logo-02.png" alt="Lariqueza Ltd">
                 </div>
             </div>
-
+    
+        </div>
+    </div>
             <!-- Newsletter Subscription -->
             <div class="footer-section newsletter">
                 <h3>Stay Updated</h3>
@@ -694,339 +693,343 @@
         document.getElementById("year").textContent = new Date().getFullYear();
 </script>
 
-<script src="script.js" defer></script>
+<script src="script.js"></script>
        
         
         <script>
 
-        // Mobile Navigation Toggle
-        document.addEventListener("DOMContentLoaded", () => {
-            const hamburger = document.querySelector('.hamburger');
-            const navMenu = document.querySelector('.nav-menu');
-            const closeMenu = document.querySelector('.close-menu');
 
-            if (hamburger && navMenu) {
-                // Toggle menu on hamburger click
-                hamburger.addEventListener('click', () => {
-                    hamburger.classList.toggle('active');
-                    navMenu.classList.toggle('active');
-                });
-            }
+// ============================================
+// MOBILE NAVIGATION
+// ============================================
+document.addEventListener("DOMContentLoaded", () => {
+    const hamburger = document.querySelector('.hamburger');
+    const navMenu = document.querySelector('.nav-menu');
+    const closeMenu = document.querySelector('.close-menu');
 
-            if (closeMenu) {
-                // Close menu on close icon click
-                closeMenu.addEventListener('click', () => {
-                    hamburger.classList.remove('active');
-                    navMenu.classList.remove('active');
-                });
-            }
-
-            // Close menu when clicking a nav link
-            document.querySelectorAll('.nav-menu a').forEach(link => {
-                link.addEventListener('click', () => {
-                    hamburger.classList.remove('active');
-                    navMenu.classList.remove('active');
-                });
-            });
+    if (hamburger && navMenu) {
+        // Toggle menu on hamburger click
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
         });
+    }
 
-        // Contact modal functions
-        function closeContactModal() {
-            document.getElementById('contact-agent-modal').style.display = 'none';
+    if (closeMenu) {
+        // Close menu on close icon click
+        closeMenu.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+        });
+    }
+
+    // Close menu when clicking a nav link
+    document.querySelectorAll('.nav-menu a').forEach(link => {
+        link.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+        });
+    });
+});
+
+// ============================================
+// CONTACT MODAL
+// ============================================
+function closeContactModal() {
+    document.getElementById('contact-agent-modal').style.display = 'none';
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('contact-agent-modal');
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+
+// ============================================
+// PROPERTY ADS CAROUSEL
+// ============================================
+const API_URL = `${API_BASE_URL}/api/public/properties`;
+let adsProperties = [];
+let currentAdIndex = 0;
+let adsInterval = null;
+
+// Fetch properties from your database
+async function loadAdsProperties() {
+    try {
+        const response = await fetch(API_URL);
+        if (!response.ok) throw new Error("Failed to fetch properties");
+        const data = await response.json();
+
+        // Transform the data to match the ads format
+        adsProperties = data.map(property => ({
+            id: property.id,
+            image: (Array.isArray(property.images) && property.images.length > 0) 
+                ? property.images[0] 
+                : 'https://via.placeholder.com/400x300?text=No+Image',
+            price: formatAdsPrice(property.price, property.type),
+            title: property.title || 'Property Available',
+            location: property.location || 'Location Available',
+            bedrooms: property.bedrooms ? `${property.bedrooms} Beds` : 'N/A',
+            bathrooms: property.bathrooms ? `${property.bathrooms} Baths` : 'N/A',
+            parking: property.parking ? `${property.parking} Cars` : 'N/A',
+            type: property.type || 'sale'
+        }));
+
+        // Start the ads rotation if we have properties
+        if (adsProperties.length > 0) {
+            updateAdsProperty();
+            currentAdIndex = 1;
+            startAdsRotation();
+        } else {
+            showNoPropertiesMessage();
         }
 
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('contact-agent-modal');
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
-        }
-    </script>
+    } catch (error) {
+        console.error("Error loading ads properties:", error);
+        showErrorMessage();
+    }
+}
 
+// Format price for ads display
+function formatAdsPrice(price, type) {
+    const numPrice = Number(price) || 0;
+    const formatted = new Intl.NumberFormat('RWF', {
+        style: 'currency',
+        currency: 'RWF',
+        minimumFractionDigits: 0
+    }).format(numPrice);
+    return type === 'rent' ? `${formatted}/month` : formatted;
+}
 
-   <script>
-        // Use your API URL
-        const API_URL = `${window.location.origin}/api/public/properties`;
-        let adsProperties = [];
-        let currentAdIndex = 0;
-        let adsInterval = null;
+function updateAdsProperty() {
+    if (adsProperties.length === 0) return;
 
-        // Fetch properties from your database
-        async function loadAdsProperties() {
-            try {
-                const response = await fetch(API_URL);
-                if (!response.ok) throw new Error("Failed to fetch properties");
-                const data = await response.json();
-
-                // Transform the data to match the ads format
-                adsProperties = data.map(property => ({
-                    id: property.id,
-                    image: (Array.isArray(property.images) && property.images.length > 0) 
-                        ? property.images[0] 
-                        : 'https://via.placeholder.com/400x300?text=No+Image',
-                    price: formatAdsPrice(property.price, property.type),
-                    title: property.title || 'Property Available',
-                    location: property.location || 'Location Available',
-                    bedrooms: property.bedrooms ? `${property.bedrooms} Beds` : 'N/A',
-                    bathrooms: property.bathrooms ? `${property.bathrooms} Baths` : 'N/A',
-                    parking: property.parking ? `${property.parking} Cars` : 'N/A',
-                    type: property.type || 'sale'
-                }));
-
-                // Start the ads rotation if we have properties
-                if (adsProperties.length > 0) {
-                    updateAdsProperty();
-                    currentAdIndex = 1;
-                    startAdsRotation();
-                } else {
-                    showNoPropertiesMessage();
-                }
-
-            } catch (error) {
-                console.error("Error loading ads properties:", error);
-                showErrorMessage();
-            }
-        }
-
-        // Format price for ads display
-        function formatAdsPrice(price, type) {
-            const numPrice = Number(price) || 0;
-            const formatted = new Intl.NumberFormat('RWF', {
-                style: 'currency',
-                currency: 'RWF',
-                minimumFractionDigits: 0
-            }).format(numPrice);
-            return type === 'rent' ? `${formatted}/month` : formatted;
-        }
-
-        function updateAdsProperty() {
-            if (adsProperties.length === 0) return;
-
-            const card = document.getElementById('adsCard');
-            const property = adsProperties[currentAdIndex];
-            
-            // Add slide out effect
-            card.classList.add('ads-slide-exit');
-            
-            setTimeout(() => {
-                // Update content
-                card.innerHTML = `
-                    <div class="ads-property-image" style="background-image: url(${property.image})">
-                        <div class="ads-property-badge">${property.type === 'rent' ? 'For Rent' : 'For Sale'}</div>
-                        <div class="ads-progress-bar"></div>
-                    </div>
-                    <div class="ads-property-content">
-                        <div class="ads-property-price">${property.price}</div>
-                        <h4 class="ads-property-title">${property.title}</h4>
-                        <div class="ads-property-location">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span>${property.location}</span>
-                        </div>
-                        <div class="ads-property-features">
-                            <div class="ads-feature">
-                                <i class="fas fa-bed"></i>
-                                <span>${property.bedrooms}</span>
-                            </div>
-                            <div class="ads-feature">
-                                <i class="fas fa-bath"></i>
-                                <span>${property.bathrooms}</span>
-                            </div>
-                            <div class="ads-feature">
-                                <i class="fas fa-car"></i>
-                                <span>${property.parking}</span>
-                            </div>
-                        </div>
-                        <button class="ads-contact-btn" onclick="viewPropertyDetails('${property.id}')">
-                            <i class="fas fa-eye"></i> View Details
-                        </button>
-                    </div>
-                `;
-                
-                // Add slide in effect
-                card.classList.remove('ads-slide-exit');
-                card.classList.add('ads-slide-enter');
-                
-                setTimeout(() => {
-                    card.classList.remove('ads-slide-enter');
-                    card.classList.add('ads-slide-active');
-                }, 50);
-                
-            }, 250);
-            
-            // Move to next property
-            currentAdIndex = (currentAdIndex + 1) % adsProperties.length;
-        }
-
-        // View property details function
-        function viewPropertyDetails(propertyId) {
-            window.location.href = `propertyDetails.html?id=${propertyId}`;
-        }
-
-        // Contact agent function (keeping for future use)
-        function contactAgent(propertyId, propertyTitle) {
-            const phoneNumber = "250725502317";
-            const message = `Hi, I'm interested in the property: ${propertyTitle}`;
-            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-            window.open(whatsappUrl, '_blank');
-        }
-
-        // Start ads rotation
-        function startAdsRotation() {
-            if (adsInterval) clearInterval(adsInterval);
-            adsInterval = setInterval(updateAdsProperty, 3000);
-        }
-
-        // Stop ads rotation
-        function stopAdsRotation() {
-            if (adsInterval) {
-                clearInterval(adsInterval);
-                adsInterval = null;
-            }
-        }
-
-        // Show message when no properties available
-        function showNoPropertiesMessage() {
-            const card = document.getElementById('adsCard');
-            card.innerHTML = `
-                <div class="ads-property-content" style="text-align: center; padding: 40px 20px;">
-                    <i class="fas fa-home" style="font-size: 2rem; color: #bdc3c7; margin-bottom: 15px;"></i>
-                    <h4 style="color: #7f8c8d; margin-bottom: 10px;">No Properties Available</h4>
-                    <p style="color: #bdc3c7; font-size: 0.9rem;">Check back later for new listings!</p>
+    const card = document.getElementById('adsCard');
+    const property = adsProperties[currentAdIndex];
+    
+    // Add slide out effect
+    card.classList.add('ads-slide-exit');
+    
+    setTimeout(() => {
+        // Update content
+        card.innerHTML = `
+            <div class="ads-property-image" style="background-image: url(${property.image})">
+                <div class="ads-property-badge">${property.type === 'rent' ? 'For Rent' : 'For Sale'}</div>
+                <div class="ads-progress-bar"></div>
+            </div>
+            <div class="ads-property-content">
+                <div class="ads-property-price">${property.price}</div>
+                <h4 class="ads-property-title">${property.title}</h4>
+                <div class="ads-property-location">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>${property.location}</span>
                 </div>
-            `;
-        }
-
-        // Show error message
-        function showErrorMessage() {
-            const card = document.getElementById('adsCard');
-            card.innerHTML = `
-                <div class="ads-property-content" style="text-align: center; padding: 40px 20px;">
-                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #e74c3c; margin-bottom: 15px;"></i>
-                    <h4 style="color: #e74c3c; margin-bottom: 10px;">Unable to Load Properties</h4>
-                    <p style="color: #7f8c8d; font-size: 0.9rem;">Please check your connection and try again.</p>
+                <div class="ads-property-features">
+                    <div class="ads-feature">
+                        <i class="fas fa-bed"></i>
+                        <span>${property.bedrooms}</span>
+                    </div>
+                    <div class="ads-feature">
+                        <i class="fas fa-bath"></i>
+                        <span>${property.bathrooms}</span>
+                    </div>
+                    <div class="ads-feature">
+                        <i class="fas fa-car"></i>
+                        <span>${property.parking}</span>
+                    </div>
                 </div>
-            `;
+                <button class="ads-contact-btn" onclick="viewPropertyDetails('${property.id}')">
+                    <i class="fas fa-eye"></i> View Details
+                </button>
+            </div>
+        `;
+        
+        // Add slide in effect
+        card.classList.remove('ads-slide-exit');
+        card.classList.add('ads-slide-enter');
+        
+        setTimeout(() => {
+            card.classList.remove('ads-slide-enter');
+            card.classList.add('ads-slide-active');
+        }, 50);
+        
+    }, 250);
+    
+    // Move to next property
+    currentAdIndex = (currentAdIndex + 1) % adsProperties.length;
+}
+
+// View property details function
+function viewPropertyDetails(propertyId) {
+    window.location.href = `propertyDetails.html?id=${propertyId}`;
+}
+
+// Contact agent function (keeping for future use)
+function contactAgent(propertyId, propertyTitle) {
+    const phoneNumber = "250725502317";
+    const message = `Hi, I'm interested in the property: ${propertyTitle}`;
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+}
+
+// Start ads rotation
+function startAdsRotation() {
+    if (adsInterval) clearInterval(adsInterval);
+    adsInterval = setInterval(updateAdsProperty, 3000);
+}
+
+// Stop ads rotation
+function stopAdsRotation() {
+    if (adsInterval) {
+        clearInterval(adsInterval);
+        adsInterval = null;
+    }
+}
+
+// Show message when no properties available
+function showNoPropertiesMessage() {
+    const card = document.getElementById('adsCard');
+    card.innerHTML = `
+        <div class="ads-property-content" style="text-align: center; padding: 40px 20px;">
+            <i class="fas fa-home" style="font-size: 2rem; color: #bdc3c7; margin-bottom: 15px;"></i>
+            <h4 style="color: #7f8c8d; margin-bottom: 10px;">No Properties Available</h4>
+            <p style="color: #bdc3c7; font-size: 0.9rem;">Check back later for new listings!</p>
+        </div>
+    `;
+}
+
+// Show error message
+function showErrorMessage() {
+    const card = document.getElementById('adsCard');
+    card.innerHTML = `
+        <div class="ads-property-content" style="text-align: center; padding: 40px 20px;">
+            <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #e74c3c; margin-bottom: 15px;"></i>
+            <h4 style="color: #e74c3c; margin-bottom: 10px;">Unable to Load Properties</h4>
+            <p style="color: #7f8c8d; font-size: 0.9rem;">Please check your connection and try again.</p>
+        </div>
+    `;
+}
+
+// Initialize ads when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    loadAdsProperties();
+});
+
+// Pause rotation when user hovers over the card
+document.addEventListener('DOMContentLoaded', () => {
+    const adsContainer = document.querySelector('.ads-property-container');
+    if (adsContainer) {
+        adsContainer.addEventListener('mouseenter', stopAdsRotation);
+        adsContainer.addEventListener('mouseleave', startAdsRotation);
+    }
+});
+
+// ============================================
+// FADE IN ANIMATIONS
+// ============================================
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
         }
+    });
+}, observerOptions);
 
-        // Initialize ads when page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            loadAdsProperties();
-        });
+document.querySelectorAll('.fade-in').forEach(el => {
+    observer.observe(el);
+});
 
-        // Pause rotation when user hovers over the card
-        document.addEventListener('DOMContentLoaded', () => {
-            const adsContainer = document.querySelector('.ads-property-container');
-            if (adsContainer) {
-                adsContainer.addEventListener('mouseenter', stopAdsRotation);
-                adsContainer.addEventListener('mouseleave', startAdsRotation);
-            }
-        });
+// ============================================
+// ACHIEVEMENTS COUNTER ANIMATION
+// ============================================
 
-        // Fade in animation for step cards
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.fade-in').forEach(el => {
-            observer.observe(el);
-        });
-    </script>
-
-
-<script>
-        // Counter animation function
-        function animateCounter(element, target, duration = 2000) {
-            const start = 0;
-            const startTime = performance.now();
-            
-            function updateCounter(currentTime) {
-                const elapsed = currentTime - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                
-                // Easing function for smooth animation
-                const easeOut = 1 - Math.pow(1 - progress, 3);
-                const current = Math.floor(start + (target - start) * easeOut);
-                
-                element.textContent = current.toLocaleString() + '+';
-                
-                if (progress < 1) {
-                    requestAnimationFrame(updateCounter);
-                }
-            }
-            
+// Counter animation function
+function animateCounter(element, target, duration = 2000) {
+    const start = 0;
+    const startTime = performance.now();
+    
+    function updateCounter(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Easing function for smooth animation
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        const current = Math.floor(start + (target - start) * easeOut);
+        
+        element.textContent = current.toLocaleString() + '+';
+        
+        if (progress < 1) {
             requestAnimationFrame(updateCounter);
         }
+    }
+    
+    requestAnimationFrame(updateCounter);
+}
 
-        // Alternative: Timeout-based animation (starts after page load)
-        let achievementsAnimated = false;
-        
-        function triggerAchievementsAnimation() {
-            if (achievementsAnimated) return;
-            
-            const achievementsGrid = document.querySelector('.achievements-grid');
-            if (!achievementsGrid) return;
-            
-            // Check if element is in viewport
-            const rect = achievementsGrid.getBoundingClientRect();
-            const isInViewport = rect.top < window.innerHeight && rect.bottom > 0;
-            
-           if (isInViewport) {
-    achievementsAnimated = true;
+// Alternative: Timeout-based animation (starts after page load)
+let achievementsAnimated = false;
 
-    const achievementNumbers = document.querySelectorAll('.achievement-number');
-    achievementNumbers.forEach((numberElement, index) => {
-        // 👇 read the number that was rendered from the database
-        const target = parseInt(numberElement.textContent.replace(/[^\d]/g, ''), 10);
-animateCounter(numberElement, target);
+function triggerAchievementsAnimation() {
+    if (achievementsAnimated) return;
+    
+    const achievementsGrid = document.querySelector('.achievements-grid');
+    if (!achievementsGrid) return;
+    
+    // Check if element is in viewport
+    const rect = achievementsGrid.getBoundingClientRect();
+    const isInViewport = rect.top < window.innerHeight && rect.bottom > 0;
+    
+    if (isInViewport) {
+        achievementsAnimated = true;
 
+        const achievementNumbers = document.querySelectorAll('.achievement-number');
+        achievementNumbers.forEach((numberElement, index) => {
+            // Read the number that was rendered from the database
+            const target = parseInt(numberElement.textContent.replace(/[^\d]/g, ''), 10);
 
-        setTimeout(() => {
-            numberElement.classList.add('animate');
-            animateCounter(numberElement, target);
-        }, index * 200 + 300);
+            setTimeout(() => {
+                numberElement.classList.add('animate');
+                animateCounter(numberElement, target);
+            }, index * 200 + 300);
+        });
+    }
+}
+
+// Initialize after DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    // Wait a bit then check if section is visible
+    setTimeout(triggerAchievementsAnimation, 500);
+    
+    // Also check on scroll with throttling
+    let scrollTimeout;
+    window.addEventListener('scroll', () => {
+        if (scrollTimeout) clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(triggerAchievementsAnimation, 100);
     });
-}}
-        
-        // Initialize after DOM is ready
-        document.addEventListener('DOMContentLoaded', () => {
-            // Wait a bit then check if section is visible
-            setTimeout(triggerAchievementsAnimation, 500);
-            
-            // Also check on scroll with throttling
-            let scrollTimeout;
-            window.addEventListener('scroll', () => {
-                if (scrollTimeout) clearTimeout(scrollTimeout);
-                scrollTimeout = setTimeout(triggerAchievementsAnimation, 100);
-            });
-        });
+});
 
-        // Add subtle hover effects
-        document.querySelectorAll('.achievement-item').forEach(item => {
-            item.addEventListener('mouseenter', () => {
-                item.style.transform = 'translateY(-2px)';
-                item.style.transition = 'transform 0.2s ease';
-            });
-            
-            item.addEventListener('mouseleave', () => {
-                item.style.transform = 'translateY(0)';
-            });
-        });
-    </script>
+// Add subtle hover effects
+document.querySelectorAll('.achievement-item').forEach(item => {
+    item.addEventListener('mouseenter', () => {
+        item.style.transform = 'translateY(-2px)';
+        item.style.transition = 'transform 0.2s ease';
+    });
+    
+    item.addEventListener('mouseleave', () => {
+        item.style.transform = 'translateY(0)';
+    });
+});
 
-
-
-<script>
-const API_BASE = '/api';
+// ============================================
+// ACHIEVEMENTS DATA LOADER
+// ============================================
 
 function getAuthHeaders() {
     const token = localStorage.getItem("adminToken");
@@ -1036,10 +1039,9 @@ function getAuthHeaders() {
     };
 }
 
-
 async function updateAchievements() {
     try {
-        const res = await fetch(`${API_BASE}/achievements`, {
+        const res = await fetch(`${API_BASE_URL}/api/achievements`, {
             headers: getAuthHeaders()
         });
 
@@ -1074,8 +1076,8 @@ async function updateAchievements() {
 }
 
 document.addEventListener('DOMContentLoaded', updateAchievements);
-setInterval(updateAchievements, 30000); // optional refresh
-</script>
+setInterval(updateAchievements, 30000); // optional refresh every 30 seconds
+        </script>
 
  
 </body>

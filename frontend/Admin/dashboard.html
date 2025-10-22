@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AMIZERO Admin Dashboard</title>
-    <link rel="icon" type="image/x-icon" href="images/company_logo_blue_color-removebg-preview.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -1882,6 +1881,7 @@
                     <th>Email</th>
                     <th>Subscribed At</th>
                     <th>Status</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody id="newsletterTableBody">
@@ -2197,7 +2197,8 @@
 // Dashboard JavaScript
 class AdminDashboard {
     constructor() {
-        this.apiUrl = '/api';
+        // Updated API URL to point to Render backend
+        this.apiUrl = 'https://amizerorealestate.onrender.com/api';
         this.currentSection = 'loginForm';
         this.skills = []; // Move skills array into the class
         this.init();
@@ -2242,80 +2243,79 @@ class AdminDashboard {
     }
 
     // Skills management setup
-setupSkillsInput() {
-    const skillInput = document.getElementById('skillInput');
-    if (skillInput) {
-        // Add skills on Enter key
-        skillInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
+    setupSkillsInput() {
+        const skillInput = document.getElementById('skillInput');
+        if (skillInput) {
+            // Add skills on Enter key
+            skillInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this.addSkillsFromInput(e.target.value);
+                    e.target.value = '';
+                }
+            });
+
+            // Optional: handle paste with commas
+            skillInput.addEventListener('paste', (e) => {
                 e.preventDefault();
-                this.addSkillsFromInput(e.target.value);
-                e.target.value = '';
+                const pasteData = e.clipboardData.getData('text');
+                this.addSkillsFromInput(pasteData);
+            });
+        }
+
+        // Ensure hidden input is updated before form submit
+        const teamForm = document.getElementById('teamForm');
+        if (teamForm) {
+            teamForm.addEventListener('submit', () => {
+                this.updateSkillsHidden();
+            });
+        }
+    }
+
+    // Add skills from input string (handles comma-separated values)
+    addSkillsFromInput(inputValue) {
+        if (!inputValue) return;
+
+        // Split by commas, trim, and filter out empty strings
+        const newSkills = inputValue.split(',').map(s => s.trim()).filter(s => s);
+
+        newSkills.forEach(skill => {
+            if (!this.skills.includes(skill)) {
+                this.skills.push(skill);
             }
         });
 
-        // Optional: handle paste with commas
-        skillInput.addEventListener('paste', (e) => {
-            e.preventDefault();
-            const pasteData = e.clipboardData.getData('text');
-            this.addSkillsFromInput(pasteData);
-        });
+        this.updateSkillsDisplay();
+        this.updateSkillsHidden();
     }
 
-    // Ensure hidden input is updated before form submit
-    const teamForm = document.getElementById('teamForm');
-    if (teamForm) {
-        teamForm.addEventListener('submit', () => {
-            this.updateSkillsHidden();
-        });
+    // Remove skill
+    removeSkill(skill) {
+        this.skills = this.skills.filter(s => s !== skill);
+        this.updateSkillsDisplay();
+        this.updateSkillsHidden();
     }
-}
 
-// Add skills from input string (handles comma-separated values)
-addSkillsFromInput(inputValue) {
-    if (!inputValue) return;
-
-    // Split by commas, trim, and filter out empty strings
-    const newSkills = inputValue.split(',').map(s => s.trim()).filter(s => s);
-
-    newSkills.forEach(skill => {
-        if (!this.skills.includes(skill)) {
-            this.skills.push(skill);
+    // Update skills display
+    updateSkillsDisplay() {
+        const container = document.getElementById('skillsContainer');
+        if (container) {
+            container.innerHTML = this.skills.map(skill => `
+                <span class="skill-tag">
+                    ${skill}
+                    <button type="button" class="skill-remove" onclick="dashboard.removeSkill('${skill}')">&times;</button>
+                </span>
+            `).join('');
         }
-    });
-
-    this.updateSkillsDisplay();
-    this.updateSkillsHidden();
-}
-
-// Remove skill
-removeSkill(skill) {
-    this.skills = this.skills.filter(s => s !== skill);
-    this.updateSkillsDisplay();
-    this.updateSkillsHidden();
-}
-
-// Update skills display
-updateSkillsDisplay() {
-    const container = document.getElementById('skillsContainer');
-    if (container) {
-        container.innerHTML = this.skills.map(skill => `
-            <span class="skill-tag">
-                ${skill}
-                <button type="button" class="skill-remove" onclick="dashboard.removeSkill('${skill}')">&times;</button>
-            </span>
-        `).join('');
     }
-}
 
-// Update hidden input for backend
-updateSkillsHidden() {
-    const hiddenInput = document.getElementById('skillsHidden');
-    if (hiddenInput) {
-        hiddenInput.value = JSON.stringify(this.skills);
+    // Update hidden input for backend
+    updateSkillsHidden() {
+        const hiddenInput = document.getElementById('skillsHidden');
+        if (hiddenInput) {
+            hiddenInput.value = JSON.stringify(this.skills);
+        }
     }
-}
-
 
     // Authentication methods
     async handleLogin(e) {
@@ -2481,8 +2481,6 @@ updateSkillsHidden() {
         }
     }
 
-
-
     // Render methods
     renderPropertiesTable(properties) {
         const tbody = document.getElementById('propertiesTableBody');
@@ -2523,73 +2521,74 @@ updateSkillsHidden() {
     }
 
     renderTeamTable(team) {
-    const tbody = document.getElementById('teamTableBody');
-    if (!team || team.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#666;">No team members found</td></tr>';
-        return;
+        const tbody = document.getElementById('teamTableBody');
+        if (!team || team.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#666;">No team members found</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = team.map(member => `
+            <tr>
+                <td>
+                    ${
+                        member.image
+                            ? `<img src="${member.image}" alt="${member.name}" style="width:60px;height:60px;object-fit:cover;border-radius:50%;">`
+                            : '<div style="width:60px;height:60px;background:#e9ecef;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#666;"><i class="fas fa-user"></i></div>'
+                    }
+                </td>
+                <td><strong>${member.name}</strong></td>
+                <td>${member.position}</td>
+                <td><a href="mailto:${member.email || member.socialLinks?.email || '#'}" class="social-link">${member.email || member.socialLinks?.email || 'N/A'}</a></td>
+                <td>${member.phone || 'N/A'}</td>
+                <td>
+                    <div class="skills-display">
+                        ${member.skills && member.skills.length > 0 
+                            ? member.skills.map(skill => `<span class="skill-badge">${skill}</span>`).join('')
+                            : '<span style="color:#666;">No skills listed</span>'
+                        }
+                    </div>
+                </td>
+                <td>
+                    <div class="social-links">
+                        ${(member.socialLinks?.linkedin || member.linkedin)
+                            ? `<a href="${member.socialLinks?.linkedin || member.linkedin}" target="_blank" class="social-link" title="LinkedIn"><i class="fab fa-linkedin"></i></a>`
+                            : ''
+                        }
+                        ${(member.socialLinks?.twitter || member.twitter)
+                            ? `<a href="${member.socialLinks?.twitter || member.twitter}" target="_blank" class="social-link" title="Twitter"><i class="fab fa-twitter"></i></a>`
+                            : ''
+                        }
+                        ${(member.socialLinks?.email || member.email)
+                            ? `<a href="mailto:${member.socialLinks?.email || member.email}" class="social-link" title="Email"><i class="fas fa-envelope"></i></a>`
+                            : ''
+                        }
+                        ${(!member.socialLinks?.linkedin && !member.linkedin && !member.socialLinks?.twitter && !member.twitter && !member.socialLinks?.email && !member.email)
+                            ? '<span style="color:#666;">N/A</span>'
+                            : ''
+                        }
+                    </div>
+                </td>
+                <td style="max-width:400px; overflow:auto;">
+                    ${member.bio ? 
+                        (member.bio.length > 100 ? 
+                            `<span title="${member.bio}">${member.bio.substring(0, 100)}...</span>` : 
+                            member.bio
+                        ) : 
+                        '<span style="color:#666;">No bio available</span>'
+                    }
+                </td>
+                <td>
+                    <button class="action-btn edit-btn" onclick="dashboard.editTeamMember('${member._id}')" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn delete-btn" onclick="dashboard.deleteTeamMember('${member._id}')" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
     }
-    
-    tbody.innerHTML = team.map(member => `
-        <tr>
-            <td>
-                ${
-                    member.image
-                        ? `<img src="${member.image}" alt="${member.name}" style="width:60px;height:60px;object-fit:cover;border-radius:50%;">`
-                        : '<div style="width:60px;height:60px;background:#e9ecef;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#666;"><i class="fas fa-user"></i></div>'
-                }
-            </td>
-            <td><strong>${member.name}</strong></td>
-            <td>${member.position}</td>
-            <td><a href="mailto:${member.email || member.socialLinks?.email || '#'}" class="social-link">${member.email || member.socialLinks?.email || 'N/A'}</a></td>
-            <td>${member.phone || 'N/A'}</td>
-            <td>
-                <div class="skills-display">
-                    ${member.skills && member.skills.length > 0 
-                        ? member.skills.map(skill => `<span class="skill-badge">${skill}</span>`).join('')
-                        : '<span style="color:#666;">No skills listed</span>'
-                    }
-                </div>
-            </td>
-            <td>
-                <div class="social-links">
-                    ${(member.socialLinks?.linkedin || member.linkedin)
-                        ? `<a href="${member.socialLinks?.linkedin || member.linkedin}" target="_blank" class="social-link" title="LinkedIn"><i class="fab fa-linkedin"></i></a>`
-                        : ''
-                    }
-                    ${(member.socialLinks?.twitter || member.twitter)
-                        ? `<a href="${member.socialLinks?.twitter || member.twitter}" target="_blank" class="social-link" title="Twitter"><i class="fab fa-twitter"></i></a>`
-                        : ''
-                    }
-                    ${(member.socialLinks?.email || member.email)
-                        ? `<a href="mailto:${member.socialLinks?.email || member.email}" class="social-link" title="Email"><i class="fas fa-envelope"></i></a>`
-                        : ''
-                    }
-                    ${(!member.socialLinks?.linkedin && !member.linkedin && !member.socialLinks?.twitter && !member.twitter && !member.socialLinks?.email && !member.email)
-                        ? '<span style="color:#666;">N/A</span>'
-                        : ''
-                    }
-                </div>
-            </td>
-            <td style="max-width:400px; overflow:auto;">
-                ${member.bio ? 
-                    (member.bio.length > 100 ? 
-                        `<span title="${member.bio}">${member.bio.substring(0, 100)}...</span>` : 
-                        member.bio
-                    ) : 
-                    '<span style="color:#666;">No bio available</span>'
-                }
-            </td>
-            <td>
-                <button class="action-btn edit-btn" onclick="dashboard.editTeamMember('${member._id}')" title="Edit">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button class="action-btn delete-btn" onclick="dashboard.deleteTeamMember('${member._id}')" title="Delete">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
-        </tr>
-    `).join('');
-}
+
     renderPortfolioTable(portfolio) {
         const tbody = document.getElementById('portfolioTableBody');
         if (!portfolio || portfolio.length === 0) {
@@ -2660,95 +2659,95 @@ updateSkillsHidden() {
 
     // Modal management
     openModal(modalId, mode, data = null) {
-    const modal = document.getElementById(modalId);
-    const form = modal.querySelector('form');
-    
-    if (mode === 'add') {
-        form.reset();
+        const modal = document.getElementById(modalId);
+        const form = modal.querySelector('form');
         
-        // Reset hidden ID fields based on modal type
-        if (modalId === 'portfolioModal') {
-            document.getElementById('portfolioId').value = '';
-        } else if (modalId === 'propertyModal') {
-            const hiddenInput = form.querySelector('input[name="propertyId"]');
-            if (hiddenInput) hiddenInput.value = '';
-        } else if (modalId === 'teamModal') {
-            const hiddenInput = form.querySelector('input[name="teamId"]');
-            if (hiddenInput) hiddenInput.value = '';
+        if (mode === 'add') {
+            form.reset();
+            
+            // Reset hidden ID fields based on modal type
+            if (modalId === 'portfolioModal') {
+                document.getElementById('portfolioId').value = '';
+            } else if (modalId === 'propertyModal') {
+                const hiddenInput = form.querySelector('input[name="propertyId"]');
+                if (hiddenInput) hiddenInput.value = '';
+            } else if (modalId === 'teamModal') {
+                const hiddenInput = form.querySelector('input[name="teamId"]');
+                if (hiddenInput) hiddenInput.value = '';
+            }
+            
+            // Reset skills for team modal
+            if (modalId === 'teamModal') {
+                this.skills = [];
+                this.updateSkillsDisplay();
+            }
+            
+            modal.querySelector('.modal-title').textContent = `Add ${modalId.replace('Modal', '')}`;
+        } else if (mode === 'edit' && data) {
+            this.populateForm(form, data);
+            
+            // Populate hidden ID field
+            if (modalId === 'portfolioModal' && data._id) {
+                document.getElementById('portfolioId').value = data._id;
+            }
+            
+            // Load existing skills if editing team member
+            if (data.skills && modalId === 'teamModal') {
+                this.skills = data.skills;
+                this.updateSkillsDisplay();
+            }
+            
+            modal.querySelector('.modal-title').textContent = `Edit ${modalId.replace('Modal', '')}`;
         }
         
-        // Reset skills for team modal
-        if (modalId === 'teamModal') {
-            this.skills = [];
-            this.updateSkillsDisplay();
-        }
-        
-        modal.querySelector('.modal-title').textContent = `Add ${modalId.replace('Modal', '')}`;
-    } else if (mode === 'edit' && data) {
-        this.populateForm(form, data);
-        
-        // Populate hidden ID field
-        if (modalId === 'portfolioModal' && data._id) {
-            document.getElementById('portfolioId').value = data._id;
-        }
-        
-        // Load existing skills if editing team member
-        if (data.skills && modalId === 'teamModal') {
-            this.skills = data.skills;
-            this.updateSkillsDisplay();
-        }
-        
-        modal.querySelector('.modal-title').textContent = `Edit ${modalId.replace('Modal', '')}`;
+        modal.style.display = 'block';
     }
-    
-    modal.style.display = 'block';
-}
 
     closeModal(modalId) {
         document.getElementById(modalId).style.display = 'none';
     }
 
     populateForm(form, data) {
-    Object.keys(data).forEach(key => {
-        // Try to find input by name attribute first
-        let input = form.querySelector(`[name="${key}"]`);
-        
-        // If not found, try by ID (legacy support)
-        if (!input) {
-            const formPrefix = form.id.replace('Form', '');
-            const inputId = `${formPrefix}${key.charAt(0).toUpperCase() + key.slice(1)}`;
-            input = document.getElementById(inputId);
-        }
-        
-        if (input) {
-            // Handle date fields specially
-            if (input.type === 'date' && data[key]) {
-                const dateValue = new Date(data[key]);
-                if (!isNaN(dateValue.getTime())) {
-                    // Format date as YYYY-MM-DD for date input
-                    input.value = dateValue.toISOString().split('T')[0];
+        Object.keys(data).forEach(key => {
+            // Try to find input by name attribute first
+            let input = form.querySelector(`[name="${key}"]`);
+            
+            // If not found, try by ID (legacy support)
+            if (!input) {
+                const formPrefix = form.id.replace('Form', '');
+                const inputId = `${formPrefix}${key.charAt(0).toUpperCase() + key.slice(1)}`;
+                input = document.getElementById(inputId);
+            }
+            
+            if (input) {
+                // Handle date fields specially
+                if (input.type === 'date' && data[key]) {
+                    const dateValue = new Date(data[key]);
+                    if (!isNaN(dateValue.getTime())) {
+                        // Format date as YYYY-MM-DD for date input
+                        input.value = dateValue.toISOString().split('T')[0];
+                    }
+                } 
+                // Handle file inputs (skip them)
+                else if (input.type === 'file') {
+                    // Don't set value for file inputs
+                    console.log(`Skipping file input: ${key}`);
                 }
-            } 
-            // Handle file inputs (skip them)
-            else if (input.type === 'file') {
-                // Don't set value for file inputs
-                console.log(`Skipping file input: ${key}`);
+                // Handle all other inputs
+                else {
+                    input.value = data[key] || '';
+                }
             }
-            // Handle all other inputs
-            else {
-                input.value = data[key] || '';
+        });
+        
+        // Set hidden ID field if present
+        if (data._id) {
+            const hiddenInput = form.querySelector('input[type="hidden"]');
+            if (hiddenInput) {
+                hiddenInput.value = data._id;
             }
-        }
-    });
-    
-    // Set hidden ID field if present
-    if (data._id) {
-        const hiddenInput = form.querySelector('input[type="hidden"]');
-        if (hiddenInput) {
-            hiddenInput.value = data._id;
         }
     }
-}
 
     // CRUD Operations
     async handlePropertySubmit(e) {
@@ -2812,104 +2811,102 @@ updateSkillsHidden() {
     }
 
     async handlePortfolioSubmit(e) {
-    e.preventDefault();
-    
-    console.log('📝 Starting portfolio submission...');
-    
-    const formData = new FormData(e.target);
-    const portfolioId = document.getElementById('portfolioId').value;
-    const isEdit = portfolioId && portfolioId.trim() !== '';
-
-    // Debug: Log all form data
-    console.log('Form data entries:');
-    for (let [key, value] of formData.entries()) {
-        console.log(`  ${key}:`, value);
-    }
-
-    // ✅ IMPORTANT: Validate required fields before submission
-    const title = formData.get('title');
-    const category = formData.get('category');
-    const description = formData.get('description');
-    const date = formData.get('date');
-
-    if (!title || !category || !description || !date) {
-        console.error('❌ Missing required fields');
-        this.showMessage('portfolioMessage', 'Please fill in all required fields (Title, Category, Description, Date)', 'error');
-        return;
-    }
-
-    // ✅ Validate date format
-    const dateObj = new Date(date);
-    if (isNaN(dateObj.getTime())) {
-        console.error('❌ Invalid date:', date);
-        this.showMessage('portfolioMessage', 'Please provide a valid date', 'error');
-        return;
-    }
-
-    console.log('✅ Validation passed');
-    console.log('Date parsed as:', dateObj.toISOString());
-
-    try {
-        // ✅ FIX: Don't include /api prefix - authenticatedFetch adds it
-        const url = isEdit ? `/portfolio/${portfolioId}` : '/portfolio';
-        const method = isEdit ? 'PUT' : 'POST';
+        e.preventDefault();
         
-        console.log(`📤 Sending ${method} request to:`, url);
+        console.log('📝 Starting portfolio submission...');
+        
+        const formData = new FormData(e.target);
+        const portfolioId = document.getElementById('portfolioId').value;
+        const isEdit = portfolioId && portfolioId.trim() !== '';
 
-        const response = await this.authenticatedFetch(url, {
-            method,
-            body: formData
-        });
+        // Debug: Log all form data
+        console.log('Form data entries:');
+        for (let [key, value] of formData.entries()) {
+            console.log(`  ${key}:`, value);
+        }
 
-        console.log('📥 Response status:', response.status);
+        // ✅ IMPORTANT: Validate required fields before submission
+        const title = formData.get('title');
+        const category = formData.get('category');
+        const description = formData.get('description');
+        const date = formData.get('date');
 
-        const result = await response.json();
-        console.log('📥 Response data:', result);
+        if (!title || !category || !description || !date) {
+            console.error('❌ Missing required fields');
+            this.showMessage('portfolioMessage', 'Please fill in all required fields (Title, Category, Description, Date)', 'error');
+            return;
+        }
 
-        if (response.ok) {
-            console.log('✅ Portfolio saved successfully');
+        // ✅ Validate date format
+        const dateObj = new Date(date);
+        if (isNaN(dateObj.getTime())) {
+            console.error('❌ Invalid date:', date);
+            this.showMessage('portfolioMessage', 'Please provide a valid date', 'error');
+            return;
+        }
+
+        console.log('✅ Validation passed');
+        console.log('Date parsed as:', dateObj.toISOString());
+
+        try {
+            const url = isEdit ? `/portfolio/${portfolioId}` : '/portfolio';
+            const method = isEdit ? 'PUT' : 'POST';
+            
+            console.log(`📤 Sending ${method} request to:`, url);
+
+            const response = await this.authenticatedFetch(url, {
+                method,
+                body: formData
+            });
+
+            console.log('📥 Response status:', response.status);
+
+            const result = await response.json();
+            console.log('📥 Response data:', result);
+
+            if (response.ok) {
+                console.log('✅ Portfolio saved successfully');
+                this.showMessage(
+                    'portfolioMessage', 
+                    `Portfolio ${isEdit ? 'updated' : 'added'} successfully!`, 
+                    'success'
+                );
+                this.closeModal('portfolioModal');
+                
+                // Reset form
+                e.target.reset();
+                document.getElementById('portfolioId').value = '';
+                
+                // Reload data
+                await this.loadPortfolio();
+                await this.loadStats();
+            } else {
+                console.error('❌ Server returned error:', result);
+                
+                // Show detailed error message
+                let errorMessage = result.message || 'Failed to save portfolio item';
+                
+                if (result.errors && Array.isArray(result.errors)) {
+                    errorMessage += '\n\nDetails:\n';
+                    result.errors.forEach(err => {
+                        errorMessage += `- ${err.field}: ${err.message}\n`;
+                    });
+                }
+                
+                this.showMessage('portfolioMessage', errorMessage, 'error');
+            }
+        } catch (error) {
+            console.error('❌ Portfolio submission error:', error);
+            console.error('Error details:', error.message);
+            console.error('Error stack:', error.stack);
+            
             this.showMessage(
                 'portfolioMessage', 
-                `Portfolio ${isEdit ? 'updated' : 'added'} successfully!`, 
-                'success'
+                'Network error. Please check your connection and try again.', 
+                'error'
             );
-            this.closeModal('portfolioModal');
-            
-            // Reset form
-            e.target.reset();
-            document.getElementById('portfolioId').value = '';
-            
-            // Reload data
-            await this.loadPortfolio();
-            await this.loadStats();
-        } else {
-            console.error('❌ Server returned error:', result);
-            
-            // Show detailed error message
-            let errorMessage = result.message || 'Failed to save portfolio item';
-            
-            if (result.errors && Array.isArray(result.errors)) {
-                errorMessage += '\n\nDetails:\n';
-                result.errors.forEach(err => {
-                    errorMessage += `- ${err.field}: ${err.message}\n`;
-                });
-            }
-            
-            this.showMessage('portfolioMessage', errorMessage, 'error');
         }
-    } catch (error) {
-        console.error('❌ Portfolio submission error:', error);
-        console.error('Error details:', error.message);
-        console.error('Error stack:', error.stack);
-        
-        this.showMessage(
-            'portfolioMessage', 
-            'Network error. Please check your connection and try again.', 
-            'error'
-        );
     }
-}
-
 
     // Edit methods
     async editProperty(id) {
@@ -3052,9 +3049,9 @@ function closeModal(modalId) {
 const dashboard = new AdminDashboard();
 
 // ==============================================
-// CONFIGURATION - Works on both local and production
+// CONFIGURATION - Points to Render backend
 // ==============================================
-const API_BASE_URL = `${window.location.origin}/api`;
+const API_BASE_URL = 'https://amizerorealestate.onrender.com/api';
 
 // Return headers with auth token
 function getAuthHeaders() {
@@ -3102,7 +3099,7 @@ async function loadNewsletterSubscribers() {
         tbody.innerHTML = '';
 
         if (!data.success || !data.subscribers || data.subscribers.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;">No subscribers found</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">No subscribers found</td></tr>`;
             return;
         }
 
@@ -3112,6 +3109,11 @@ async function loadNewsletterSubscribers() {
                 <td>${sub.email}</td>
                 <td>${new Date(sub.subscribedAt).toLocaleString()}</td>
                 <td>${sub.status || 'active'}</td>
+                <td>
+                    <button class="delete-btn" onclick="deleteSubscriber('${sub._id}', '${sub.email}')">
+                        Delete
+                    </button>
+                </td>
             `;
             tbody.appendChild(tr);
         });
@@ -3120,7 +3122,46 @@ async function loadNewsletterSubscribers() {
     } catch (err) {
         console.error("Failed to load newsletter subscribers", err);
         const tbody = document.getElementById('newsletterTableBody');
-        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;color:#e53e3e;">Error loading subscribers</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:#e53e3e;">Error loading subscribers</td></tr>`;
+    }
+}
+
+async function deleteSubscriber(subscriberId, email) {
+    // Confirm deletion
+    if (!confirm(`Are you sure you want to delete subscriber: ${email}?`)) {
+        return;
+    }
+
+    const token = localStorage.getItem('adminToken');
+    
+    if (!token) {
+        alert('Authentication required');
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API_BASE_URL}/newsletter/${subscriberId}`, {
+            method: 'DELETE',
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            throw new Error(data.error || 'Failed to delete subscriber');
+        }
+
+        if (data.success) {
+            alert('Subscriber deleted successfully');
+            // Reload the subscribers list
+            loadNewsletterSubscribers();
+        }
+    } catch (err) {
+        console.error("Failed to delete subscriber", err);
+        alert(`Error: ${err.message}`);
     }
 }
 
@@ -3666,6 +3707,33 @@ document.getElementById('achievementForm').addEventListener('submit', async func
 });
 
 // ==============================================
+// VISITOR STATISTICS
+// ==============================================
+async function updateVisitorStats() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/visitor-stats`);
+        const data = await response.json();
+        
+        // Update the visitor count
+        document.getElementById('websiteVisitors').textContent = data.totalVisitors;
+        document.getElementById('todayVisitors').textContent = `Today: ${data.todayVisitors}`;
+    } catch (error) {
+        console.error('Error fetching visitor stats:', error);
+    }
+}
+
+async function trackVisit() {
+    try {
+        await fetch(`${API_BASE_URL}/track-visit`, {
+            method: 'POST',
+            credentials: 'include'
+        });
+    } catch (error) {
+        console.error('Error tracking visit:', error);
+    }
+}
+
+// ==============================================
 // INITIALIZATION
 // ==============================================
 document.addEventListener('DOMContentLoaded', function() {
@@ -3680,6 +3748,7 @@ document.addEventListener('DOMContentLoaded', function() {
             loadDashboardOverview();
             loadScheduledVisits();
             loadCurrentValues();
+            updateVisitorStats();
         }, 500);
     }
     
@@ -3689,45 +3758,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (currentToken) {
             loadScheduledVisits();
             loadDashboardOverview();
+            updateVisitorStats();
         }
     }, 30000);
 });
-</script>
-
-
-<script>
-    // Fetch and update visitor statistics
-    async function updateVisitorStats() {
-        try {
-            const response = await fetch('/api/visitor-stats');
-            const data = await response.json();
-            
-            // Update the visitor count
-            document.getElementById('websiteVisitors').textContent = data.totalVisitors;
-            document.getElementById('todayVisitors').textContent = `Today: ${data.todayVisitors}`;
-        } catch (error) {
-            console.error('Error fetching visitor stats:', error);
-        }
-    }
-
-    // Track visitor on page load (optional - middleware already tracks)
-    async function trackVisit() {
-        try {
-            await fetch('/api/track-visit', {
-                method: 'POST',
-                credentials: 'include' // Important for cookies
-            });
-        } catch (error) {
-            console.error('Error tracking visit:', error);
-        }
-    }
-
-    // Initialize on page load
-    document.addEventListener('DOMContentLoaded', () => {
-        updateVisitorStats();
-        // Refresh stats every 30 seconds
-        setInterval(updateVisitorStats, 30000);
-    });
 </script>
 
 </body>

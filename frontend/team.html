@@ -84,17 +84,16 @@
             </div>
 
             <!-- Our Partners -->
-            <div class="footer-section our-partners">
-                <h3>Our Partners</h3>
-                <div class="partners-grid">
-                    <div class="partner-item">
-                        <div class="partner-logo">
-                            <img src="images/La_Riqueza_logo-01-removebg-preview.png" alt="">
-                        </div>
-                        <div class="partner-name">Lariqueza Ltd</div>
-                    </div>
+    <div class="footer-section our-partners">
+        <h3>Our Partners</h3>
+        <div class="partners-grid">
+            <div class="partner-item">
+                <div class="partner-logo">
+                    <img src="images/La Riqueza logo-02.png" alt="Lariqueza Ltd">
                 </div>
             </div>
+        </div>
+    </div>
 
             <!-- Newsletter Subscription -->
             <div class="footer-section newsletter">
@@ -190,8 +189,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     </script>
 
-    <script>
-      // Function to load team members from public API
+   <script>
+    
+
+// Function to load team members from backend API
 async function loadTeamMembers() {
     try {
         // Get the team grid container
@@ -205,8 +206,8 @@ async function loadTeamMembers() {
         // Show loading state
         teamGrid.innerHTML = '<div class="loading">Loading team members...</div>';
 
-        // Fetch team data from public API (no authentication needed)
-        const response = await fetch('/api/public/team', {
+        // Fetch team data from backend API (no authentication needed)
+        const response = await fetch(`${API_BASE_URL}/api/public/team`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -305,7 +306,7 @@ async function loadTeamMembersByPosition(position = null) {
         teamGrid.innerHTML = '<div class="loading">Loading team members...</div>';
 
         // Build URL with query parameters if needed
-        let url = '/api/public/team';
+        let url = `${API_BASE_URL}/api/public/team`;
         if (position) {
             url += `?position=${encodeURIComponent(position)}`;
         }
@@ -390,6 +391,7 @@ function refreshTeamMembers() {
 
 // Export functions if using modules
 // export { loadTeamMembers, loadTeamMembersByPosition, refreshTeamMembers };
-    </script>
+   </script>
+
 </body>
 </html>
