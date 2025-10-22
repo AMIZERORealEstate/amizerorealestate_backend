@@ -1723,9 +1723,9 @@ footer::before {
 /* FIXED: Team Avatar with proper image stacking */
 .team-avatar {
     width: 250px;
-    height: 250px;
+    height: 270px;
     background: var(--gradient);
-    border-radius: 10px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
