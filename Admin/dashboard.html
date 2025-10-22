@@ -3110,7 +3110,7 @@ async function loadNewsletterSubscribers() {
                 <td>${new Date(sub.subscribedAt).toLocaleString()}</td>
                 <td>${sub.status || 'active'}</td>
                 <td>
-                    <button class="delete-btn" onclick="deleteSubscriber('${sub._id}', '${sub.email}')">
+                    <button class="action-btn delete-btn" onclick="deleteSubscriber('${sub._id}', '${sub.email}')">
                         Delete
                     </button>
                 </td>
