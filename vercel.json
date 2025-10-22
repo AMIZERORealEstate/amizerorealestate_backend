@@ -1,0 +1,13 @@
+{
+  "rewrites": [
+    {
+      "source": "/admin/dashboard",
+      "destination": "/admin/dashboard.html"
+    },
+    {
+      "source": "/admin/dashboard/",
+      "destination": "/admin/dashboard.html"
+    }
+  ],
+  "cleanUrls": true
+}
