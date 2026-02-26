@@ -5,222 +5,440 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us - AMIZERO Real Estate Ltd</title>
     <link rel="icon" type="image/x-icon" href="images/company_logo_blue_color-removebg-preview.png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="index.css">
     <link rel="stylesheet" href="about.css">
+    <link rel="stylesheet" href="nav.css">
+    <link rel="stylesheet" href="other.css">
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <div id="contact-info">
-            <h1 id="company-name">AMIZERO Real Estate Ltd</h1>
-            <div class="contact-item" id="contact-item">
-                <span class="icon">📞</span>
-                <div class="contact-text" id="contact-text">
-                    <span class="label">CALL:</span>
-                    <a style="text-decoration: none;" href="tel:+250725502317"><span class="value">+250 725 502 317</span></a>
-                </div>
-            </div>
-            <div class="contact-item" id="contact-item">
-                <span class="icon">⏰</span>
-                <div class="contact-text" id="contact-text">
-                    <span class="label">OPENING HOURS:</span>
-                    <span class="value">Mon - Fri 8:00AM - 6:00PM</span>
-                </div>
-            </div>
-        </div>
 
-        <nav>
-            <a href="index.html" class="logo"><img src="images/company_logo_blue_color-removebg-preview.png" alt=""></a>
-            <ul class="nav-menu">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="listing.html">Listing</a></li>
-                <li><a href="about.html" class="active">About</a></li>
-                <li><a href="services.html">Services</a></li>
-                <li><a href="portfolio.html">Portfolio</a></li>
-                <li><a href="team.html">Team</a></li>
-                <li><a href="contact.html">Contact</a></li>
-            </ul>
-            <div class="close-menu">&times;</div>
-            <div class="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </nav>
+   
+    <header>
+
+          <nav>
+    <a href="index.html" class="logo">
+        <img src="images/logo_with_color__b8976a-removebg-preview.png" alt="Amizero Real Estate">
+    </a>
+
+    <ul class="nav-menu">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="listing.html">Properties</a></li>
+        <li><a href="about.html" class="active">About</a></li>
+        <li><a href="services.html">Services</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="contact.html">Contact</a></li>
+
+        <!-- Mobile only auth — sits inside the mobile menu -->
+        <li class="nav-mobile-auth">
+            <a href="contact.html" class="nav-login">Login</a>
+            <a href="contact.html" class="nav-register"><span>Register</span></a>
+        </li>
+    </ul>
+
+    <!-- Desktop auth buttons -->
+    <div class="nav-auth">
+        <a href="contact.html" class="nav-login">Login</a>
+        <a href="contact.html" class="nav-register"><span>Register</span></a>
+    </div>
+
+    <div class="close-menu">&times;</div>
+    <div class="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+</nav>
     </header>
 
-    <section id="about">
-        <div class="about-container">
-            <div class="about-intro fade-in-element">
-                <h2>About AMIZERO Real Estate</h2>
-                <p class="subtitle">Rwanda's Premier Real Estate Partner</p>
-                <p class="about-description">
-                    Established as Rwanda's leading professional real estate company, AMIZERO Real Estate Ltd stands at the forefront of the nation's property market transformation. We combine deep local expertise with international best practices to deliver exceptional value across all our service areas.
-                </p>
-            </div>
 
-            <div class="about-main">
-                <div class="about-content fade-in-element">
-                    <h3>Excellence in Real Estate</h3>
-                    <p>
-                        AMIZERO Real Estate Ltd has been instrumental in shaping Rwanda's modern real estate landscape. Our comprehensive approach encompasses Property Management, Professional Valuation Services, and Strategic Brokerage Solutions, all delivered with unwavering commitment to transparency and client satisfaction.
-                    </p>
-                    <p>
-                        Founded with a vision to professionalize and elevate the real estate sector in Rwanda, we have consistently demonstrated our ability to navigate complex property transactions while maintaining the highest standards of ethical practice and regulatory compliance.
-                    </p>
-                    
-                    <div class="about-highlights">
-                        <div class="highlight-item">
-                            <div class="highlight-icon">
-                                <i class="fas fa-certificate"></i>
-                            </div>
-                            <div>
-                                <strong>Licensed & Certified:</strong> Fully licensed real estate professionals with certified expertise
-                            </div>
-                        </div>
-                        <div class="highlight-item">
-                            <div class="highlight-icon">
-                                <i class="fas fa-shield-alt"></i>
-                            </div>
-                            <div>
-                                <strong>Regulatory Compliance:</strong> Adherence to all local and international real estate standards
-                            </div>
-                        </div>
-                        <div class="highlight-item">
-                            <div class="highlight-icon">
-                                <i class="fas fa-handshake"></i>
-                            </div>
-                            <div>
-                                <strong>Client-Centric:</strong> Tailored solutions that prioritize client objectives and outcomes
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <!-- ── MARKUP ── -->
+<section class="aph-section">
 
-                <div class="about-image-container fade-in-element">
-                    <div class="about-image-wrapper">
-                        <img src="images/home page image 1.png" class="about-image" alt="Modern real estate development">
-                        <div class="about-overlay">
-                            <div class="overlay-content">
-                                <h4>Professional Excellence</h4>
-                                <p>Setting new standards in Rwanda's real estate market</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <!-- Three team photos as background -->
+  <div class="aph-bg">
+    <div class="aph-bg-photo"></div>
+    <div class="aph-bg-photo"></div>
+    <div class="aph-bg-photo"></div>
+  </div>
 
-            <div class="about-values">
-                <div class="values-header fade-in-element">
-                    <h3>Our Values</h3>
-                    <p>The principles that guide our commitment to excellence</p>
-                </div>
-                <div class="values-grid">
-                    <div class="value-item fade-in-element">
-                        <div class="value-icon">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <h4>Integrity & Transparency</h4>
-                        <p>We uphold honesty and openness in all transactions, ensuring trust and reliability in every deal.</p>
-                    </div>
-                    <div class="value-item fade-in-element">
-                        <div class="value-icon">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <h4>Customer-Centric Approach</h4>
-                        <p>Our clients come first. We tailor our services to meet their unique needs and expectations.</p>
-                    </div>
-                    <div class="value-item fade-in-element">
-                        <div class="value-icon">
-                            <i class="fas fa-star"></i>
-                        </div>
-                        <h4>Excellence & Professionalism</h4>
-                        <p>We maintain the highest standards in property management, valuation, and brokerage services.</p>
-                    </div>
-                    <div class="value-item fade-in-element">
-                        <div class="value-icon">
-                            <i class="fas fa-lightbulb"></i>
-                        </div>
-                        <h4>Innovation & Growth</h4>
-                        <p>We embrace technology and modern strategies to enhance efficiency and stay ahead in the real estate industry.</p>
-                    </div>
-                    <div class="value-item fade-in-element">
-                        <div class="value-icon">
-                            <i class="fas fa-leaf"></i>
-                        </div>
-                        <h4>Commitment to Sustainability</h4>
-                        <p>We promote responsible real estate practices that support long-term property value and environmental sustainability.</p>
-                    </div>
-                    <div class="value-item fade-in-element">
-                        <div class="value-icon">
-                            <i class="fas fa-globe-africa"></i>
-                        </div>
-                        <h4>Empowering Local & Diaspora Investors</h4>
-                        <p>We make real estate investment seamless for Rwandans at home and abroad, ensuring their assets are well-managed and profitable.</p>
-                    </div>
-                </div>
-            </div>
+  <div class="aph-overlay"></div>
+  <div class="aph-dividers"></div>
+  <div class="aph-grain"></div>
+  <div class="aph-fade-bottom"></div>
 
-            <div class="about-mission-vision">
-                <div class="mission-card fade-in-element">
-                    <div class="card-icon">
-                        <i class="fas fa-bullseye"></i>
-                    </div>
-                    <h4 class="card-title">Our Mission</h4>
-                    <p class="card-text">
-                        At AMIZERO Real Estate Ltd, our mission is to revolutionize Rwanda's real estate sector by delivering professional, transparent, and efficient property management, valuation, and brokerage services. We are committed to helping property owners, investors, and homebuyers make informed decisions, maximize their investments, and ensure seamless transactions. Through innovation, integrity, and a customer-centric approach, we strive to create sustainable and long-term value for our clients, both locally and in the diaspora.
-                    </p>
-                </div>
+  <div class="aph-content">
 
-                <div class="vision-card fade-in-element">
-                    <div class="card-icon">
-                        <i class="fas fa-eye"></i>
-                    </div>
-                    <h4 class="card-title">Our Vision</h4>
-                    <p class="card-text">
-                        To be the most trusted and innovative real estate firm in Rwanda, providing exceptional property management, valuation, and brokerage services. We aim to empower property owners, investors, and homebuyers by ensuring transparent, efficient, and profitable real estate transactions. Through professionalism, technology, and customer-focused solutions, we aspire to shape a sustainable and thriving real estate industry that benefits both local and diaspora communities.
-                    </p>
-                </div>
-            </div>
+    <p class="aph-label">
+      <span class="aph-label-dot"></span>
+      The people behind the vision
+    </p>
+
+    <h1 class="aph-headline">
+      About <span>Us</span>
+    </h1>
+
+    <p class="aph-tagline">Passionate. Dedicated. Built for you.</p>
+
+    <div class="aph-rule"></div>
+
+  </div>
+
+  <div class="aph-hint">
+    <span class="aph-hint-line"></span>
+    Our story
+  </div>
+
+</section>
+
+    <!-- ===================================================
+         ABOUT SECTION
+=================================================== -->
+<div class="bv-page-wrapper">
+
+  <!-- ─── HERO ─── -->
+  <section class="bv-hero-section">
+
+    <!-- Left Column -->
+    <div class="bv-hero-section__left-col">
+
+      <h1 class="bv-hero-section__headline">
+        Professional
+        <span class="bv-headline-badge">
+          <span class="bv-headline-badge__avatar">
+            <img
+              src="https://images.unsplash.com/photo-1762397794646-f19044bd0828?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8bW9kZXJuJTIwYXBhcnRtZW50JTIwYnVpbGRpbmclMjBleHRlcmlvcnxlbnwwfHwwfHx8MA%3D%3D"
+              alt="Property management"
+            />
+          </span>
+          <span class="bv-headline-badge__label">Management</span>
+        </span>
+        For Your<br>Properties & Assets.
+      </h1>
+
+      <p class="bv-hero-section__tagline">
+        AMIZERO Real Estate Ltd provides trusted Property and Asset Management
+        services in Rwanda, helping landlords and investors protect,
+        manage, and grow the value of their real estate investments
+        with professionalism and transparency.
+      </p>
+
+      <div class="bv-hero-section__cta-row">
+        <a href="services.html">
+          <button class="bv-cta-primary">
+            Learn more
+            <span class="bv-cta-primary__arrow-chip">↗</span>
+          </button>
+        </a>
+        <a href="contact.html">
+          <button class="bv-cta-secondary">Contact us</button>
+        </a>
+      </div>
+
+      <div class="bv-hero-section__photo-bottomleft">
+        <img
+          src="https://images.unsplash.com/photo-1762397794646-f19044bd0828?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8bW9kZXJuJTIwYXBhcnRtZW50JTIwYnVpbGRpbmclMjBleHRlcmlvcnxlbnwwfHwwfHx8MA%3D%3D"
+          alt="Managed residential property"
+        />
+      </div>
+
+    </div>
+
+    <!-- Right Column -->
+    <div class="bv-hero-section__right-col">
+
+      <div class="bv-hero-section__photo-center">
+        <img
+          src="https://plus.unsplash.com/premium_photo-1754337710205-f99dbe3fac9f?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fHVyYmFuJTIwcmVzaWRlbnRpYWwlMjBjb21wbGV4fGVufDB8fDB8fHww"
+          alt="Modern managed building"
+        />
+      </div>
+
+      <div class="bv-hero-section__right-stack">
+        <div class="bv-hero-section__photo-topright">
+          <img
+            src="https://images.unsplash.com/photo-1750764515068-80d222d974bb?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fGludGVyaW9yJTIwb2YlMjBtb2Rlcm4lMjByZW50YWwlMjBhcGFydG1lbnR8ZW58MHx8MHx8fDA%3D"
+            alt="Investment property"
+          />
         </div>
+        <div class="bv-hero-infocard">
+          <p class="bv-hero-infocard__body">
+            We manage, maintain, and maximize your property investments
+            with efficiency, integrity, and expert market knowledge.
+          </p>
+          <a href="services.html" class="bv-hero-infocard__link">Explore Our Services</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ─── METRICS / STATS ─── -->
+  <section class="bv-metrics-section">
+
+    <div class="bv-metrics-section__header">
+      <h2 class="bv-metrics-section__heading">
+        <span class="bv-metrics-section__heading-light">Property & Asset</span>
+        Management<br>Experts in Rwanda
+      </h2>
+      <p class="bv-metrics-section__description">
+        AMIZERO Real Estate Ltd delivers comprehensive real estate solutions
+        including Property Management, Asset Management, Brokerage,
+        Valuation, and Advisory services tailored to property owners,
+        institutions, and investors.
+      </p>
+    </div>
+
+    <div class="bv-metrics-section__grid">
+
+      <!-- Stat 1 -->
+      <div class="bv-stat-card bv-stat-card--dark" style="grid-column:1; grid-row:1;">
+        <div class="bv-stat-card__number">10+</div>
+        <div class="bv-stat-card__caption">Properties Managed & Advised</div>
+      </div>
+
+      <!-- Stat 2 -->
+      <div class="bv-stat-card" style="grid-column:2; grid-row:1;">
+        <div class="bv-stat-card__number">3+</div>
+        <div class="bv-stat-card__caption">Years Professional Experience</div>
+      </div>
+
+      <!-- Stat 3 -->
+      <div class="bv-stat-card" style="grid-column:1; grid-row:2;">
+        <div class="bv-stat-card__number">95%</div>
+        <div class="bv-stat-card__caption">Client Satisfaction</div>
+      </div>
+
+      <!-- Stat 4 -->
+      <div class="bv-stat-card" style="grid-column:2; grid-row:2;">
+        <div class="bv-stat-card__number">24/7</div>
+        <div class="bv-stat-card__caption">Property Support</div>
+      </div>
+
+      <!-- Blurb + CTA -->
+      <div class="bv-metrics-blurb-card">
+        <p class="bv-metrics-blurb-card__text">
+          At AMIZERO Real Estate Ltd, we combine local market expertise
+          with strategic asset management practices to ensure your property
+          performs at its highest potential. Your investment is our priority,
+          and your success is our mission.
+        </p>
+        <a href="services.html">
+          <button class="bv-metrics-blurb-card__cta">
+            Discover More &nbsp;↗
+          </button>
+        </a>
+      </div>
+
+      <!-- Photo Card -->
+      <div class="bv-metrics-photo-card">
+        <img
+          src="https://images.unsplash.com/photo-1615634364452-8daf3851f2f1?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8bW9kZXJuJTIwcmVzaWRlbnRpYWwlMjBuZWlnaGJvcmhvb2R8ZW58MHwxfDB8fHww"
+          alt="Modern residential property"
+        />
+      </div>
+
+    </div>
+  </section>
+
+</div>
+
+
+<!-- Team Section -->
+<section id="team" class="team">
+  <div class="section-header fade-in">
+    <h2>Our Team</h2>
+    <p>Meet the experienced professionals driving AMIZERO's success</p>
+  </div>
+
+  <div class="team-grid">
+    <!-- This will be populated by JavaScript -->
+</div>
+
+  </section>
+
+
+    <!-- ── VALUES SECTION ── -->
+<section class="cv">
+
+  <div class="cv__header">
+    <div>
+      <p class="cv__eyebrow">What We Stand For</p>
+      <h2 class="cv__heading">Our Core <em>Values</em></h2>
+    </div>
+    <span class="cv__count" aria-hidden="true">06</span>
+  </div>
+
+  <ul class="cv__list">
+
+    <!-- 01 -->
+    <li class="cv__item">
+      <details open>
+        <summary class="cv__trigger">
+          <span class="cv__num">01</span>
+          <span class="cv__icon-shell"><i class="fa-solid fa-shield-halved"></i></span>
+          <span class="cv__title">Integrity & Transparency</span>
+          <span class="cv__arrow">↗</span>
+        </summary>
+        <div class="cv__body">
+          <p class="cv__description">We uphold honesty and openness in all transactions, ensuring trust and reliability in every deal we handle for our clients across Rwanda.</p>
+        </div>
+      </details>
+    </li>
+
+    <!-- 02 -->
+    <li class="cv__item">
+      <details>
+        <summary class="cv__trigger">
+          <span class="cv__num">02</span>
+          <span class="cv__icon-shell"><i class="fa-solid fa-users"></i></span>
+          <span class="cv__title">Customer-Centric Approach</span>
+          <span class="cv__arrow">↗</span>
+        </summary>
+        <div class="cv__body">
+          <p class="cv__description">Our clients come first. We tailor every service to meet their unique needs, goals, and expectations — from first contact to final handover.</p>
+        </div>
+      </details>
+    </li>
+
+    <!-- 03 -->
+    <li class="cv__item">
+      <details>
+        <summary class="cv__trigger">
+          <span class="cv__num">03</span>
+          <span class="cv__icon-shell"><i class="fa-solid fa-star"></i></span>
+          <span class="cv__title">Excellence & Professionalism</span>
+          <span class="cv__arrow">↗</span>
+        </summary>
+        <div class="cv__body">
+          <p class="cv__description">We maintain the highest standards in property management, valuation, and brokerage — delivering work that reflects pride in our profession.</p>
+        </div>
+      </details>
+    </li>
+
+    <!-- 04 -->
+    <li class="cv__item">
+      <details>
+        <summary class="cv__trigger">
+          <span class="cv__num">04</span>
+          <span class="cv__icon-shell"><i class="fa-solid fa-lightbulb"></i></span>
+          <span class="cv__title">Innovation & Growth</span>
+          <span class="cv__arrow">↗</span>
+        </summary>
+        <div class="cv__body">
+          <p class="cv__description">We embrace technology and modern strategies to enhance efficiency and remain ahead of the curve in Rwanda's fast-evolving real estate landscape.</p>
+        </div>
+      </details>
+    </li>
+
+    <!-- 05 -->
+    <li class="cv__item">
+      <details>
+        <summary class="cv__trigger">
+          <span class="cv__num">05</span>
+          <span class="cv__icon-shell"><i class="fa-solid fa-leaf"></i></span>
+          <span class="cv__title">Commitment to Sustainability</span>
+          <span class="cv__arrow">↗</span>
+        </summary>
+        <div class="cv__body">
+          <p class="cv__description">We promote responsible real estate practices that support long-term property value, community wellbeing, and environmental sustainability.</p>
+        </div>
+      </details>
+    </li>
+
+    <!-- 06 -->
+    <li class="cv__item">
+      <details>
+        <summary class="cv__trigger">
+          <span class="cv__num">06</span>
+          <span class="cv__icon-shell"><i class="fa-solid fa-plane"></i></span>
+          <span class="cv__title">Empowering Diaspora Investors</span>
+          <span class="cv__arrow">↗</span>
+        </summary>
+        <div class="cv__body">
+          <p class="cv__description">We make real estate investment seamless for Rwandans at home and abroad — ensuring assets are well managed, profitable, and always within reach.</p>
+        </div>
+      </details>
+    </li>
+
+  </ul>
+
+</section>
+
+    <!-- ─── MISSION & VISION ─── -->
+    <section class="bv-pillars-section">
+
+      <div class="bv-pillars-section__two-up">
+
+        <!-- Mission -->
+        <div class="bv-pillar-card bv-pillar-card--mission">
+          <div class="bv-pillar-card__icon-ring">🎯</div>
+          <span class="bv-pillar-card__kicker">Our Mission</span>
+          <div class="bv-pillar-card__rule"></div>
+          <h3 class="bv-pillar-card__title">Driving Real Estate Forward</h3>
+          <p class="bv-pillar-card__body">
+            At AMIZERO Real Estate Ltd, our mission is to revolutionize Rwanda's real estate sector by delivering professional, transparent, and efficient property management, valuation, and brokerage services. We are committed to helping property owners, investors, and homebuyers make informed decisions, maximize their investments, and ensure seamless transactions. Through innovation, integrity, and a customer-centric approach, we strive to create sustainable and long-term value for our clients, both locally and in the diaspora.
+          </p>
+        </div>
+
+        <!-- Vision -->
+        <div class="bv-pillar-card bv-pillar-card--vision">
+          <div class="bv-pillar-card__icon-ring">👁️</div>
+          <span class="bv-pillar-card__kicker">Our Vision</span>
+          <div class="bv-pillar-card__rule"></div>
+          <h3 class="bv-pillar-card__title">The Most Trusted Firm in Rwanda</h3>
+          <p class="bv-pillar-card__body">
+            To be the most trusted and innovative real estate firm in Rwanda, providing exceptional property management, valuation, and brokerage services. We aim to empower property owners, investors, and homebuyers by ensuring transparent, efficient, and profitable real estate transactions. Through professionalism, technology, and customer-focused solutions, we aspire to shape a sustainable and thriving real estate industry that benefits both local and diaspora communities.
+          </p>
+        </div>
+
+      </div>
     </section>
 
 
 
+     <!-- FOOTER -->
+     
+    <!-- ── MARKUP ── -->
+<a class="cta-strip" href="contact.html#contact">
+
+  <div class="cs-bottom-line"></div>
+
+  <div class="cs-inner">
+
+    <!-- Left: text -->
+    <div class="cs-text">
+      <h2 class="cs-headline">Ready to Work With <em>Us?</em></h2>
+      <p class="cs-subtext">Your project, your vision, our expertise. Let's begin.</p>
+    </div>
+
+    <!-- Right: arrow -->
+    <div class="cs-arrow-btn">
+      <span class="cs-arrow-icon">↗</span>
+    </div>
+
+  </div>
+
+</a>
+
     <!-- Footer -->
     <footer>
         <div class="footer-content">
-            <!-- Company Information -->
-            <div class="footer-section company-info">
-                <div class="footer-logo">AMIZERO Real Estate</div>
-                <p class="company-description">
-                    Rwanda's premier real estate company with over 2 years of experience. 
-                    We specialize in residential, commercial, and investment properties across 
-                    Kigali and beyond, providing exceptional service and expert guidance.
-                </p>
-                <div class="company-certifications">
-                    <div class="certification-item">Licensed Real Estate Company</div>
-                    <div class="certification-item">Member of Rwanda Real Estate Association</div>
-                    <div class="certification-item">2+ Years Market Experience</div>
-                </div>
-            </div>
-
-             <!-- Our Partners -->
-    <div class="footer-section our-partners">
-        <h3>Our Partners</h3>
-        <div class="partners-grid">
-            <div class="partner-item">
-                <div class="partner-logo">
-                    <img src="images/La Riqueza logo-02.png" alt="Lariqueza Ltd">
-                </div>
-            </div>
-        </div>
-    </div>
-
+           <!-- Column 1: Quick Links -->
+<div class="footer-section">
+  <h4 class="footer-col-heading">Quick Links</h4>
+  <ul class="quick-links-list">
+    <li><a href="listing.html">Browse Properties</a></li>
+    <li><a href="about.html#team">Our Team</a></li>
+    <li><a href="portfolio.html">Our Projects</a></li>
+    <li><a href="about.html">About Us</a></li>
+    <li><a href="contact.html">Contact Us</a></li>
+  </ul>
+</div>
             <!-- Newsletter Subscription -->
             <div class="footer-section newsletter">
-                <h3>Stay Updated</h3>
+                <h3>Stay Connected with Us</h3>
                 <p>Subscribe to our newsletter for the latest property listings, market insights, and exclusive offers.</p>
                 <form class="newsletter-form" action="#" method="POST">
                     <input type="email" class="newsletter-input" placeholder="Enter your email address" required>
@@ -228,9 +446,9 @@
                 </form>
             </div>
 
-            <!-- Social Media & Awards -->
+         <!-- Social Media & Awards -->
             <div class="footer-section social-awards">
-                <h3>Connect & Recognize</h3>
+                <h3>Follow us</h3>
                 <div class="social-links">
                     <a href="https://www.facebook.com/profile.php?id=100079745410953" aria-label="Facebook" target="_blank"><i class="fab fa-facebook-f"></i></a>
                     <a href="https://x.com/AMIZERO_RealEst?t=e2BML0ybqgVfdY9Xkyz5cw&s=09" aria-label="Twitter" target="_blank"><i class="fab fa-twitter"></i></a>
@@ -263,22 +481,20 @@
                 </div>
             </div>
             <div class="footer-bottom-right">
-                <a href="#about" class="back-to-top" aria-label="Back to top">
-                    <i class="fas fa-chevron-up"></i>
+                <a href="#services" class="back-to-top" aria-label="Back to top">
+                    <i class="fa-solid fa-chevron-up"></i>
                 </a>
             </div>
         </div>
     </footer>
 
-    <script>
-        document.getElementById("year").textContent = new Date().getFullYear();
-    </script>
-
+    
     <script src="script.js"></script>
+    <script src="team.js"></script>
 
 
     <script>
-        // Mobile Navigation Toggle
+    // Mobile Navigation Toggle
 document.addEventListener("DOMContentLoaded", () => {
     const hamburger = document.querySelector('.hamburger');
     const navMenu = document.querySelector('.nav-menu');
@@ -309,6 +525,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-    </script>
+</script>
+    
 </body>
 </html>

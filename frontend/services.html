@@ -7,166 +7,582 @@
     <link rel="icon" type="image/x-icon" href="images/company_logo_blue_color-removebg-preview.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="services.css">
     <link rel="stylesheet" href="about.css">
+    <link rel="stylesheet" href="nav.css">
+    <link rel="stylesheet" href="other.css">
 </head>
 <body>
     <!-- Header -->
     <header>
-        <div id="contact-info">
-            <h1 id="company-name">AMIZERO Real Estate Ltd</h1>
-            <div class="contact-item" id="contact-item">
-                <span class="icon">📞</span>
-                <div class="contact-text" id="contact-text">
-                    <span class="label">CALL:</span>
-                    <a style="text-decoration: none;" href="tel:+250725502317"><span class="value">+250 725 502 317</span></a>
-                </div>
-            </div>
-            <div class="contact-item" id="contact-item">
-                <span class="icon">⏰</span>
-                <div class="contact-text" id="contact-text">
-                    <span class="label">OPENING HOURS:</span>
-                    <span class="value">Mon - Fri 8:00AM - 6:00PM</span>
-                </div>
-            </div>
-        </div>
+    
+           <nav>
+    <a href="index.html" class="logo">
+        <img src="images/logo_with_color__b8976a-removebg-preview.png" alt="Amizero Real Estate">
+    </a>
 
-        <nav>
-            <a href="index.html" class="logo"><img src="images/company_logo_blue_color-removebg-preview.png" alt=""></a>
-            <ul class="nav-menu">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="listing.html">Listing</a></li>
-                 <li><a href="about.html">About</a></li>
-                <li><a href="services.html" class="active">Services</a></li>
-                <li><a href="portfolio.html">Portfolio</a></li>
-                <li><a href="team.html">Team</a></li>
-                <li><a href="contact.html">Contact</a></li>
-            </ul>
-            <div class="close-menu">&times;</div>
-            <div class="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </nav>
+    <ul class="nav-menu">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="listing.html">Properties</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="services.html" class="active">Services</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="contact.html">Contact</a></li>
+
+        <!-- Mobile only auth — sits inside the mobile menu -->
+        <li class="nav-mobile-auth">
+            <a href="contact.html" class="nav-login">Login</a>
+            <a href="contact.html" class="nav-register"><span>Register</span></a>
+        </li>
+    </ul>
+
+    <!-- Desktop auth buttons -->
+    <div class="nav-auth">
+        <a href="contact.html" class="nav-login">Login</a>
+        <a href="contact.html" class="nav-register"><span>Register</span></a>
+    </div>
+
+    <div class="close-menu">&times;</div>
+    <div class="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+</nav>
     </header>
 
-  
 
-   <!-- Services Section -->
-    <section id="services" class="services">
-        <div class="section-header">
-            <h2>Our Services</h2>
-            <p>Comprehensive real estate solutions tailored to your needs</p>
+
+    <!-- ── SERVICES HERO BANNER MARKUP ── -->
+<section class="sph-section">
+
+  <div class="sph-bg"></div>
+  <div class="sph-overlay"></div>
+  <div class="sph-grain"></div>
+  <div class="sph-fade-bottom"></div>
+
+  <div class="sph-content">
+
+    <p class="sph-label">
+      <span class="sph-label-dot"></span>
+      What we offer
+    </p>
+
+    <h1 class="sph-headline">
+      Our <span>Services</span>
+    </h1>
+
+    <p class="sph-tagline">Crafted with purpose. Delivered with excellence.</p>
+
+    <div class="sph-rule"></div>
+
+  </div>
+
+  <div class="sph-scroll-hint">
+    <span class="sph-scroll-line"></span>
+    Explore
+  </div>
+
+</section>
+
+   <!-- ── MARKUP ── -->
+<section id="services" class="srv">
+
+  <div class="srv__header">
+    <div class="srv__header-left">
+      <p class="srv__eyebrow">What we offer</p>
+      <h2 class="srv__heading">Our <em>Services</em></h2>
+    </div>
+    <span class="srv__count" aria-hidden="true">09</span>
+  </div>
+
+  <ul class="srv__list">
+
+    <!-- 01 -->
+    <li class="srv__item">
+      <details open>
+        <summary class="srv__trigger">
+          <span class="srv__num">01</span>
+          <span class="srv__title">Property & Asset Management</span>
+          <span class="srv__arrow">↗</span>
+        </summary>
+        <div class="srv__body">
+          <p class="srv__description">We handle comprehensive property management services including rent collection, tenant management, lease administration, and maintenance coordination.</p>
+          <ul class="srv__bullets">
+            <li>Tenant sourcing and screening</li>
+            <li>Lease agreement preparation</li>
+            <li>Rent collection and reporting</li>
+            <li>Routine inspections & maintenance coordination</li>
+            <li>Security, cleaning & landscaping management</li>
+          </ul>
+          <div class="srv__tariff">
+            <span class="srv__tariff-label">Fee</span>
+            6–10% of monthly rental income
+      
+          </div>
+          <br/>
+          <div class="srv__book-wrap">
+            <button class="srv__book-btn" onclick="srvToggle(this)">
+              <span>Book this service</span>
+              <span class="srv__book-btn-icon">↓</span>
+            </button>
+            <div class="srv__dropdown">
+              <a href="contact.html?service=Property+%26+Asset+Management" class="srv__drop-item">
+                <span class="srv__drop-icon">✉</span>
+                <span>Book via Form</span>
+              </a>
+              <a href="https://wa.me/250725502317?text=Hello%2C+I'd+like+to+book:+Property+%26+Asset+Management" target="_blank" class="srv__drop-item srv__drop-wa">
+                <span class="srv__drop-icon">💬</span>
+                <span>WhatsApp</span>
+              </a>
+            </div>
+          </div>
         </div>
-        <div class="services-grid">
+      </details>
+    </li>
 
-                <div class="service-card fade-in">
-                <div class="service-icon">
-                    <i class="fas fa-building"></i>
-                </div>
-                <h3>Property & Asset Management</h3>
-                <p>We handle comprehensive property management services including rent collection, tenant management, lease administration, and maintenance coordination. Our facility management covers security, cleaning, landscaping, utilities, and vacancy management to maximize your property value.</p>
+    <!-- 02 -->
+    <li class="srv__item">
+      <details>
+        <summary class="srv__trigger">
+          <span class="srv__num">02</span>
+          <span class="srv__title">Building Permit & Compliance</span>
+          <span class="srv__arrow">↗</span>
+        </summary>
+        <div class="srv__body">
+          <p class="srv__description">We assist in obtaining building permits and ensuring legal compliance for your projects. From documentation to approvals, we simplify the process.</p>
+          <ul class="srv__bullets">
+            <li>Permit application & documentation</li>
+            <li>Regulatory compliance checks</li>
+            <li>Liaison with local authorities</li>
+            <li>Approval tracking and follow-up</li>
+          </ul>
+          <div class="srv__tariff">
+            <span class="srv__tariff-label">Fee</span>
+            Fee depends on project scope and regulatory requirements
+          </div>
+          <br/>
+          <div class="srv__book-wrap">
+            <button class="srv__book-btn" onclick="srvToggle(this)">
+              <span>Book this service</span>
+              <span class="srv__book-btn-icon">↓</span>
+            </button>
+            <div class="srv__dropdown">
+              <a href="contact.html?service=Building+Permit+%26+Compliance" class="srv__drop-item">
+                <span class="srv__drop-icon">✉</span>
+                <span>Book via Form</span>
+              </a>
+              <a href="https://wa.me/250725502317?text=Hello%2C+I'd+like+to+book:+Building+Permit+%26+Compliance" target="_blank" class="srv__drop-item srv__drop-wa">
+                <span class="srv__drop-icon">💬</span>
+                <span>WhatsApp</span>
+              </a>
             </div>
-            <div class="service-card fade-in">
-                <div class="service-icon">
-                    <i class="fas fa-file-contract"></i>
-                </div>
-                <h3>Building Permit & Compliance</h3>
-                <p>We assist in obtaining building permits and ensuring legal compliance for your projects. From documentation to approvals, we simplify the process, saving you time and preventing delays.</p>
-            </div>
-            <div class="service-card fade-in">
-                <div class="service-icon">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <h3>Property Valuation</h3>
-                <p>We provide detailed, market-based valuation reports to guide smart investments and ensure proper pricing for buying or selling property.</p>
-            </div>
-            <div class="service-card fade-in">
-                <div class="service-icon">
-                    <i class="fas fa-handshake"></i>
-                </div>
-                <h3>Real Estate Brokerage</h3>
-                <p>We connect buyers and sellers, ensuring smooth real estate transactions. Our expert guidance, market knowledge, and negotiation skills help you secure the best deals efficiently.</p>
-            </div>
-            <div class="service-card fade-in">
-                <div class="service-icon">
-                    <i class="fas fa-calculator"></i>
-                </div>
-                <h3>Quantity Survey</h3>
-                <p>We provide cost estimation, budgeting, and financial planning for construction projects. Our experts ensure cost-effective procurement and accurate material assessment.</p>
-            </div>
-        
-            <div class="service-card fade-in">
-                <div class="service-icon">
-                    <i class="fas fa-hard-hat"></i>
-                </div>
-                <h3>Development & Construction Support</h3>
-                <p>We offer complete construction support from project feasibility studies and land acquisition to construction project management. Our services include architecture and design coordination, interior design, and fit-outs to bring your vision to reality.</p>
-            </div>
-            <div class="service-card fade-in">
-                <div class="service-icon">
-                    <i class="fas fa-coins"></i>
-                </div>
-                <h3>Financial & Investment Services</h3>
-                <p>We provide expert real estate investment advisory and property portfolio management services. Our comprehensive financial support includes mortgage and financing assistance, property tax advisory, compliance guidance, and insurance brokerage including property and rental guarantee insurance.</p>
-            </div>
-            <div class="service-card fade-in">
-                <div class="service-icon">
-                    <i class="fas fa-chart-bar"></i>
-                </div>
-                <h3>Market & Research</h3>
-                <p>We deliver in-depth real estate market analysis and investment risk assessments to inform your decisions. Our research services include demographic and location studies, rental price benchmarking, and comprehensive market intelligence to give you competitive advantages.</p>
-            </div>
-            <div class="service-card fade-in">
-                <div class="service-icon">
-                    <i class="fas fa-gavel"></i>
-                </div>
-                <h3>Legal & Advisory</h3>
-                <p>We provide comprehensive legal support for real estate transactions including contract drafting and review. Our advisory services cover mediation in property disputes, estate planning, and inheritance property handling to ensure smooth and compliant transactions.</p>
-            </div>
+          </div>
         </div>
+      </details>
+    </li>
 
-        
-<div class="contact-button-container">
-    <a href="contact.html?=contactus" class="contact-btn">
-        Contact Us Today
-    </a>
-</div>
-    </section>
+    <!-- 03 -->
+    <li class="srv__item">
+      <details>
+        <summary class="srv__trigger">
+          <span class="srv__num">03</span>
+          <span class="srv__title">Property Valuation</span>
+          <span class="srv__arrow">↗</span>
+        </summary>
+        <div class="srv__body">
+          <p class="srv__description">We provide detailed, market-based valuation reports to guide smart investments and ensure proper pricing for buying or selling property.</p>
+          <ul class="srv__bullets">
+            <li>Market-based comparative analysis</li>
+            <li>Certified valuation reports</li>
+            <li>Investment feasibility assessment</li>
+            <li>Pre-sale & pre-purchase valuations</li>
+          </ul>
+          <div class="srv__tariff">
+            <span class="srv__tariff-label">Fee</span>
+            Valuation fee based on property type, size, and location.
+          </div>
+          <br/>
+          <div class="srv__book-wrap">
+            <button class="srv__book-btn" onclick="srvToggle(this)">
+              <span>Book this service</span>
+              <span class="srv__book-btn-icon">↓</span>
+            </button>
+            <div class="srv__dropdown">
+              <a href="contact.html?service=Property+Valuation" class="srv__drop-item">
+                <span class="srv__drop-icon">✉</span>
+                <span>Book via Form</span>
+              </a>
+              <a href="https://wa.me/250725502317?text=Hello%2C+I'd+like+to+book:+Property+Valuation" target="_blank" class="srv__drop-item srv__drop-wa">
+                <span class="srv__drop-icon">💬</span>
+                <span>WhatsApp</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </details>
+    </li>
+
+    <!-- 04 -->
+    <li class="srv__item">
+      <details>
+        <summary class="srv__trigger">
+          <span class="srv__num">04</span>
+          <span class="srv__title">Real Estate Brokerage</span>
+          <span class="srv__arrow">↗</span>
+        </summary>
+        <div class="srv__body">
+          <p class="srv__description">We connect buyers and sellers, ensuring smooth real estate transactions with expert guidance, market knowledge, and negotiation skills.</p>
+          <ul class="srv__bullets">
+            <li>Buyer & seller representation</li>
+            <li>Market listing & property marketing</li>
+            <li>Negotiation and offer management</li>
+            <li>Transaction coordination to closing</li>
+          </ul>
+          <div class="srv__tariff">
+            <span class="srv__tariff-label">Commission</span>
+            5–8% of Property Sale Price
+          </div>
+          <br/>
+          <div class="srv__book-wrap">
+            <button class="srv__book-btn" onclick="srvToggle(this)">
+              <span>Book this service</span>
+              <span class="srv__book-btn-icon">↓</span>
+            </button>
+            <div class="srv__dropdown">
+              <a href="contact.html?service=Real+Estate+Brokerage" class="srv__drop-item">
+                <span class="srv__drop-icon">✉</span>
+                <span>Book via Form</span>
+              </a>
+              <a href="https://wa.me/250725502317?text=Hello%2C+I'd+like+to+book:+Real+Estate+Brokerage" target="_blank" class="srv__drop-item srv__drop-wa">
+                <span class="srv__drop-icon">💬</span>
+                <span>WhatsApp</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </details>
+    </li>
+
+    <!-- 05 -->
+    <li class="srv__item">
+      <details>
+        <summary class="srv__trigger">
+          <span class="srv__num">05</span>
+          <span class="srv__title">Quantity Survey</span>
+          <span class="srv__arrow">↗</span>
+        </summary>
+        <div class="srv__body">
+          <p class="srv__description">We provide cost estimation, budgeting, and financial planning for construction projects. Our experts ensure cost-effective procurement and accurate material assessment.</p>
+          <ul class="srv__bullets">
+            <li>Bills of Quantities (BoQ) preparation</li>
+            <li>Cost estimation & budget planning</li>
+            <li>Procurement advisory</li>
+            <li>Construction cost monitoring</li>
+          </ul>
+          <div class="srv__tariff">
+            <span class="srv__tariff-label">Fee</span>
+            Fee determined by project size and complexity.
+          </div>
+          <br/>
+          <div class="srv__book-wrap">
+            <button class="srv__book-btn" onclick="srvToggle(this)">
+              <span>Book this service</span>
+              <span class="srv__book-btn-icon">↓</span>
+            </button>
+            <div class="srv__dropdown">
+              <a href="contact.html?service=Quantity+Survey" class="srv__drop-item">
+                <span class="srv__drop-icon">✉</span>
+                <span>Book via Form</span>
+              </a>
+              <a href="https://wa.me/250725502317?text=Hello%2C+I'd+like+to+book:+Quantity+Survey" target="_blank" class="srv__drop-item srv__drop-wa">
+                <span class="srv__drop-icon">💬</span>
+                <span>WhatsApp</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </details>
+    </li>
+
+    <!-- 06 -->
+    <li class="srv__item">
+      <details>
+        <summary class="srv__trigger">
+          <span class="srv__num">06</span>
+          <span class="srv__title">Development & Construction Support</span>
+          <span class="srv__arrow">↗</span>
+        </summary>
+        <div class="srv__body">
+          <p class="srv__description">We offer complete construction support from project feasibility studies and land acquisition to construction project management and interior design.</p>
+          <ul class="srv__bullets">
+            <li>Feasibility studies & land acquisition</li>
+            <li>Architecture & design coordination</li>
+            <li>Construction project management</li>
+            <li>Interior design & fit-outs</li>
+          </ul>
+          <div class="srv__tariff">
+            <span class="srv__tariff-label">Fee</span>
+            Fee structured based on project scope, duration, and risk level.
+          </div>
+          <br/>
+          <div class="srv__book-wrap">
+            <button class="srv__book-btn" onclick="srvToggle(this)">
+              <span>Book this service</span>
+              <span class="srv__book-btn-icon">↓</span>
+            </button>
+            <div class="srv__dropdown">
+              <a href="contact.html?service=Development+%26+Construction+Support" class="srv__drop-item">
+                <span class="srv__drop-icon">✉</span>
+                <span>Book via Form</span>
+              </a>
+              <a href="https://wa.me/250725502317?text=Hello%2C+I'd+like+to+book:+Development+%26+Construction+Support" target="_blank" class="srv__drop-item srv__drop-wa">
+                <span class="srv__drop-icon">💬</span>
+                <span>WhatsApp</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </details>
+    </li>
+
+    <!-- 07 -->
+    <li class="srv__item">
+      <details>
+        <summary class="srv__trigger">
+          <span class="srv__num">07</span>
+          <span class="srv__title">Financial & Investment Services</span>
+          <span class="srv__arrow">↗</span>
+        </summary>
+        <div class="srv__body">
+          <p class="srv__description">We provide expert real estate investment advisory and property portfolio management. Our support includes mortgage assistance, tax advisory, and insurance brokerage.</p>
+          <ul class="srv__bullets">
+            <li>Investment advisory & portfolio management</li>
+            <li>Mortgage & financing assistance</li>
+            <li>Property tax advisory & compliance</li>
+            <li>Property & rental guarantee insurance</li>
+          </ul>
+          <div class="srv__tariff">
+            <span class="srv__tariff-label">Fee</span>
+            Custom advisory fee based on investment size and complexity.
+          </div>
+          <br/>
+          <div class="srv__book-wrap">
+            <button class="srv__book-btn" onclick="srvToggle(this)">
+              <span>Book this service</span>
+              <span class="srv__book-btn-icon">↓</span>
+            </button>
+            <div class="srv__dropdown">
+              <a href="contact.html?service=Financial+%26+Investment+Services" class="srv__drop-item">
+                <span class="srv__drop-icon">✉</span>
+                <span>Book via Form</span>
+              </a>
+              <a href="https://wa.me/250725502317?text=Hello%2C+I'd+like+to+book:+Financial+%26+Investment+Services" target="_blank" class="srv__drop-item srv__drop-wa">
+                <span class="srv__drop-icon">💬</span>
+                <span>WhatsApp</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </details>
+    </li>
+
+    <!-- 08 -->
+    <li class="srv__item">
+      <details>
+        <summary class="srv__trigger">
+          <span class="srv__num">08</span>
+          <span class="srv__title">Market Research & Analysis</span>
+          <span class="srv__arrow">↗</span>
+        </summary>
+        <div class="srv__body">
+          <p class="srv__description">We deliver in-depth real estate market analysis and investment risk assessments including demographic studies, rental benchmarking, and market intelligence.</p>
+          <ul class="srv__bullets">
+            <li>Real estate market analysis reports</li>
+            <li>Investment risk assessment</li>
+            <li>Demographic & location studies</li>
+            <li>Rental price benchmarking</li>
+          </ul>
+          <div class="srv__tariff">
+            <span class="srv__tariff-label">Fee</span>
+            Pricing depends on data depth and research scope.
+          </div>
+          <br/>
+          <div class="srv__book-wrap">
+            <button class="srv__book-btn" onclick="srvToggle(this)">
+              <span>Book this service</span>
+              <span class="srv__book-btn-icon">↓</span>
+            </button>
+            <div class="srv__dropdown">
+              <a href="contact.html?service=Market+Research+%26+Analysis" class="srv__drop-item">
+                <span class="srv__drop-icon">✉</span>
+                <span>Book via Form</span>
+              </a>
+              <a href="https://wa.me/250725502317?text=Hello%2C+I'd+like+to+book:+Market+Research+%26+Analysis" target="_blank" class="srv__drop-item srv__drop-wa">
+                <span class="srv__drop-icon">💬</span>
+                <span>WhatsApp</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </details>
+    </li>
+
+    <!-- 09 -->
+    <li class="srv__item">
+      <details>
+        <summary class="srv__trigger">
+          <span class="srv__num">09</span>
+          <span class="srv__title">Legal & Advisory</span>
+          <span class="srv__arrow">↗</span>
+        </summary>
+        <div class="srv__body">
+          <p class="srv__description">We provide comprehensive legal support for real estate transactions including contract drafting, dispute mediation, estate planning, and inheritance handling.</p>
+          <ul class="srv__bullets">
+            <li>Contract drafting & review</li>
+            <li>Property dispute mediation</li>
+            <li>Estate planning & inheritance handling</li>
+            <li>Regulatory & compliance advisory</li>
+          </ul>
+          <div class="srv__tariff">
+            <span class="srv__tariff-label">Fee</span>
+            Transaction legal support: 1% – 3% of transaction value
+          </div>
+          <br/>
+          <div class="srv__book-wrap">
+            <button class="srv__book-btn" onclick="srvToggle(this)">
+              <span>Book this service</span>
+              <span class="srv__book-btn-icon">↓</span>
+            </button>
+            <div class="srv__dropdown">
+              <a href="contact.html?service=Legal+%26+Advisory" class="srv__drop-item">
+                <span class="srv__drop-icon">✉</span>
+                <span>Book via Form</span>
+              </a>
+              <a href="https://wa.me/250725502317?text=Hello%2C+I'd+like+to+book:+Legal+%26+Advisory" target="_blank" class="srv__drop-item srv__drop-wa">
+                <span class="srv__drop-icon">💬</span>
+                <span>WhatsApp</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </details>
+    </li>
+
+  </ul>
+
+</section>
+
+
+<!-- ── WHY WORK WITH US ── -->
+<section class="wca">
+
+  <h2 class="wca__heading">Why Choose <em>AMIZERO Real Estate?</em></h2>
+  <p class="wca__subtext">Six reasons our clients trust us with Rwanda's most important decisions.</p>
+
+  <div class="wca__grid">
+
+    <div class="wca__card">
+      <div class="wca__icon"><i class="fa-solid fa-house-circle-check"></i></div>
+      <div class="wca__text">
+        <p class="wca__description">Every property we list is personally verified — from title deeds to site visits — before it reaches you.</p>
+        <p class="wca__name">Verified Listings</p>
+      </div>
+    </div>
+
+    <div class="wca__card">
+      <div class="wca__icon"><i class="fa-solid fa-handshake"></i></div>
+      <div class="wca__text">
+        <p class="wca__description">Our fees are stated upfront. No hidden charges, no surprises — just honest, transparent transactions from start to finish.</p>
+        <p class="wca__name">Transparent Pricing</p>
+      </div>
+    </div>
+
+    <div class="wca__card">
+      <div class="wca__icon"><i class="fa-solid fa-scale-balanced"></i></div>
+      <div class="wca__text">
+        <p class="wca__description">Every transaction is fully documented and legally compliant with Rwandan property law — your investment is always protected.</p>
+        <p class="wca__name">Legal Compliance</p>
+      </div>
+    </div>
+
+    <div class="wca__card">
+      <div class="wca__icon"><i class="fa-solid fa-map-location-dot"></i></div>
+      <div class="wca__text">
+        <p class="wca__description">Born and based in Kigali, we bring deep local knowledge of neighbourhoods, pricing trends, and market dynamics across Rwanda.</p>
+        <p class="wca__name">Local Market Expertise</p>
+      </div>
+    </div>
+
+    <div class="wca__card">
+      <div class="wca__icon"><i class="fa-solid fa-plane"></i></div>
+      <div class="wca__text">
+        <p class="wca__description">Managing property from abroad? We handle everything on your behalf — tenants, maintenance, and reporting — with full accountability.</p>
+        <p class="wca__name">Diaspora Friendly</p>
+      </div>
+    </div>
+
+    <div class="wca__card">
+      <div class="wca__icon"><i class="fa-solid fa-headset"></i></div>
+      <div class="wca__text">
+        <p class="wca__description">From first enquiry to final handover, we stay with you at every step — responsive, professional, and genuinely invested in your outcome.</p>
+        <p class="wca__name">End-to-End Support</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="wca__dots">
+    <div class="wca__dot"></div>
+    <div class="wca__dot"></div>
+    <div class="wca__dot"></div>
+  </div>
+
+</section>
+
+
+
+
+    <!-- FOOTER -->
+     
+<a class="cta-strip" href="contact.html#contact">
+
+  <div class="cs-bottom-line"></div>
+
+  <div class="cs-inner">
+
+    <!-- Left: text -->
+    <div class="cs-text">
+      <h2 class="cs-headline">Ready to Work With <em>Us?</em></h2>
+      <p class="cs-subtext">Your project, your vision, our expertise. Let's begin.</p>
+    </div>
+
+    <!-- Right: arrow -->
+    <div class="cs-arrow-btn">
+      <span class="cs-arrow-icon">↗</span>
+    </div>
+
+  </div>
+
+</a>
 
     <!-- Footer -->
     <footer>
         <div class="footer-content">
-            <!-- Company Information -->
-            <div class="footer-section company-info">
-                <div class="footer-logo">AMIZERO Real Estate</div>
-                <p class="company-description">
-                    Rwanda's premier real estate company with over 2 years of experience. 
-                    We specialize in residential, commercial, and investment properties across 
-                    Kigali and beyond, providing exceptional service and expert guidance.
-                </p>
-                <div class="company-certifications">
-                    <div class="certification-item">Licensed Real Estate Company</div>
-                    <div class="certification-item">Member of Rwanda Real Estate Association</div>
-                    <div class="certification-item">2+ Years Market Experience</div>
-                </div>
-            </div>
-
-              <!-- Our Partners -->
-    <div class="footer-section our-partners">
-        <h3>Our Partners</h3>
-        <div class="partners-grid">
-            <div class="partner-item">
-                <div class="partner-logo">
-                    <img src="images/La Riqueza logo-02.png" alt="Lariqueza Ltd">
-                </div>
-            </div>
-        </div>
-    </div>
-
+           <!-- Column 1: Quick Links -->
+<div class="footer-section">
+  <h4 class="footer-col-heading">Quick Links</h4>
+  <ul class="quick-links-list">
+    <li><a href="listing.html">Browse Properties</a></li>
+    <li><a href="about.html#team">Our Team</a></li>
+    <li><a href="portfolio.html">Our Projects</a></li>
+    <li><a href="about.html">About Us</a></li>
+    <li><a href="contact.html">Contact Us</a></li>
+  </ul>
+</div>
             <!-- Newsletter Subscription -->
             <div class="footer-section newsletter">
-                <h3>Stay Updated</h3>
+                <h3>Stay Connected with Us</h3>
                 <p>Subscribe to our newsletter for the latest property listings, market insights, and exclusive offers.</p>
                 <form class="newsletter-form" action="#" method="POST">
                     <input type="email" class="newsletter-input" placeholder="Enter your email address" required>
@@ -176,7 +592,7 @@
 
          <!-- Social Media & Awards -->
             <div class="footer-section social-awards">
-                <h3>Connect & Recognize</h3>
+                <h3>Follow us</h3>
                 <div class="social-links">
                     <a href="https://www.facebook.com/profile.php?id=100079745410953" aria-label="Facebook" target="_blank"><i class="fab fa-facebook-f"></i></a>
                     <a href="https://x.com/AMIZERO_RealEst?t=e2BML0ybqgVfdY9Xkyz5cw&s=09" aria-label="Twitter" target="_blank"><i class="fab fa-twitter"></i></a>
@@ -210,7 +626,7 @@
             </div>
             <div class="footer-bottom-right">
                 <a href="#services" class="back-to-top" aria-label="Back to top">
-                    <i class="fas fa-chevron-up"></i>
+                    <i class="fa-solid fa-chevron-up"></i>
                 </a>
             </div>
         </div>
@@ -277,5 +693,49 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 </script>
+
+
+<script>
+  // Accordion — one open at a time
+  document.querySelectorAll('.srv__list details').forEach(detail => {
+    detail.addEventListener('toggle', () => {
+      if (detail.open) {
+        document.querySelectorAll('.srv__list details').forEach(other => {
+          if (other !== detail) other.removeAttribute('open');
+        });
+      }
+    });
+  });
+
+  // Dropdown toggle
+  function srvToggle(btn) {
+    const dropdown = btn.nextElementSibling;
+    const isOpen = dropdown.classList.contains('open');
+
+    // Close all other dropdowns first
+    document.querySelectorAll('.srv__dropdown.open').forEach(d => {
+      d.classList.remove('open');
+      d.previousElementSibling.classList.remove('active');
+    });
+
+    // Toggle current
+    if (!isOpen) {
+      dropdown.classList.add('open');
+      btn.classList.add('active');
+    }
+  }
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.srv__book-wrap')) {
+      document.querySelectorAll('.srv__dropdown.open').forEach(d => {
+        d.classList.remove('open');
+        d.previousElementSibling.classList.remove('active');
+      });
+    }
+  });
+</script>
+
+
 </body>
 </html>

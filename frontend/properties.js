@@ -317,9 +317,10 @@ function formatPrice(price, type) {
 // ------------------- LOADING STATES -------------------
 function showLoading() {
     propertiesGrid.style.display = 'none';
+    loadingState.style.display = 'block';
     noResults.style.display = 'none';
-    loadingState.style.display = 'flex';
 }
+
 function hideLoading() {
     loadingState.style.display = 'none';
 }
@@ -788,15 +789,3 @@ function refreshPagination() {
     }
 }
 
-// Example usage after fetching properties from API:
-/*
-fetch('/api/properties')
-    .then(response => response.json())
-    .then(data => {
-        // Render property cards
-        renderPropertyCards(data.properties);
-        
-        // Refresh pagination
-        refreshPagination();
-    });
-*/

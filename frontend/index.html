@@ -6,182 +6,148 @@
     <title>AMIZERO Real Estate Ltd - Professional Real Estate Services in Rwanda</title>
     <link rel="icon" type="image/x-icon" href="images/company_logo_blue_color-removebg-preview.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="index.css">
     <link rel="stylesheet" href="about.css">
     <link rel="stylesheet" href="listing.css">
+    <link rel="stylesheet" href="other.css">
+    <link rel="stylesheet" href="listing-colors.css">
+    <link rel="stylesheet" href="contact-colors.css">
+    <link rel="stylesheet" href="services.css">
+    <link rel="stylesheet" href="nav.css">
+    <link rel="stylesheet" href="latest-props.css">
     
    <style>
 
-    @media(max-width: 480px){
-    
-.cta{
-        display: flex;
-        flex-direction: column;
-        row-gap: 1rem !important;
-    }
-    .listingbtn , .contact_servicesbtn{
-        display: flex;
-        flex-direction: column;
-        row-gap: 1rem !important;
-    }
-
-    }
-
-    * Services button container */
-.services-button-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 3rem;
-    padding-top: 2rem;
+/* ── Home page only — transparent nav over hero ── */
+header {
+    background: transparent;
+    box-shadow: none;
+    border-bottom: 1px solid transparent;
+    padding: 0px 10%;
 }
 
-/* Explore services button */
-.explore-services-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
-    padding: 15px 30px;
-    font-size: 14px;
-    font-weight: 600;
-    border-radius: 10px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
-    transition: all 0.3s ease;
-    letter-spacing: 0.5px;
-    position: relative;
-    overflow: hidden;
+header .nav-menu a {
+    color: rgba(255,255,255,0.8);
 }
 
-/* Button hover effect */
-.explore-services-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+header .nav-menu a:hover,
+header .nav-menu a.active {
+    color: #ffffff;
 }
 
-/* Button active state */
-.explore-services-btn:active {
-    transform: translateY(0);
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+header .nav-login {
+    color: rgba(255,255,255,0.8);
 }
 
-/* Arrow animation */
-.btn-arrow {
-    font-size: 18px;
-    transition: transform 0.3s ease;
+header .nav-login:hover {
+    color: #ffffff;
 }
 
-.explore-services-btn:hover .btn-arrow {
-    transform: translateX(5px);
+header .nav-login::after {
+    background: #ffffff;
 }
 
-/* Button focus state for accessibility */
-.explore-services-btn:focus {
-    outline: none;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3), 0 0 0 3px rgba(102, 126, 234, 0.2);
+header .nav-register {
+    background: rgba(184,151,106,0.9);
+    border-color: rgba(184,151,106,0.9);
 }
 
-/* Responsive design */
-@media (max-width: 768px) {
-    .explore-services-btn {
-        padding: 12px 25px;
-        font-size: 14px;
-    }
-    
-    .services-button-container {
-        margin-top: 2rem;
-        padding-top: 1rem;
-    }
+header .hamburger span {
+    background: #ffffff;
 }
 
-#about{
-    padding: 1rem 3% !important;
-    
+/* ── When scrolled — restore solid white ── */
+header.solid {
+    background: #ffffff;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+    border-bottom: 1px solid #e5e0d8;
 }
+
+header.solid .nav-menu a { color: #5a5550; }
+header.solid .nav-menu a:hover,
+header.solid .nav-menu a.active { color: #b8976a; }
+header.solid .nav-login { color: #5a5550; }
+header.solid .nav-login:hover { color: #b8976a; }
+header.solid .nav-register { background: #b8976a; border-color: #b8976a; }
+header.solid .hamburger span { background: #1a1410; }
     
    </style>
 </head>
 <body>
+    
     <!-- Header -->
     <header>
-        <div id="contact-info">
-            <h1 id="company-name">AMIZERO Real Estate Ltd</h1>
-            <div class="contact-item" id="contact-item">
-                <span class="icon">📞</span>
-                <div class="contact-text" id="contact-text">
-                    <span class="label">CALL:</span>
-                    <a style="text-decoration: none;" href="tel:+250725502317"><span class="value">+250 725 502 317</span></a>
-                </div>
-            </div>
-            <div class="contact-item" id="contact-item">
-                <span class="icon">⏰</span>
-                <div class="contact-text" id="contact-text">
-                    <span class="label">OPENING HOURS:</span>
-                    <span class="value">Mon - Fri 8:00AM - 6:00PM</span>
-                </div>
-            </div>
-        </div>
+       <nav>
+    <a href="index.html" class="logo">
+        <img src="images/logo_with_color__b8976a-removebg-preview.png" alt="Amizero Real Estate">
+    </a>
 
-        <nav>
-            <a href="index.html" class="logo"><img src="images/company_logo_blue_color-removebg-preview.png" alt=""></a>
-            <ul class="nav-menu">
-                <li><a href="index.html" class="active">Home</a></li>
-                <li><a href="listing.html">Listing</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="services.html">Services</a></li>
-                <li><a href="portfolio.html">Portfolio</a></li>
-                <li><a href="team.html">Team</a></li>
-                <li><a href="contact.html">Contact</a></li>
-            </ul>
-            <div class="close-menu">&times;</div>
-            <div class="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </nav>
+    <ul class="nav-menu">
+        <li><a href="index.html" class="active">Home</a></li>
+        <li><a href="listing.html">Properties</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="services.html">Services</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="contact.html">Contact</a></li>
+
+        <!-- Mobile only auth — sits inside the mobile menu -->
+        <li class="nav-mobile-auth">
+            <a href="contact.html" class="nav-login">Login</a>
+            <a href="contact.html" class="nav-register"><span>Register</span></a>
+        </li>
+    </ul>
+
+    <!-- Desktop auth buttons -->
+    <div class="nav-auth">
+        <a href="contact.html" class="nav-login">Login</a>
+        <a href="contact.html" class="nav-register"><span>Register</span></a>
+    </div>
+
+    <div class="close-menu">&times;</div>
+    <div class="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+</nav>
     </header>
 
     <section id="home" class="hero">
         <div class="hero-content">
-            <h1>AMIZERO <span class="heroh1span">Real Estate Ltd</span></h1>
-            <div class="tagline">
-                <span class="your-property">Your Property,</span> <span class="our-priority">Our Priority</span>
-            </div>
+            <div>
+           <div class="tagline-wrapper">
+  <p class="tagline">
+    Invest Smart<span class="dot">.</span> 
+    Manage Better<span class="dot">.</span> 
+    Grow Faster<span class="dot">.</span>
+  </p>
+</div>
             <p class="hero-description">From sales and rentals to valuation, management, and advisory — AMIZERO Real Estate is your complete solution for all property needs in Rwanda.</p>
-            
-
-            <div class="cta-buttons">
-                <div class="listingbtn" style="display: flex; gap: 2rem;">
-                 <a href="listing.html?type=buy" class="btn btn-buy">
-        <i class="fas fa-home"></i>
-        Buy a Property
-    </a>
-    <a href="listing.html?type=rent" class="btn btn-rent">
-        <i class="fas fa-key"></i>
-        Rent a Property
-    </a>
-                </div>
-
-                <div class="contact_servicesbtn" style="display: flex; gap: 2rem;">
-    <a href="services.html?type=services" class="btn btn-primary">
-
-                    <i class="fas fa-building"></i>
-                    Our Services
-                </a>
-                <a href="contact.html?type=contact" class="btn btn-secondary" style="color: white; border: 2px solid white;">
-                    <i class="fas fa-phone"></i>
-                    Get in Touch
-                </a>
-                </div>
-
-               
-                
             </div>
-         
+
+                <!-- ALL 4 CTAs IN ONE FROSTED CONTAINER -->
+           <div class="amz-cta-panel">
+    <div class="amz-cta-header">
+        <span class="amz-cta-dot"></span>
+        What are you looking for?
+    </div>
+    <div class="amz-cta-grid">
+        <a href="listing.html?type=buy" class="amz-btn amz-btn--buy">
+            <i class="fas fa-home"></i> Buy a Property
+        </a>
+        <a href="listing.html?type=rent" class="amz-btn amz-btn--rent">
+            <i class="fas fa-key"></i> Rent a Property
+        </a>
+        <a href="services.html" class="amz-btn amz-btn--services">
+            <i class="fas fa-building"></i> Our Services
+        </a>
+        <a href="contact.html" class="amz-btn amz-btn--contact">
+            <i class="fas fa-phone"></i> Get in Touch
+        </a>
+    </div>
+</div> 
         </div>
     </section>
 
@@ -256,18 +222,6 @@
                         </div>
                     </div>
 
-                    <div class="process-flow">
-                        <div class="flow-step">Search Properties</div>
-                        <div class="flow-arrow"><i class="fas fa-arrow-right"></i></div>
-                        <div class="flow-step">Apply Filters</div>
-                        <div class="flow-arrow"><i class="fas fa-arrow-right"></i></div>
-                        <div class="flow-step">View Details</div>
-                        <div class="flow-arrow"><i class="fas fa-arrow-right"></i></div>
-                        <div class="flow-step">Contact Agent</div>
-                        <div class="flow-arrow"><i class="fas fa-arrow-right"></i></div>
-                        <div class="flow-step">Schedule Visit</div>
-                    </div>
-
                     <div class="demo-section">
                         <h3 class="demo-title">Ready to Find Your Dream Property?</h3>
                         <p class="demo-description">
@@ -275,7 +229,7 @@
                             From luxury villas to affordable apartments, we have something for everyone.
                         </p>
                         <a href="listing.html?=properties" class="cta-explore">
-                            <i class="fas fa-home"></i> Explore Properties
+                            <i class="fas fa-home"></i> Explore More Properties
                         </a>
                     </div>
                 </div>
@@ -314,189 +268,282 @@
                             <button class="ads-contact-btn">
                                <i class="fas fa-eye"></i> View Details
                             </button>
+
+
                         </div>
+
                     </div>
                 </div>
+
+                
             </div>
         </div>
     </section>
 
 
-    <div class="achievements-container">
-        <div class="achievements-header">
-            <h1>ACHIEVEMENTS</h1>
-            <p>Our Track Record of Excellence</p>
+
+
+    <!-- ── LATEST PROPERTIES ── -->
+<section class="latest-props">
+  <div class="latest-props__header">
+    <div>
+      <p class="latest-props__eyebrow">Fresh on the market</p>
+      <h2 class="latest-props__heading">Latest <em>Properties</em></h2>
+    </div>
+    <a href="listing.html" class="latest-props__see-more">See all properties →</a>
+  </div>
+
+  <div class="latest-props__grid" id="latestPropsGrid">
+    <!-- Skeleton loaders while fetching -->
+    <div class="lp-skeleton"></div>
+    <div class="lp-skeleton"></div>
+    <div class="lp-skeleton"></div>
+  </div>
+
+  <div class="latest-props__footer">
+    <a href="listing.html" class="latest-props__btn">
+      <i class="fas fa-th-large"></i> See More Properties
+    </a>
+  </div>
+</section>
+
+
+     <!-- ===================================================
+         ABOUT SECTION
+=================================================== -->
+<div class="bv-page-wrapper">
+
+  <!-- ─── HERO ─── -->
+  <section class="bv-hero-section">
+
+    <!-- Left Column -->
+    <div class="bv-hero-section__left-col">
+
+      <h1 class="bv-hero-section__headline">
+        Professional
+        <span class="bv-headline-badge">
+          <span class="bv-headline-badge__avatar">
+            <img
+              src="https://images.unsplash.com/photo-1762397794646-f19044bd0828?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8bW9kZXJuJTIwYXBhcnRtZW50JTIwYnVpbGRpbmclMjBleHRlcmlvcnxlbnwwfHwwfHx8MA%3D%3D"
+              alt="Property management"
+            />
+          </span>
+          <span class="bv-headline-badge__label">Management</span>
+        </span>
+        For Your<br>Properties & Assets.
+      </h1>
+
+      <p class="bv-hero-section__tagline">
+        AMIZERO Real Estate Ltd provides trusted Property and Asset Management
+        services in Rwanda, helping landlords and investors protect,
+        manage, and grow the value of their real estate investments
+        with professionalism and transparency.
+      </p>
+
+      <div class="bv-hero-section__cta-row">
+        <a href="services.html">
+          <button class="bv-cta-primary">
+            Learn more
+            <span class="bv-cta-primary__arrow-chip">↗</span>
+          </button>
+        </a>
+        <a href="contact.html">
+          <button class="bv-cta-secondary">Contact us</button>
+        </a>
+      </div>
+
+      <div class="bv-hero-section__photo-bottomleft">
+        <img
+          src="https://images.unsplash.com/photo-1762397794646-f19044bd0828?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8bW9kZXJuJTIwYXBhcnRtZW50JTIwYnVpbGRpbmclMjBleHRlcmlvcnxlbnwwfHwwfHx8MA%3D%3D"
+          alt="Managed residential property"
+        />
+      </div>
+
+    </div>
+
+    <!-- Right Column -->
+    <div class="bv-hero-section__right-col">
+
+      <div class="bv-hero-section__photo-center">
+        <img
+          src="https://plus.unsplash.com/premium_photo-1754337710205-f99dbe3fac9f?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fHVyYmFuJTIwcmVzaWRlbnRpYWwlMjBjb21wbGV4fGVufDB8fDB8fHww"
+          alt="Modern managed building"
+        />
+      </div>
+
+      <div class="bv-hero-section__right-stack">
+        <div class="bv-hero-section__photo-topright">
+          <img
+            src="https://images.unsplash.com/photo-1750764515068-80d222d974bb?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fGludGVyaW9yJTIwb2YlMjBtb2Rlcm4lMjByZW50YWwlMjBhcGFydG1lbnR8ZW58MHx8MHx8fDA%3D"
+            alt="Investment property"
+          />
         </div>
-
-        <div class="achievements-grid">
-            <div class="achievement-item">
-                <div class="achievement-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"></path>
-                        <path d="m3 9 2.45-4.9A2 2 0 0 1 7.24 3h9.52a2 2 0 0 1 1.8 1.1L21 9"></path>
-                        <path d="M12 3v6"></path>
-                    </svg>
-                </div>
-                <div class="achievement-content">
-                    <div class="achievement-number" data-target="50">0+</div>
-                    <div class="achievement-label">Listings</div>
-                </div>
-            </div>
-             <div class="achievement-item">
-                <div class="achievement-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 21h18"></path>
-                        <path d="M5 21V7l8-4v18"></path>
-                        <path d="M19 21V11l-6-4"></path>
-                    </svg>
-                </div>
-                <div class="achievement-content">
-                    <div class="achievement-number" data-target="20">0+</div>
-                    <div class="achievement-label">Properties Managed</div>
-                </div>
-            </div>
-
-            <div class="achievement-item">
-                <div class="achievement-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14,2 14,8 20,8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10,9 9,9 8,9"></polyline>
-                    </svg>
-                </div>
-                <div class="achievement-content">
-                    <div class="achievement-number" data-target="1000">0+</div>
-                    <div class="achievement-label">Transactions completed</div>
-                </div>
-            </div>
-
-            <div class="achievement-item">
-                <div class="achievement-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-                        <line x1="8" y1="21" x2="16" y2="21"></line>
-                        <line x1="12" y1="17" x2="12" y2="21"></line>
-                    </svg>
-                </div>
-                <div class="achievement-content">
-                    <div class="achievement-number" data-target="50">0+</div>
-                    <div class="achievement-label">Projects</div>
-                </div>
-            </div>
+        <div class="bv-hero-infocard">
+          <p class="bv-hero-infocard__body">
+            We manage, maintain, and maximize your property investments
+            with efficiency, integrity, and expert market knowledge.
+          </p>
+          <a href="services.html" class="bv-hero-infocard__link">Explore Our Services</a>
         </div>
+      </div>
 
-        </div>
+    </div>
+  </section>
+
+  <!-- ─── METRICS / STATS ─── -->
+  <section class="bv-metrics-section">
+
+    <div class="bv-metrics-section__header">
+      <h2 class="bv-metrics-section__heading">
+        <span class="bv-metrics-section__heading-light">Property & Asset</span>
+        Management<br>Experts in Rwanda
+      </h2>
+      <p class="bv-metrics-section__description">
+        AMIZERO Real Estate Ltd delivers comprehensive real estate solutions
+        including Property Management, Asset Management, Brokerage,
+        Valuation, and Advisory services tailored to property owners,
+        institutions, and investors.
+      </p>
+    </div>
+
+    <div class="bv-metrics-section__grid">
+
+      <!-- Stat 1 -->
+      <div class="bv-stat-card bv-stat-card--dark" style="grid-column:1; grid-row:1;">
+        <div class="bv-stat-card__number">10+</div>
+        <div class="bv-stat-card__caption">Properties Managed & Advised</div>
+      </div>
+
+      <!-- Stat 2 -->
+      <div class="bv-stat-card" style="grid-column:2; grid-row:1;">
+        <div class="bv-stat-card__number">3+</div>
+        <div class="bv-stat-card__caption">Years Professional Experience</div>
+      </div>
+
+      <!-- Stat 3 -->
+      <div class="bv-stat-card" style="grid-column:1; grid-row:2;">
+        <div class="bv-stat-card__number">95%</div>
+        <div class="bv-stat-card__caption">Client Satisfaction</div>
+      </div>
+
+      <!-- Stat 4 -->
+      <div class="bv-stat-card" style="grid-column:2; grid-row:2;">
+        <div class="bv-stat-card__number">24/7</div>
+        <div class="bv-stat-card__caption">Property Support</div>
+      </div>
+
+      <!-- Blurb + CTA -->
+      <div class="bv-metrics-blurb-card">
+        <p class="bv-metrics-blurb-card__text">
+          At AMIZERO Real Estate Ltd, we combine local market expertise
+          with strategic asset management practices to ensure your property
+          performs at its highest potential. Your investment is our priority,
+          and your success is our mission.
+        </p>
+        <a href="services.html">
+          <button class="bv-metrics-blurb-card__cta">
+            Discover More &nbsp;↗
+          </button>
+        </a>
+      </div>
+
+      <!-- Photo Card -->
+      <div class="bv-metrics-photo-card">
+        <img
+          src="https://images.unsplash.com/photo-1615634364452-8daf3851f2f1?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8bW9kZXJuJTIwcmVzaWRlbnRpYWwlMjBuZWlnaGJvcmhvb2R8ZW58MHwxfDB8fHww"
+          alt="Modern residential property"
+        />
+      </div>
+
+    </div>
+  </section>
+
+</div>
 
 
 
+    <!-- ── SERVICES SECTION ── -->
+<section class="hsrv">
 
-        <section id="about">
-        <div class="about-container">
-            <div class="about-intro fade-in-element">
-                <h2>About AMIZERO Real Estate</h2>
-                <p class="subtitle">Rwanda's Premier Real Estate Partner</p>
-                <p class="about-description">
-                    Established as Rwanda's leading professional real estate company, AMIZERO Real Estate Ltd stands at the forefront of the nation's property market transformation. We combine deep local expertise with international best practices to deliver exceptional value across all our service areas.
-                </p>
-            </div>
+  <div class="hsrv__header">
+    <div>
+      <p class="hsrv__eyebrow">What we offer</p>
+      <h2 class="hsrv__heading">Our <em>Services</em></h2>
+      <p class="hsrv__tagline">Comprehensive real estate solutions built around your goals — from property management to legal advisory.</p>
+    </div>
+    <a href="services.html" class="hsrv__view-all">See full details →</a>
+  </div>
 
-            <div class="about-main">
-                <div class="about-content fade-in-element">
-                    <h3>Excellence in Real Estate</h3>
-                    <p>
-                        AMIZERO Real Estate Ltd has been instrumental in shaping Rwanda's modern real estate landscape. Our comprehensive approach encompasses Property Management, Professional Valuation Services, and Strategic Brokerage Solutions, all delivered with unwavering commitment to transparency and client satisfaction.
-                    </p>
-                    <p>
-                        Founded with a vision to professionalize and elevate the real estate sector in Rwanda, we have consistently demonstrated our ability to navigate complex property transactions while maintaining the highest standards of ethical practice and regulatory compliance.
-                    </p>
-                    
-                    <div class="about-highlights">
-                        <div class="highlight-item">
-                            <div class="highlight-icon">
-                                <i class="fas fa-certificate"></i>
-                            </div>
-                            <div>
-                                <strong>Licensed & Certified:</strong> Fully licensed real estate professionals with certified expertise
-                            </div>
-                        </div>
-                        <div class="highlight-item">
-                            <div class="highlight-icon">
-                                <i class="fas fa-shield-alt"></i>
-                            </div>
-                            <div>
-                                <strong>Regulatory Compliance:</strong> Adherence to all local and international real estate standards
-                            </div>
-                        </div>
-                        <div class="highlight-item">
-                            <div class="highlight-icon">
-                                <i class="fas fa-handshake"></i>
-                            </div>
-                            <div>
-                                <strong>Client-Centric:</strong> Tailored solutions that prioritize client objectives and outcomes
-                            </div>
-                        </div>
-                    </div>
-                </div>
+  <div class="hsrv__body">
 
-                <div class="about-image-container fade-in-element">
-                    <div class="about-image-wrapper">
-                        <img src="images/home page image 1.png" class="about-image">
-                        <div class="about-overlay">
-                            <div class="overlay-content">
-                                <h4>Professional Excellence</h4>
-                                <p>Setting new standards in Rwanda's real estate market</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <a href="services.html#services" class="hsrv__item">
+      <span class="hsrv__item-num">01</span>
+      <span class="hsrv__item-name">Property & Asset Management</span>
+      <span class="hsrv__item-arrow">↗</span>
+    </a>
 
-        </div>
-    </section>
+    <a href="services.html#services" class="hsrv__item">
+      <span class="hsrv__item-num">02</span>
+      <span class="hsrv__item-name">Building Permit & Compliance</span>
+      <span class="hsrv__item-arrow">↗</span>
+    </a>
 
+    <a href="services.html#services" class="hsrv__item">
+      <span class="hsrv__item-num">03</span>
+      <span class="hsrv__item-name">Property Valuation</span>
+      <span class="hsrv__item-arrow">↗</span>
+    </a>
 
+    <a href="services.html#services" class="hsrv__item">
+      <span class="hsrv__item-num">04</span>
+      <span class="hsrv__item-name">Real Estate Brokerage</span>
+      <span class="hsrv__item-arrow">↗</span>
+    </a>
 
-    <section id="services" class="services">
-        <div class="section-header">
-            <h2>Our Services</h2>
-            <p>Comprehensive real estate solutions tailored to your needs</p>
-        </div>
-        <div class="services-grid">
-            <div class="service-card fade-in">
-                <div class="service-icon">
-                    <i class="fas fa-handshake"></i>
-                </div>
-                <h3>Real Estate Brokerage</h3>
-                <p>We connect buyers and sellers, ensuring smooth real estate transactions. Our expert guidance, market knowledge, and negotiation skills help you secure the best deals efficiently.</p>
-            </div>
-          
-            <div class="service-card fade-in">
-                <div class="service-icon">
-                    <i class="fas fa-building"></i>
-                </div>
-                <h3>Property & Asset Management</h3>
-                <p>We handle comprehensive property management services including rent collection, tenant management, lease administration, and maintenance coordination. Our facility management covers security, cleaning, landscaping, utilities, and vacancy management to maximize your property value.</p>
-            </div>
-            <div class="service-card fade-in">
-                <div class="service-icon">
-                    <i class="fas fa-hard-hat"></i>
-                </div>
-                <h3>Development & Construction Support</h3>
-                <p>We offer complete construction support from project feasibility studies and land acquisition to construction project management. Our services include architecture and design coordination, interior design, and fit-outs to bring your vision to reality.</p>
-            </div>
-           
-           <div class="services-button-container">
-            <a style="text-decoration: none;" href="services.html?=services">
-                <button class="explore-services-btn">
-                Explore More Services
-                <span class="btn-arrow">→</span>
-            </button>
-            </a>
-            
+    <a href="services.html#services" class="hsrv__item">
+      <span class="hsrv__item-num">05</span>
+      <span class="hsrv__item-name">Quantity Survey</span>
+      <span class="hsrv__item-arrow">↗</span>
+    </a>
 
-    </section>
+    <a href="services.html#services" class="hsrv__item">
+      <span class="hsrv__item-num">06</span>
+      <span class="hsrv__item-name">Development & Construction Support</span>
+      <span class="hsrv__item-arrow">↗</span>
+    </a>
+
+    <a href="services.html#services" class="hsrv__item">
+      <span class="hsrv__item-num">07</span>
+      <span class="hsrv__item-name">Financial & Investment Services</span>
+      <span class="hsrv__item-arrow">↗</span>
+    </a>
+
+    <a href="services.html#services" class="hsrv__item">
+      <span class="hsrv__item-num">08</span>
+      <span class="hsrv__item-name">Market Research & Analysis</span>
+      <span class="hsrv__item-arrow">↗</span>
+    </a>
+
+    <a href="services.html#services" class="hsrv__item">
+      <span class="hsrv__item-num">09</span>
+      <span class="hsrv__item-name">Legal & Advisory</span>
+      <span class="hsrv__item-arrow">↗</span>
+    </a>
+
+  </div>
+
+  <div class="hsrv__footer">
+    <p class="hsrv__footer-text">
+      <strong>9 services</strong> designed to cover every step of your real estate journey.
+    </p>
+    <a href="services.html" class="hsrv__cta">
+      <span>See full details</span>
+      <span class="hsrv__cta-arrow">→</span>
+    </a>
+  </div>
+
+  </section>
+
 
 
     <section id="contact" style="margin-top: 80px;">
@@ -505,36 +552,57 @@
             <p>Ready to start your real estate journey? Contact us today</p>
         </div>
         <div class="contact-content">
+           <!-- LEFT COLUMN -->
+        <div class="contact-left">
             <div class="contact-info">
                 <h3>Contact Information</h3>
                 <div class="contact-item">
-                    <div class="contact-icon">
-                        <i class="fas fa-phone"></i>
-                    </div>
+                    <div class="contact-icon"><i class="fas fa-phone"></i></div>
                     <div>
                         <h4>Phone</h4>
                         <p>+250 725 502 317</p>
                     </div>
                 </div>
                 <div class="contact-item">
-                    <div class="contact-icon">
-                        <i class="fas fa-envelope"></i>
-                    </div>
+                    <div class="contact-icon"><i class="fas fa-envelope"></i></div>
                     <div>
                         <h4>Email</h4>
                         <p>amizerorealestate@gmail.com</p>
                     </div>
                 </div>
                 <div class="contact-item">
-                    <div class="contact-icon">
-                        <i class="fas fa-map-marker-alt"></i>
-                    </div>
+                    <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
                     <div>
                         <h4>Location</h4>
-                        <p>Kigali, Rwanda</p>
+                        <p>KG 735 St, Kigali, Rwanda</p>
                     </div>
                 </div>
             </div>
+
+            <!-- MAP SITS HERE — inside left column, under contact-info -->
+            <div class="office-map">
+                <div class="office-map__header">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Our Office Location</span>
+                </div>
+                <div class="office-map__frame">
+                    <iframe
+    src="https://maps.google.com/maps?q=AMIZERO+Real+Estate+Ltd,KG+735+St,Kigali,Rwanda&t=k&z=17&ie=UTF8&iwloc=&output=embed"
+    width="100%"
+    height="100%"
+    style="border:0;"
+    allowfullscreen=""
+    loading="lazy"
+    referrerpolicy="no-referrer-when-downgrade">
+</iframe>
+                </div>
+                <a href="https://maps.google.com/?q=AMIZERO+Real+Estate+Ltd,KG+735+St,Kigali,Rwanda"
+                   target="_blank"
+                   class="office-map__directions">
+                    <i class="fas fa-directions"></i> Get Directions
+                </a>
+            </div>
+        </div>
             <form class="contact-form" id="contactForm">
                 <div class="form-group">
                     <label for="name">Full Name</label>
@@ -604,39 +672,47 @@
 
 
 
+ <!-- FOOTER -->
+     
+    <!-- ── MARKUP ── -->
+<a class="cta-strip" href="contact.html#contact">
+
+  <div class="cs-bottom-line"></div>
+
+  <div class="cs-inner">
+
+    <!-- Left: text -->
+    <div class="cs-text">
+      <h2 class="cs-headline">Ready to Work With <em>Us?</em></h2>
+      <p class="cs-subtext">Your project, your vision, our expertise. Let's begin.</p>
+    </div>
+
+    <!-- Right: arrow -->
+    <div class="cs-arrow-btn">
+      <span class="cs-arrow-icon">↗</span>
+    </div>
+
+  </div>
+
+</a>
+
     <!-- Footer -->
     <footer>
         <div class="footer-content">
-            <!-- Company Information -->
-            <div class="footer-section company-info">
-                <div class="footer-logo">AMIZERO Real Estate</div>
-                <p class="company-description">
-                    Rwanda's premier real estate company with over 2 years of experience. 
-                    We specialize in residential, commercial, and investment properties across 
-                    Kigali and beyond, providing exceptional service and expert guidance.
-                </p>
-                <div class="company-certifications">
-                    <div class="certification-item">Licensed Real Estate Company</div>
-                    <div class="certification-item">Member of Rwanda Real Estate Association</div>
-                    <div class="certification-item">2+ Years Market Experience</div>
-                </div>
-            </div>
-
-            <!-- Our Partners -->
-    <div class="footer-section our-partners">
-        <h3>Our Partners</h3>
-        <div class="partners-grid">
-            <div class="partner-item">
-                <div class="partner-logo">
-                    <img src="images/La Riqueza logo-02.png" alt="Lariqueza Ltd">
-                </div>
-            </div>
-    
-        </div>
-    </div>
+           <!-- Column 1: Quick Links -->
+<div class="footer-section">
+  <h4 class="footer-col-heading">Quick Links</h4>
+  <ul class="quick-links-list">
+    <li><a href="listing.html">Browse Properties</a></li>
+    <li><a href="about.html#team">Our Team</a></li>
+    <li><a href="portfolio.html">Our Projects</a></li>
+    <li><a href="about.html">About Us</a></li>
+    <li><a href="contact.html">Contact Us</a></li>
+  </ul>
+</div>
             <!-- Newsletter Subscription -->
             <div class="footer-section newsletter">
-                <h3>Stay Updated</h3>
+                <h3>Stay Connected with Us</h3>
                 <p>Subscribe to our newsletter for the latest property listings, market insights, and exclusive offers.</p>
                 <form class="newsletter-form" action="#" method="POST">
                     <input type="email" class="newsletter-input" placeholder="Enter your email address" required>
@@ -644,9 +720,9 @@
                 </form>
             </div>
 
-            <!-- Social Media & Awards -->
+         <!-- Social Media & Awards -->
             <div class="footer-section social-awards">
-                <h3>Connect & Recognize</h3>
+                <h3>Follow us</h3>
                 <div class="social-links">
                     <a href="https://www.facebook.com/profile.php?id=100079745410953" aria-label="Facebook" target="_blank"><i class="fab fa-facebook-f"></i></a>
                     <a href="https://x.com/AMIZERO_RealEst?t=e2BML0ybqgVfdY9Xkyz5cw&s=09" aria-label="Twitter" target="_blank"><i class="fab fa-twitter"></i></a>
@@ -679,8 +755,8 @@
                 </div>
             </div>
             <div class="footer-bottom-right">
-                <a href="#home" class="back-to-top" aria-label="Back to top">
-                    <i class="fas fa-chevron-up"></i>
+                <a href="#services" class="back-to-top" aria-label="Back to top">
+                    <i class="fa-solid fa-chevron-up"></i>
                 </a>
             </div>
         </div>
@@ -694,6 +770,37 @@
 </script>
 
 <script src="script.js"></script>
+
+<script>
+    const header = document.querySelector('header');
+const homeSection = document.getElementById('home');
+
+function updateNavbar() {
+    const isHomePage = homeSection !== null;
+
+    if (!isHomePage) {
+        // Not on home page → always solid background
+        header.classList.remove('transparent');
+        header.classList.add('solid');
+        return;
+    }
+
+    // On home page → transparent when at top, solid when scrolled
+    const homeSectionBottom = homeSection.getBoundingClientRect().bottom;
+
+    if (homeSectionBottom <= 600) {
+        header.classList.remove('transparent');
+        header.classList.add('solid');
+    } else {
+        header.classList.remove('solid');
+        header.classList.add('transparent');
+    }
+}
+
+// Run on load and scroll
+updateNavbar();
+window.addEventListener('scroll', updateNavbar);
+</script>
        
         
         <script>
@@ -791,6 +898,73 @@ async function loadAdsProperties() {
         showErrorMessage();
     }
 }
+
+
+
+
+// ── LATEST PROPERTIES ──
+async function loadLatestProperties() {
+  const grid = document.getElementById('latestPropsGrid');
+  const res = await fetch(`${API_BASE_URL}/api/public/properties`);
+  const data = await res.json();
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/public/properties`);
+    if (!res.ok) throw new Error('Failed');
+    const data = await res.json();
+
+
+    // Sort by newest, take 3
+    const latest = data
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .slice(0, 3);
+
+
+
+    if (!latest.length) {
+      grid.innerHTML = `<p style="color:#9e9488; grid-column:1/-1; text-align:center; padding:40px 0;">No properties available at the moment.</p>`;
+      return;
+    }
+
+    grid.innerHTML = latest.map(p => {
+
+      const img = Array.isArray(p.images) && p.images.length ? p.images[0] : 'https://via.placeholder.com/400x300?text=No+Image';
+      const badgeClass = p.type === 'sale' ? 'lp-card__badge--sale' : 'lp-card__badge--rent';
+      const badgeText  = p.type === 'sale' ? 'For Sale' : 'For Rent';
+      const price = new Intl.NumberFormat('en-RW', { style: 'currency', currency: 'RWF', minimumFractionDigits: 0 }).format(p.price);
+      const formattedPrice = p.type === 'rent' ? `${price}/mo` : price;
+      const phone = "250725502317";
+
+      return `
+        <div class="lp-card">
+          <div class="lp-card__image-wrap">
+            <img src="${img}" alt="${p.title}" onerror="this.src='https://via.placeholder.com/400x300?text=No+Image'">
+            <span class="lp-card__badge ${badgeClass}">${badgeText}</span>
+          </div>
+          <div class="lp-card__body">
+            <div class="lp-card__price">${formattedPrice}</div>
+            <h3 class="lp-card__title">${p.title}</h3>
+            <div class="lp-card__location"><i class="fas fa-map-marker-alt"></i> ${p.location}</div>
+            <div class="lp-card__features">
+              <div class="lp-card__feat"><i class="fas fa-bed"></i> ${p.bedrooms ?? 'N/A'}</div>
+              <div class="lp-card__feat"><i class="fas fa-bath"></i> ${p.bathrooms ?? 'N/A'}</div>
+              <div class="lp-card__feat"><i class="fas fa-ruler-combined"></i> ${p.area ? p.area + ' m²' : 'N/A'}</div>
+            </div>
+            <div class="lp-card__actions">
+              <a href="propertyDetails.html?id=${p.id}" class="lp-card__btn lp-card__btn--primary"><i class="fas fa-eye"></i> View Details</a>
+              <a href="https://wa.me/${phone}" target="_blank" class="lp-card__btn lp-card__btn--outline"><i class="fas fa-phone"></i> Contact</a>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+
+  } catch (err) {
+    console.error('Latest properties error:', err);
+    grid.innerHTML = `<p style="color:#9e9488; grid-column:1/-1; text-align:center; padding:40px 0;">Unable to load properties. Please try again later.</p>`;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadLatestProperties);
 
 // Format price for ads display
 function formatAdsPrice(price, type) {
@@ -1039,44 +1213,7 @@ function getAuthHeaders() {
     };
 }
 
-async function updateAchievements() {
-    try {
-        const res = await fetch(`${API_BASE_URL}/api/achievements`, {
-            headers: getAuthHeaders()
-        });
 
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const json = await res.json();
-        if (!json.success) throw new Error(json.message || "Failed to load achievements");
-
-        const data = json.data || {};
-
-        // Map between labels and API keys
-        const fieldMap = {
-            'Listings': 'listings',
-            'Properties Managed': 'propertiesManaged',
-            'Transactions completed': 'transactions',
-            'Projects': 'projects'
-        };
-
-        // For each achievement block, find its label and fill the number
-        document.querySelectorAll('.achievement-item').forEach(item => {
-            const label = item.querySelector('.achievement-label')?.textContent.trim();
-            const numberEl = item.querySelector('.achievement-number');
-            const key = fieldMap[label];
-            if (key && data[key] !== undefined) {
-                numberEl.textContent = `${data[key]}+`;
-            }
-        });
-
-    } catch (err) {
-        console.error('Achievements update error:', err);
-        // fallback (leave defaults or set to 0)
-    }
-}
-
-document.addEventListener('DOMContentLoaded', updateAchievements);
-setInterval(updateAchievements, 30000); // optional refresh every 30 seconds
         </script>
 
  

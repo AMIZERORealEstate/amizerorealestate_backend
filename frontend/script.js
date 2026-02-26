@@ -230,7 +230,7 @@ function addScrollProgress() {
         left: 0;
         width: 0%;
         height: 3px;
-        background: linear-gradient(90deg, #667eea, #764ba2);
+        background-color: #b8976a;
         z-index: 9999;
         transition: width 0.1s ease;
     `;

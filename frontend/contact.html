@@ -8,125 +8,274 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="index.css">
     <link rel="stylesheet" href="about.css">
+    <link rel="stylesheet" href="nav.css">
+    <link rel="stylesheet" href="other.css">
+    <link rel="stylesheet" href="contact-colors.css">
 </head>
 <body>
     <!-- Header -->
     <header>
-        <div id="contact-info">
-            <h1 id="company-name">AMIZERO Real Estate Ltd</h1>
-            <div class="contact-item" id="contact-item">
-                <span class="icon">📞</span>
-                <div class="contact-text" id="contact-text">
-                    <span class="label">CALL:</span>
-                    <a style="text-decoration: none;" href="tel:+250725502317"><span class="value">+250 725 502 317</span></a>
-                </div>
-            </div>
-            <div class="contact-item" id="contact-item">
-                <span class="icon">⏰</span>
-                <div class="contact-text" id="contact-text">
-                    <span class="label">OPENING HOURS:</span>
-                    <span class="value">Mon - Fri 8:00AM - 6:00PM</span>
-                </div>
-            </div>
-        </div>
+       
+ <nav>
+    <a href="index.html" class="logo">
+        <img src="images/logo_with_color__b8976a-removebg-preview.png" alt="Amizero Real Estate">
+    </a>
 
-        <nav>
-            <a href="index.html" class="logo"><img src="images/company_logo_blue_color-removebg-preview.png" alt=""></a>
-            <ul class="nav-menu">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="listing.html">Listing</a></li>
-                <li><a href="services.html">Services</a></li>
-                <li><a href="portfolio.html">Portfolio</a></li>
-                <li><a href="team.html">Team</a></li>
-                <li><a href="contact.html" class="active">Contact</a></li>
-            </ul>
-            <div class="close-menu">&times;</div>
-            <div class="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </nav>
+    <ul class="nav-menu">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="listing.html">Properties</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="services.html">Services</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="contact.html" class="active">Contact</a></li>
+
+        <!-- Mobile only auth — sits inside the mobile menu -->
+        <li class="nav-mobile-auth">
+            <a href="contact.html" class="nav-login">Login</a>
+            <a href="contact.html" class="nav-register"><span>Register</span></a>
+        </li>
+    </ul>
+
+    <!-- Desktop auth buttons -->
+    <div class="nav-auth">
+        <a href="contact.html" class="nav-login">Login</a>
+        <a href="contact.html" class="nav-register"><span>Register</span></a>
+    </div>
+
+    <div class="close-menu">&times;</div>
+    <div class="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+</nav>
     </header>
 
-        <section id="contact" style="margin-top: 80px;">
-        <div class="section-header">
-            <h2>Get In Touch</h2>
-            <p>Ready to start your real estate journey? Contact us today</p>
-        </div>
-        <div class="contact-content">
+
+    <!-- ── MARKUP ── -->
+<section class="chc-section">
+
+  <div class="chc-bg"></div>
+  <div class="chc-overlay"></div>
+  <div class="chc-grain"></div>
+  <div class="chc-fade-bottom"></div>
+
+  <div class="chc-content">
+    <p class="chc-label">
+      <span class="chc-label-dot"></span>
+      We'd love to hear from you
+    </p>
+
+    <h1 class="chc-headline">
+      Let's Have a <span>Conversation</span>
+    </h1>
+
+    <div class="chc-rule"></div>
+  </div>
+
+  <!-- CTA bottom-right like "Explore" -->
+  <a class="chc-cta" href="#contact">
+    <span class="chc-cta-line"></span>
+    Start the Conversation
+  </a>
+
+</section>
+
+
+
+        <section id="contact">
+    <div class="section-header">
+        <h2>Get In Touch</h2>
+        <p>Ready to start your real estate journey? Contact us today</p>
+    </div>
+    <div class="contact-content">
+
+        <!-- LEFT COLUMN -->
+        <div class="contact-left">
             <div class="contact-info">
                 <h3>Contact Information</h3>
                 <div class="contact-item">
-                    <div class="contact-icon">
-                        <i class="fas fa-phone"></i>
-                    </div>
+                    <div class="contact-icon"><i class="fas fa-phone"></i></div>
                     <div>
                         <h4>Phone</h4>
                         <p>+250 725 502 317</p>
                     </div>
                 </div>
                 <div class="contact-item">
-                    <div class="contact-icon">
-                        <i class="fas fa-envelope"></i>
-                    </div>
+                    <div class="contact-icon"><i class="fas fa-envelope"></i></div>
                     <div>
                         <h4>Email</h4>
                         <p>amizerorealestate@gmail.com</p>
                     </div>
                 </div>
                 <div class="contact-item">
-                    <div class="contact-icon">
-                        <i class="fas fa-map-marker-alt"></i>
-                    </div>
+                    <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
                     <div>
                         <h4>Location</h4>
-                        <p>Kigali, Rwanda</p>
+                        <p>KG 735 St, Kigali, Rwanda</p>
                     </div>
                 </div>
             </div>
-            <form class="contact-form" id="contactForm">
-                <div class="form-group">
-                    <label for="name">Full Name</label>
-                    <input type="text" id="name" name="name" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="phone">Phone Number</label>
-                    <input type="tel" id="phone" name="phone">
-                </div>
-                <div class="form-group">
-                    <label for="service">Service Interested In</label>
-                    <select id="service" name="service" style="width: 100%; padding: 1rem; border: 2px solid #e9ecef; border-radius: 8px; font-size: 1rem;">
-                        <option value="">Select a service</option>
-                        <option value="building-permit">Building Permit & Compliance</option>
-                        <option value="PropertyAssetManagement">Property & Asset Management</option>
-                        <option value="property-valuation">Property Valuation</option>
-                        <option value="brokerage">Real Estate Brokerage</option>
-                        <option value="quantity-survey">Quantity Survey</option>
-                        <option value="DevelopmentConstructionSupport">Development & Construction Support</option>
-                        <option value="Financial-Investment-Services">Financial & Investment Services</option>
-                        <option value="Market-Research">Market & Research</option>
-                        <option value="Legal-Advisory">Legal & Advisory</option>
 
-                        <option value="other">Other</option>
-                    </select>
+            <!-- MAP SITS HERE — inside left column, under contact-info -->
+            <div class="office-map">
+                <div class="office-map__header">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Our Office Location</span>
                 </div>
-                <div class="form-group">
-                    <label for="message">Message</label>
-                    <textarea id="message" name="message" placeholder="Tell us about your project or inquiry..." required></textarea>
+                <div class="office-map__frame">
+                    <iframe
+    src="https://maps.google.com/maps?q=AMIZERO+Real+Estate+Ltd,KG+735+St,Kigali,Rwanda&t=k&z=17&ie=UTF8&iwloc=&output=embed"
+    width="100%"
+    height="100%"
+    style="border:0;"
+    allowfullscreen=""
+    loading="lazy"
+    referrerpolicy="no-referrer-when-downgrade">
+</iframe>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%;">
-                    <i class="fas fa-paper-plane"></i>
-                    Send Message
-                </button>
-            </form>
+                <a href="https://maps.google.com/?q=AMIZERO+Real+Estate+Ltd,KG+735+St,Kigali,Rwanda"
+                   target="_blank"
+                   class="office-map__directions">
+                    <i class="fas fa-directions"></i> Get Directions
+                </a>
+            </div>
         </div>
-    </section>
+
+        <!-- RIGHT COLUMN -->
+        <form class="contact-form" id="contactForm">
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone">
+            </div>
+            <div class="form-group">
+                <label for="service">Service Interested In</label>
+                <select id="service" name="service" style="width:100%;padding:1rem;border:2px solid #e9ecef;border-radius:8px;font-size:1rem;">
+                    <option value="">Select a service</option>
+                    <option value="building-permit">Building Permit & Compliance</option>
+                    <option value="PropertyAssetManagement">Property & Asset Management</option>
+                    <option value="property-valuation">Property Valuation</option>
+                    <option value="brokerage">Real Estate Brokerage</option>
+                    <option value="quantity-survey">Quantity Survey</option>
+                    <option value="DevelopmentConstructionSupport">Development & Construction Support</option>
+                    <option value="Financial-Investment-Services">Financial & Investment Services</option>
+                    <option value="Market-Research">Market & Research</option>
+                    <option value="Legal-Advisory">Legal & Advisory</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="message">Message</label>
+                <textarea id="message" name="message" placeholder="Tell us about your project or inquiry..." required></textarea>
+            </div>
+            <button type="submit" class="send-msg-btn" style="width:100%;">
+                <i class="fas fa-paper-plane"></i>
+                Send Message
+            </button>
+        </form>
+
+    </div>
+</section>
+
+
+
+     <!-- FOOTER -->
+     
+    <!-- ── MARKUP ── -->
+<a class="cta-strip" href="contact.html#contact">
+
+  <div class="cs-bottom-line"></div>
+
+  <div class="cs-inner">
+
+    <!-- Left: text -->
+    <div class="cs-text">
+      <h2 class="cs-headline">Ready to Work With <em>Us?</em></h2>
+      <p class="cs-subtext">Your project, your vision, our expertise. Let's begin.</p>
+    </div>
+
+    <!-- Right: arrow -->
+    <div class="cs-arrow-btn">
+      <span class="cs-arrow-icon">↗</span>
+    </div>
+
+  </div>
+
+</a>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+           <!-- Column 1: Quick Links -->
+<div class="footer-section">
+  <h4 class="footer-col-heading">Quick Links</h4>
+  <ul class="quick-links-list">
+    <li><a href="listing.html">Browse Properties</a></li>
+    <li><a href="about.html#team">Our Team</a></li>
+    <li><a href="portfolio.html">Our Projects</a></li>
+    <li><a href="about.html">About Us</a></li>
+    <li><a href="contact.html">Contact Us</a></li>
+  </ul>
+</div>
+            <!-- Newsletter Subscription -->
+            <div class="footer-section newsletter">
+                <h3>Stay Connected with Us</h3>
+                <p>Subscribe to our newsletter for the latest property listings, market insights, and exclusive offers.</p>
+                <form class="newsletter-form" action="#" method="POST">
+                    <input type="email" class="newsletter-input" placeholder="Enter your email address" required>
+                    <button type="submit" class="newsletter-btn">Subscribe</button>
+                </form>
+            </div>
+
+         <!-- Social Media & Awards -->
+            <div class="footer-section social-awards">
+                <h3>Follow us</h3>
+                <div class="social-links">
+                    <a href="https://www.facebook.com/profile.php?id=100079745410953" aria-label="Facebook" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://x.com/AMIZERO_RealEst?t=e2BML0ybqgVfdY9Xkyz5cw&s=09" aria-label="Twitter" target="_blank"><i class="fab fa-twitter"></i></a>
+                    <a href="https://www.linkedin.com/in/aphrodis-amizero-523280243?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" aria-label="LinkedIn" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="https://www.instagram.com/amizero_realestate?igsh=MWZ0bW0ydDRya3Y0Yw==" aria-label="Instagram" target="_blank"><i class="fab fa-instagram"></i></a>
+                    <a href="https://wa.me/250725502317" aria-label="WhatsApp" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                    <a href="https://www.youtube.com/@Amizero_RealEstate" aria-label="YouTube" target="_blank"><i class="fab fa-youtube"></i></a>
+                </div>
+                
+                <div class="awards-list">
+                    <div class="award-item">
+                        <div class="award-icon">🏆</div>
+                        <span>Best Real Estate Company in Rwanda</span>
+                    </div>
+                    <div class="award-item">
+                        <div class="award-icon">🎖️</div>
+                        <span>Excellence in Service</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Bottom -->
+        <div class="footer-bottom">
+            <div class="footer-bottom-left">
+                <p>&copy; <span id="year"></span> AMIZERO Real Estate Ltd. All rights reserved.</p>
+                <div class="footer-links">
+                    <a href="https://docs.google.com/document/d/1oM2efPSQ6FOW38egru1eOc53FVCkeQW_7VKy5Rabmjk/edit?usp=sharing" target="_blank">Privacy Policy</a>
+                    <a href="https://docs.google.com/document/d/1JNCxnBGV89Wz_YTmbVT7vn6Ui4iBDwhYWG8qBi8QHXc/edit?usp=sharing" target="_blank">Terms of Service</a>
+                </div>
+            </div>
+            <div class="footer-bottom-right">
+                <a href="#services" class="back-to-top" aria-label="Back to top">
+                    <i class="fa-solid fa-chevron-up"></i>
+                </a>
+            </div>
+        </div>
+    </footer>
 
 
        <!-- Success Modal -->
@@ -189,6 +338,30 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
+</script>
+
+
+<script>
+  /* Wrapped in IIFE so variables don't pollute global scope */
+  (function () {
+    var chcWrap = document.getElementById('chc-particles');
+    if (!chcWrap) return;
+    for (var i = 0; i < 18; i++) {
+      var p = document.createElement('div');
+      p.classList.add('chc-particle');
+      var size = Math.random() * 3 + 1;
+      p.style.cssText =
+        'width:' + size + 'px;' +
+        'height:' + size + 'px;' +
+        'background:rgba(201,169,110,' + (Math.random() * 0.6 + 0.2) + ');' +
+        'left:' + (Math.random() * 100) + '%;' +
+        'bottom:-10px;' +
+        'animation-duration:' + (Math.random() * 12 + 8) + 's;' +
+        'animation-delay:' + (Math.random() * 10) + 's;' +
+        'box-shadow:0 0 ' + (size * 3) + 'px rgba(201,169,110,0.4);';
+      chcWrap.appendChild(p);
+    }
+  })();
 </script>
 
 

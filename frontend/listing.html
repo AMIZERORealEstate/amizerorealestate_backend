@@ -9,54 +9,82 @@
     <link rel="stylesheet" href="index.css">
     <link rel="stylesheet" href="listing.css">
     <link rel="stylesheet" href="about.css">
+    <link rel="stylesheet" href="nav.css">
+    <link rel="stylesheet" href="other.css">
+    <link rel="stylesheet" href="listing-colors.css">
 </head>
 <body>
     <!-- Header -->
     <header>
-        <div id="contact-info">
-            <h1 id="company-name">AMIZERO Real Estate Ltd</h1>
-            <div class="contact-item" id="contact-item">
-                <span class="icon">📞</span>
-                <div class="contact-text" id="contact-text">
-                    <span class="label">CALL:</span>
-                    <a style="text-decoration: none;" href="tel:+250725502317"><span class="value">+250 725 502 317</span></a>
-                </div>
-            </div>
-            <div class="contact-item" id="contact-item">
-                <span class="icon">⏰</span>
-                <div class="contact-text" id="contact-text">
-                    <span class="label">OPENING HOURS:</span>
-                    <span class="value">Mon - Fri 8:00AM - 6:00PM</span>
-                </div>
-            </div>
-        </div>
 
-        <nav>
-            <a href="index.html" class="logo"><img src="images/company_logo_blue_color-removebg-preview.png" alt=""></a>
-            <ul class="nav-menu">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="listing.html" class="active">Listing</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="services.html">Services</a></li>
-                <li><a href="portfolio.html">Portfolio</a></li>
-                <li><a href="team.html">Team</a></li>
-                <li><a href="contact.html">Contact</a></li>
-            </ul>
-            <div class="close-menu">&times;</div>
-            <div class="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </nav>
+             <nav>
+    <a href="index.html" class="logo">
+        <img src="images/logo_with_color__b8976a-removebg-preview.png" alt="Amizero Real Estate">
+    </a>
+
+    <ul class="nav-menu">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="listing.html" class="active">Properties</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="services.html">Services</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="contact.html">Contact</a></li>
+
+        <!-- Mobile only auth — sits inside the mobile menu -->
+        <li class="nav-mobile-auth">
+            <a href="contact.html" class="nav-login">Login</a>
+            <a href="contact.html" class="nav-register"><span>Register</span></a>
+        </li>
+    </ul>
+
+    <!-- Desktop auth buttons -->
+    <div class="nav-auth">
+        <a href="contact.html" class="nav-login">Login</a>
+        <a href="contact.html" class="nav-register"><span>Register</span></a>
+    </div>
+
+    <div class="close-menu">&times;</div>
+    <div class="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+</nav>
     </header>
+
+    
+       <!-- ── MARKUP ── -->
+<section class="lph-section">
+
+  <div class="lph-bg"></div>
+  <div class="lph-overlay"></div>
+  <div class="lph-grain"></div>
+  <div class="lph-fade-bottom"></div>
+
+  <div class="lph-content">
+
+    <p class="lph-label">
+      <span class="lph-label-dot"></span>
+      Find your perfect home
+    </p>
+
+    <h1 class="lph-headline">
+      Property <span>Listings</span>
+    </h1>
+
+    <p class="lph-tagline">Discover your perfect home or investment opportunity.</p>
+
+    <div class="lph-rule"></div>
+
+  </div>
+
+  <div class="lph-browse">
+    <span class="lph-browse-line"></span>
+    Browse
+  </div>
+
+</section>
     <section class="main-container" id="listing">
-  
-        <!-- Page Header -->
-        <div class="page-header">
-            <h1><i class="fas fa-home"></i> Property Listings</h1>
-            <p>Discover your perfect home or investment opportunity</p>
-        </div>
 
         <!-- Filters Section -->
         <div class="filters-section">
@@ -137,9 +165,16 @@
         </div>
 
         <!-- Loading State -->
-        <div class="loading" id="loadingState" style="display: none;">
-            <div class="spinner"></div>
-        </div>
+       <div class="loading" id="loadingState" style="display: none;">
+    <div class="skeleton-grid">
+        <div class="sk-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-line sk-line--wide"></div><div class="sk-line sk-line--med"></div><div class="sk-line sk-line--narrow"></div><div class="sk-features"><div class="sk-feat"></div><div class="sk-feat"></div><div class="sk-feat"></div></div><div class="sk-actions"><div class="sk-btn"></div><div class="sk-btn"></div></div></div></div>
+        <div class="sk-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-line sk-line--wide"></div><div class="sk-line sk-line--med"></div><div class="sk-line sk-line--narrow"></div><div class="sk-features"><div class="sk-feat"></div><div class="sk-feat"></div><div class="sk-feat"></div></div><div class="sk-actions"><div class="sk-btn"></div><div class="sk-btn"></div></div></div></div>
+        <div class="sk-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-line sk-line--wide"></div><div class="sk-line sk-line--med"></div><div class="sk-line sk-line--narrow"></div><div class="sk-features"><div class="sk-feat"></div><div class="sk-feat"></div><div class="sk-feat"></div></div><div class="sk-actions"><div class="sk-btn"></div><div class="sk-btn"></div></div></div></div>
+        <div class="sk-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-line sk-line--wide"></div><div class="sk-line sk-line--med"></div><div class="sk-line sk-line--narrow"></div><div class="sk-features"><div class="sk-feat"></div><div class="sk-feat"></div><div class="sk-feat"></div></div><div class="sk-actions"><div class="sk-btn"></div><div class="sk-btn"></div></div></div></div>
+        <div class="sk-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-line sk-line--wide"></div><div class="sk-line sk-line--med"></div><div class="sk-line sk-line--narrow"></div><div class="sk-features"><div class="sk-feat"></div><div class="sk-feat"></div><div class="sk-feat"></div></div><div class="sk-actions"><div class="sk-btn"></div><div class="sk-btn"></div></div></div></div>
+        <div class="sk-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-line sk-line--wide"></div><div class="sk-line sk-line--med"></div><div class="sk-line sk-line--narrow"></div><div class="sk-features"><div class="sk-feat"></div><div class="sk-feat"></div><div class="sk-feat"></div></div><div class="sk-actions"><div class="sk-btn"></div><div class="sk-btn"></div></div></div></div>
+    </div>
+</div>
 
         <!-- No Results -->
         <div class="no-results" id="noResults" style="display: none;">
@@ -164,41 +199,47 @@
 
 
 
+ <!-- FOOTER -->
+     
+    <!-- ── MARKUP ── -->
+<a class="cta-strip" href="contact.html#contact">
 
+  <div class="cs-bottom-line"></div>
 
-   <!-- Footer -->
-    <footer>
-        <div class="footer-content">
-            <!-- Company Information -->
-            <div class="footer-section company-info">
-                <div class="footer-logo">AMIZERO Real Estate</div>
-                <p class="company-description">
-                    Rwanda's premier real estate company with over 2 years of experience. 
-                    We specialize in residential, commercial, and investment properties across 
-                    Kigali and beyond, providing exceptional service and expert guidance.
-                </p>
-                <div class="company-certifications">
-                    <div class="certification-item">Licensed Real Estate Company</div>
-                    <div class="certification-item">Member of Rwanda Real Estate Association</div>
-                    <div class="certification-item">2+ Years Market Experience</div>
-                </div>
-            </div>
+  <div class="cs-inner">
 
-              <!-- Our Partners -->
-    <div class="footer-section our-partners">
-        <h3>Our Partners</h3>
-        <div class="partners-grid">
-            <div class="partner-item">
-                <div class="partner-logo">
-                    <img src="images/La Riqueza logo-02.png" alt="Lariqueza Ltd">
-                </div>
-            </div>
-        </div>
+    <!-- Left: text -->
+    <div class="cs-text">
+      <h2 class="cs-headline">Ready to Work With <em>Us?</em></h2>
+      <p class="cs-subtext">Your project, your vision, our expertise. Let's begin.</p>
     </div>
 
+    <!-- Right: arrow -->
+    <div class="cs-arrow-btn">
+      <span class="cs-arrow-icon">↗</span>
+    </div>
+
+  </div>
+
+</a>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+           <!-- Column 1: Quick Links -->
+<div class="footer-section">
+  <h4 class="footer-col-heading">Quick Links</h4>
+  <ul class="quick-links-list">
+    <li><a href="listing.html">Browse Properties</a></li>
+    <li><a href="about.html#team">Our Team</a></li>
+    <li><a href="portfolio.html">Our Projects</a></li>
+    <li><a href="about.html">About Us</a></li>
+    <li><a href="contact.html">Contact Us</a></li>
+  </ul>
+</div>
             <!-- Newsletter Subscription -->
             <div class="footer-section newsletter">
-                <h3>Stay Updated</h3>
+                <h3>Stay Connected with Us</h3>
                 <p>Subscribe to our newsletter for the latest property listings, market insights, and exclusive offers.</p>
                 <form class="newsletter-form" action="#" method="POST">
                     <input type="email" class="newsletter-input" placeholder="Enter your email address" required>
@@ -206,9 +247,9 @@
                 </form>
             </div>
 
-        <!-- Social Media & Awards -->
+         <!-- Social Media & Awards -->
             <div class="footer-section social-awards">
-                <h3>Connect & Recognize</h3>
+                <h3>Follow us</h3>
                 <div class="social-links">
                     <a href="https://www.facebook.com/profile.php?id=100079745410953" aria-label="Facebook" target="_blank"><i class="fab fa-facebook-f"></i></a>
                     <a href="https://x.com/AMIZERO_RealEst?t=e2BML0ybqgVfdY9Xkyz5cw&s=09" aria-label="Twitter" target="_blank"><i class="fab fa-twitter"></i></a>
@@ -241,13 +282,12 @@
                 </div>
             </div>
             <div class="footer-bottom-right">
-                <a href="#listing" class="back-to-top" aria-label="Back to top">
-                    <i class="fas fa-chevron-up"></i>
+                <a href="#services" class="back-to-top" aria-label="Back to top">
+                    <i class="fa-solid fa-chevron-up"></i>
                 </a>
             </div>
         </div>
     </footer>
-     
 
     <script>
         document.getElementById("year").textContent = new Date().getFullYear();

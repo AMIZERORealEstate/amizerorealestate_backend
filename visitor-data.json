@@ -1,9 +1,11 @@
 {
-  "totalVisitors": 1,
+  "totalVisitors": 2,
   "uniqueVisitors": [
-    "58787855-62aa-4099-b764-cdf2fef1fd8a"
+    "58787855-62aa-4099-b764-cdf2fef1fd8a",
+    "1d3770cc-a778-48ad-9de0-7813fe800bd0"
   ],
   "visitsByDate": {
-    "2025-10-19": 1
+    "2025-10-19": 1,
+    "2026-02-17": 1
   }
 }
