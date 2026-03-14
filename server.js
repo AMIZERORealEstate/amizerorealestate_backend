@@ -17,6 +17,10 @@ const cloudinary = require('./cloudinary');
 const cookieParser = require('cookie-parser');
 const { v4: uuidv4 } = require('uuid');
 
+const { google } = require('googleapis');
+
+const OAuth2 = google.auth.OAuth2;
+
 const app = express();
 const PORT = process.env.PORT || 2000;
 
@@ -39,64 +43,122 @@ let mongoClient;
 
 let transporter;
 
-function createMailTransporter() {
-    if (process.env.EMAIL_SERVICE === 'gmail') {
-        return nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
-            },
-            tls: {
-                rejectUnauthorized: false  // ✅ add this line
-            }
-        });
-    }
+// ✅ Create transporter using OAuth2
+async function createMailTransporter() {
+    const oauth2Client = new OAuth2(
+        process.env.GMAIL_CLIENT_ID,
+        process.env.GMAIL_CLIENT_SECRET,
+        'https://developers.google.com/oauthplayground'
+    );
+
+    oauth2Client.setCredentials({
+        refresh_token: process.env.GMAIL_REFRESH_TOKEN
+    });
+
+    const accessToken = await oauth2Client.getAccessToken();
 
     return nodemailer.createTransport({
-        host: process.env.SMTP_HOST || 'smtp.gmail.com',
-        port: parseInt(process.env.SMTP_PORT) || 587,
-        secure: process.env.SMTP_SECURE === 'true',
+        service: 'gmail',
         auth: {
+            type: 'OAuth2',
             user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
-        },
-        tls: {
-            rejectUnauthorized: false
+            clientId: process.env.GMAIL_CLIENT_ID,
+            clientSecret: process.env.GMAIL_CLIENT_SECRET,
+            refreshToken: process.env.GMAIL_REFRESH_TOKEN,
+            accessToken: accessToken.token
         }
     });
 }
 
 
+// ✅ Verify on startup
 (async () => {
-    // ✅ Fix 3: check both possible env var names
-    const emailUser = process.env.EMAIL_USER;
-    const emailPass = process.env.EMAIL_PASS || process.env.EMAIL_PASSWORD;
-
-    if (!emailUser || !emailPass) {
-        console.error('❌ EMAIL_USER or EMAIL_PASS not found in environment variables');
-        console.log('📝 Please add the following to your .env file:');
-        console.log('   EMAIL_SERVICE=gmail  (or omit for custom SMTP)');
-        console.log('   EMAIL_USER=your-email@gmail.com');
-        console.log('   EMAIL_PASS=your-app-password');
-        console.log('   SMTP_HOST=smtp.gmail.com');
-        console.log('   SMTP_PORT=587');
-        console.log('   SMTP_SECURE=false  (true only for port 465)');
-        return; // stop here — no point verifying
-    }
-
     try {
-        transporter = createMailTransporter();
+        if (!process.env.GMAIL_CLIENT_ID || !process.env.GMAIL_CLIENT_SECRET || !process.env.GMAIL_REFRESH_TOKEN) {
+            console.error('❌ Gmail OAuth2 credentials missing in .env');
+            return;
+        }
+        const transporter = await createMailTransporter();
         await transporter.verify();
-        console.log('✅ Nodemailer is configured and ready to send emails');
+        console.log('✅ Gmail OAuth2 is configured and ready to send emails');
     } catch (error) {
-        console.error('❌ Nodemailer configuration error:', error.message);
-        // Optional: exit process if email is critical
-        // process.exit(1);
+        console.error('❌ Gmail OAuth2 configuration error:', error.message);
     }
 })();
 
-module.exports = { transporter };
+// ✅ Send contact emails
+async function sendContactEmails(name, email, phone, service, message, contactId) {
+    try {
+        const transporter = await createMailTransporter();
+
+        const fromName = process.env.EMAIL_FROM_NAME || 'AMIZERO Real Estate';
+        const adminEmail = process.env.ADMIN_EMAIL;
+
+        // Admin notification
+        await transporter.sendMail({
+            from: `"${fromName}" <${process.env.EMAIL_USER}>`,
+            to: adminEmail,
+            subject: '🏠 New Contact Request - AMIZERO Real Estate',
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; text-align: center;">
+                        <h1 style="color: white; margin: 0;">AMIZERO Real Estate</h1>
+                        <p style="color: white; margin: 5px 0;">New Contact Request</p>
+                    </div>
+                    <div style="padding: 20px; background: #f8f9fa;">
+                        <h2 style="color: #2c3e50;">Contact Details</h2>
+                        <p><strong>Name:</strong> ${name}</p>
+                        <p><strong>Email:</strong> ${email}</p>
+                        <p><strong>Phone:</strong> ${phone || 'Not provided'}</p>
+                        <p><strong>Service:</strong> ${service || 'General Inquiry'}</p>
+                        <p><strong>Submitted:</strong> ${new Date().toLocaleString()}</p>
+                        <h3 style="color: #2c3e50;">Message</h3>
+                        <div style="background: white; padding: 15px; border-left: 4px solid #3498db;">
+                            ${message}
+                        </div>
+                        <p style="color: #7f8c8d; font-size: 0.9em;">Contact ID: ${contactId}</p>
+                    </div>
+                </div>
+            `
+        });
+        console.log('✅ Admin email sent');
+
+        // Customer confirmation
+        await transporter.sendMail({
+            from: `"${fromName}" <${process.env.EMAIL_USER}>`,
+            to: email,
+            subject: 'Thank you for contacting AMIZERO Real Estate',
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; text-align: center;">
+                        <h1 style="color: white; margin: 0;">AMIZERO Real Estate</h1>
+                        <p style="color: white; margin: 5px 0;">Thank You for Your Interest</p>
+                    </div>
+                    <div style="padding: 20px;">
+                        <h2 style="color: #2c3e50;">Dear ${name},</h2>
+                        <p>Thank you for contacting AMIZERO Real Estate Ltd. We have received your inquiry and will get back to you within 24 hours.</p>
+                        <h3 style="color: #2c3e50;">Your Message Summary:</h3>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 5px;">
+                            <p><strong>Service:</strong> ${service || 'General Inquiry'}</p>
+                            <p><strong>Message:</strong> ${message}</p>
+                        </div>
+                        <p>Feel free to contact us directly:</p>
+                        <ul>
+                            <li>Phone: +250 725 502 317</li>
+                            <li>Email: ${adminEmail}</li>
+                        </ul>
+                        <p style="margin-top: 30px;">Best regards,<br/><strong>AMIZERO Real Estate Team</strong></p>
+                    </div>
+                </div>
+            `
+        });
+        console.log('✅ Customer email sent');
+
+    } catch (error) {
+        console.error('❌ Email error:', error.message);
+        throw error;
+    }
+}
 
 // Cloudinary Storage Configuration
 const storage = new CloudinaryStorage({
@@ -156,33 +218,19 @@ app.post('/api/contact', async (req, res) => {
     try {
         const { name, email, phone, service, message } = req.body;
 
-        // Check database connection
         if (!db) {
-            console.error('❌ Database not connected');
-            return res.status(500).json({
-                success: false,
-                error: 'Database connection not available'
-            });
+            return res.status(500).json({ success: false, error: 'Database connection not available' });
         }
 
-        // Validate required fields
         if (!name || !email || !message) {
-            return res.status(400).json({
-                success: false,
-                error: 'Name, email, and message are required fields'
-            });
+            return res.status(400).json({ success: false, error: 'Name, email, and message are required' });
         }
 
-        // Validate email format
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
-            return res.status(400).json({
-                success: false,
-                error: 'Please provide a valid email address'
-            });
+            return res.status(400).json({ success: false, error: 'Please provide a valid email address' });
         }
 
-        // Create contact document
         const contactData = {
             name: name.trim(),
             email: email.trim().toLowerCase(),
@@ -196,116 +244,24 @@ app.post('/api/contact', async (req, res) => {
             userAgent: req.get('User-Agent')
         };
 
-        // Save to MongoDB
         const collection = db.collection('contacts');
         const result = await collection.insertOne(contactData);
 
-        // Send emails using Nodemailer (don't wait for completion)
+        // ✅ Fire email in background — user gets instant response
         sendContactEmails(name, email, phone, service, message, result.insertedId)
-            .catch(err => console.error('Email sending error:', err));
+            .then(() => console.log('✅ Emails sent for contact:', result.insertedId))
+            .catch(err => console.error('❌ Email error:', err.message));
 
-        res.json({
-            success: true,
-            contactId: result.insertedId
-        });
+        return res.json({ success: true, contactId: result.insertedId });
 
     } catch (error) {
-        console.error('Contact form error:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to submit contact form. Please try again later.'
-        });
+        console.error('❌ Contact form error:', error.message);
+        return res.status(500).json({ success: false, error: 'Failed to submit contact form. Please try again later.' });
     }
 });
 
-// Helper function to send contact emails using Nodemailer
-async function sendContactEmails(name, email, phone, service, message, contactId) {
-    try {
-        if (!transporter) {
-            console.error('❌ Email transporter not configured');
-            return;
-        }
 
-        const fromEmail = process.env.EMAIL_USER;
-        const fromName = process.env.EMAIL_FROM_NAME || 'AMIZERO Real Estate';
-        const adminEmail = process.env.ADMIN_EMAIL || 'amizerorealestate@gmail.com';
 
-        // Send admin notification email
-        const adminMailOptions = {
-            from: `"${fromName}" <${fromEmail}>`,
-            to: adminEmail,
-            subject: '🏠 New Contact Request - AMIZERO Real Estate',
-            html: `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; text-align: center;">
-                        <h1 style="color: white; margin: 0;">AMIZERO Real Estate</h1>
-                        <p style="color: white; margin: 5px 0;">New Contact Request</p>
-                    </div>
-                    <div style="padding: 20px; background: #f8f9fa;">
-                        <h2 style="color: #2c3e50;">Contact Details</h2>
-                        <p><strong>Name:</strong> ${name}</p>
-                        <p><strong>Email:</strong> ${email}</p>
-                        <p><strong>Phone:</strong> ${phone || 'Not provided'}</p>
-                        <p><strong>Service:</strong> ${service || 'General Inquiry'}</p>
-                        <p><strong>Submitted:</strong> ${new Date().toLocaleString()}</p>
-                        
-                        <h3 style="color: #2c3e50;">Message</h3>
-                        <div style="background: white; padding: 15px; border-left: 4px solid #3498db; margin: 10px 0;">
-                            ${message}
-                        </div>
-                        
-                        <p style="margin-top: 20px; color: #7f8c8d; font-size: 0.9em;">
-                            Contact ID: ${contactId}
-                        </p>
-                    </div>
-                </div>
-            `
-        };
-
-        await transporter.sendMail(adminMailOptions);
-        console.log('✅ Admin notification email sent');
-
-        // Send customer confirmation email
-        const customerMailOptions = {
-            from: `"${fromName}" <${fromEmail}>`,
-            to: email,
-            subject: 'Thank you for contacting AMIZERO Real Estate',
-            html: `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; text-align: center;">
-                        <h1 style="color: white; margin: 0;">AMIZERO Real Estate</h1>
-                        <p style="color: white; margin: 5px 0;">Thank You for Your Interest</p>
-                    </div>
-                    <div style="padding: 20px;">
-                        <h2 style="color: #2c3e50;">Dear ${name},</h2>
-                        <p>Thank you for contacting AMIZERO Real Estate Ltd. We have received your inquiry and will get back to you within 24 hours.</p>
-                        
-                        <h3 style="color: #2c3e50;">Your Message Summary:</h3>
-                        <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 10px 0;">
-                            <p><strong>Service:</strong> ${service || 'General Inquiry'}</p>
-                            <p><strong>Message:</strong> ${message}</p>
-                        </div>
-                        
-                        <p>In the meantime, feel free to explore our services or contact us directly:</p>
-                        <ul>
-                            <li>Phone: +250 725 502 317</li>
-                            <li>Email: ${adminEmail}</li>
-                        </ul>
-                        
-                        <p style="margin-top: 30px;">Best regards,<br><strong>AMIZERO Real Estate Team</strong></p>
-                    </div>
-                </div>
-            `
-        };
-
-        await transporter.sendMail(customerMailOptions);
-        console.log('✅ Customer confirmation email sent');
-
-    } catch (error) {
-        console.error('❌ Error sending emails via Nodemailer:', error);
-        throw error;
-    }
-}
 
 // Get all contacts (admin endpoint)
 app.get('/api/contacts', async (req, res) => {
