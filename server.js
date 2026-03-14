@@ -156,19 +156,33 @@ app.post('/api/contact', async (req, res) => {
     try {
         const { name, email, phone, service, message } = req.body;
 
+        // Check database connection
         if (!db) {
-            return res.status(500).json({ success: false, error: 'Database connection not available' });
+            console.error('❌ Database not connected');
+            return res.status(500).json({
+                success: false,
+                error: 'Database connection not available'
+            });
         }
 
+        // Validate required fields
         if (!name || !email || !message) {
-            return res.status(400).json({ success: false, error: 'Name, email, and message are required' });
+            return res.status(400).json({
+                success: false,
+                error: 'Name, email, and message are required fields'
+            });
         }
 
+        // Validate email format
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
-            return res.status(400).json({ success: false, error: 'Please provide a valid email address' });
+            return res.status(400).json({
+                success: false,
+                error: 'Please provide a valid email address'
+            });
         }
 
+        // Create contact document
         const contactData = {
             name: name.trim(),
             email: email.trim().toLowerCase(),
@@ -182,17 +196,22 @@ app.post('/api/contact', async (req, res) => {
             userAgent: req.get('User-Agent')
         };
 
+        // Save to MongoDB
         const collection = db.collection('contacts');
         const result = await collection.insertOne(contactData);
 
-        // ✅ Now properly awaited — errors will be caught below
-        await sendContactEmails(name, email, phone, service, message, result.insertedId);
+        // Send emails using Nodemailer (don't wait for completion)
+        sendContactEmails(name, email, phone, service, message, result.insertedId)
+            .catch(err => console.error('Email sending error:', err));
 
-        return res.json({ success: true, contactId: result.insertedId });
+        res.json({
+            success: true,
+            contactId: result.insertedId
+        });
 
     } catch (error) {
-        console.error('❌ Contact form error:', error.message);
-        return res.status(500).json({
+        console.error('Contact form error:', error);
+        res.status(500).json({
             success: false,
             error: 'Failed to submit contact form. Please try again later.'
         });
