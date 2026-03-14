@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <link rel="icon" type="image/x-icon" href="images/logo_with_color__b8976a-removebg-preview.png">
     <title>Portfolio Details – AMIZERO Real Estate Ltd</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -52,11 +53,14 @@
             background: var(--white);
             box-shadow: 0 2px 20px rgba(26,20,16,0.08);
             border-bottom: 1px solid var(--border);
-            padding: 1rem 0;
+            padding: 0.5rem;
             position: sticky;
             top: 0;
             z-index: 1000;
+            height: 70px;
         }
+
+       
 
         .nav-container {
             max-width: 1200px;
@@ -90,7 +94,7 @@
         }
 
         .logo img {
-            width: 100px;
+            width: 70px;
             object-fit: contain;
         }
 
@@ -709,7 +713,7 @@
 
         @media (max-width: 768px) {
             .nav-container {
-                flex-direction: column;
+                flex-direction: row;
                 gap: 10px;
                 align-items: flex-start;
             }
@@ -1588,141 +1592,168 @@ class PortfolioDetailsManager {
         });
     }
 
+
+
+
     // ✅ DOWNLOAD BROCHURE METHOD WITH IMAGES
 async downloadBrochure() {
     if (!this.currentProject) return;
-    
+
     const project = this.currentProject;
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    
-    const primaryColor = [102, 126, 234];
-    const textColor = [44, 62, 80];
-    const lightGray = [127, 140, 141];
-    
-    let yPosition = 15;
+
+    // ── Company Colors ──
+    const gold        = [184, 151, 106];   // #b8976a
+    const darkGold    = [160, 130, 90];    // #a0825a
+    const nearBlack   = [14,  12,  10];    // #0e0c0a
+    const darkBrown   = [26,  20,  16];    // #1a1410
+    const secondaryTx = [158, 148, 136];   // #9e9488
+    const cream       = [250, 247, 242];   // #faf7f2
+    const white       = [255, 255, 255];
+
+    let yPosition  = 15;
     const leftMargin = 20;
-    const pageWidth = doc.internal.pageSize.width;
-    
+    const pageWidth  = doc.internal.pageSize.width;
+
     const addSection = (title, spacing) => {
         spacing = spacing || 15;
-        
+
         if (yPosition > doc.internal.pageSize.height - 60) {
             doc.addPage();
             yPosition = 15;
         }
-        
+
         yPosition += spacing;
-        doc.setFontSize(12);
-        doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+        doc.setFontSize(11);
+        doc.setTextColor(gold[0], gold[1], gold[2]);
         doc.setFont('helvetica', 'bold');
-        // Clean the title text
+
         const cleanTitle = title.replace(/[^\x00-\x7F]/g, '').trim();
         doc.text(cleanTitle, leftMargin, yPosition);
-        
+
+        // Gold underline
         const textWidth = doc.getTextWidth(cleanTitle);
-        doc.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+        doc.setDrawColor(gold[0], gold[1], gold[2]);
+        doc.setLineWidth(0.5);
         doc.line(leftMargin, yPosition + 2, leftMargin + textWidth, yPosition + 2);
+
         yPosition += 9;
     };
-    
-    // Header
-    doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-    doc.rect(0, 0, pageWidth, 25, 'F');
-    
+
+    // ── Header Banner ──
+    doc.setFillColor(nearBlack[0], nearBlack[1], nearBlack[2]);
+    doc.rect(0, 0, pageWidth, 28, 'F');
+
+    // Gold top accent line
+    doc.setFillColor(gold[0], gold[1], gold[2]);
+    doc.rect(0, 0, pageWidth, 2, 'F');
+
     try {
-        const logoPath = 'images/AMR_LOGO_white_color-removebg-preview.png';
-        doc.addImage(logoPath, 'PNG', leftMargin, 5, 15, 15);
+        const logoPath = 'images/logo_with_color__b8976a-removebg-preview.png';
+        doc.addImage(logoPath, 'PNG', leftMargin, 6, 15, 15);
     } catch (error) {
         console.warn('Logo not found');
     }
-    
-    doc.setFontSize(18);
-    doc.setTextColor(255, 255, 255);
+
+    doc.setFontSize(16);
+    doc.setTextColor(gold[0], gold[1], gold[2]);
     doc.setFont(undefined, 'bold');
-    doc.text('AMIZERO REAL ESTATE', leftMargin + 20, 15);
-    
-    doc.setFontSize(10);
+    doc.text('AMIZERO REAL ESTATE', leftMargin + 20, 14);
+
+    doc.setFontSize(8);
+    doc.setTextColor(secondaryTx[0], secondaryTx[1], secondaryTx[2]);
     doc.setFont(undefined, 'normal');
-    doc.text('PROJECT BROCHURE', pageWidth - 60, 15);
-    
-    // Project Title
-    yPosition = 35;
-    doc.setFontSize(20);
-    doc.setTextColor(textColor[0], textColor[1], textColor[2]);
+    doc.text('Your Trusted Property Partner', leftMargin + 20, 21);
+
+    doc.setFontSize(9);
+    doc.setTextColor(gold[0], gold[1], gold[2]);
+    doc.text('PROJECT BROCHURE', pageWidth - 58, 17);
+
+    // ── Project Title Block ──
+    yPosition = 38;
+
+    // Cream title background strip
+    doc.setFillColor(cream[0], cream[1], cream[2]);
+    doc.rect(0, yPosition - 6, pageWidth, 20, 'F');
+
+    doc.setFontSize(18);
+    doc.setTextColor(darkBrown[0], darkBrown[1], darkBrown[2]);
     doc.setFont('helvetica', 'bold');
     const cleanTitle = project.title.replace(/[^\x00-\x7F]/g, '').trim();
-    doc.text(cleanTitle, leftMargin, yPosition);
-    yPosition += 10;
-    
-    doc.setFontSize(10);
-    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+    doc.text(cleanTitle, leftMargin, yPosition + 6);
+    yPosition += 20;
+
+    doc.setFontSize(9);
+    doc.setTextColor(gold[0], gold[1], gold[2]);
     doc.setFont('helvetica', 'bold');
     doc.text(this.getCategoryDisplayName(project.category).toUpperCase(), leftMargin, yPosition);
-    yPosition += 15;
-    
-    // Add Project Images
+    yPosition += 14;
+
+    // ── Project Images ──
     if (project.images && project.images.length > 0) {
         addSection('PROJECT IMAGES', 5);
-        
+
         try {
-            const imagesToShow = project.images.slice(0, 4); // Show up to 4 images
-            const imagesPerRow = 2;
-            const imageWidth = 75;
-            const imageHeight = 55;
-            const imageSpacing = 10;
-            
+            const imagesToShow = project.images.slice(0, 4);
+            const imagesPerRow  = 2;
+            const imageWidth    = 75;
+            const imageHeight   = 55;
+            const imageSpacing  = 10;
+
             for (let i = 0; i < imagesToShow.length; i++) {
-                const col = i % imagesPerRow;
-                const row = Math.floor(i / imagesPerRow);
-                
+                const col  = i % imagesPerRow;
+                const row  = Math.floor(i / imagesPerRow);
                 const xPos = leftMargin + (col * (imageWidth + imageSpacing));
-                const yPos = yPosition + (row * (imageHeight + imageSpacing));
-                
-                // Check if we need a new page
+                const yPos = yPosition  + (row * (imageHeight + imageSpacing));
+
                 if (yPos + imageHeight > doc.internal.pageSize.height - 40) {
                     doc.addPage();
                     yPosition = 15;
-                    const newYPos = yPosition + (row * (imageHeight + imageSpacing));
-                    
                     try {
                         const imgData = await this.loadImageAsBase64(imagesToShow[i]);
-                        doc.addImage(imgData, 'JPEG', xPos, newYPos, imageWidth, imageHeight);
+                        doc.addImage(imgData, 'JPEG', xPos, yPosition, imageWidth, imageHeight);
                     } catch (err) {
                         console.warn('Could not load image:', imagesToShow[i]);
                     }
                 } else {
                     try {
                         const imgData = await this.loadImageAsBase64(imagesToShow[i]);
+
+                        // Gold border around image
+                        doc.setDrawColor(gold[0], gold[1], gold[2]);
+                        doc.setLineWidth(0.4);
+                        doc.rect(xPos - 1, yPos - 1, imageWidth + 2, imageHeight + 2);
+
                         doc.addImage(imgData, 'JPEG', xPos, yPos, imageWidth, imageHeight);
                     } catch (err) {
                         console.warn('Could not load image:', imagesToShow[i]);
                     }
                 }
             }
-            
+
             yPosition += Math.ceil(imagesToShow.length / imagesPerRow) * (imageHeight + imageSpacing) + 5;
-            
+
         } catch (error) {
             console.warn('Error adding images to PDF:', error);
         }
     }
-    
-    // Overview
+
+    // ── Project Overview ──
     addSection('PROJECT OVERVIEW');
+
     doc.setFontSize(10);
-    doc.setTextColor(textColor[0], textColor[1], textColor[2]);
+    doc.setTextColor(darkBrown[0], darkBrown[1], darkBrown[2]);
     doc.setFont('helvetica', 'normal');
-    
+
     const maxLineWidth = pageWidth - 40;
-    // Clean and encode the description text properly
     const cleanDescription = project.description
-        .replace(/[^\x00-\x7F]/g, '') // Remove non-ASCII characters
-        .replace(/\s+/g, ' ') // Normalize whitespace
+        .replace(/[^\x00-\x7F]/g, '')
+        .replace(/\s+/g, ' ')
         .trim();
-    
+
     const descriptionLines = doc.splitTextToSize(cleanDescription, maxLineWidth);
-    descriptionLines.forEach(function(line) {
+    descriptionLines.forEach(line => {
         if (yPosition > doc.internal.pageSize.height - 40) {
             doc.addPage();
             yPosition = 20;
@@ -1730,124 +1761,135 @@ async downloadBrochure() {
         doc.text(line, leftMargin, yPosition);
         yPosition += 6;
     });
-    
-    // Project Details
+
+    // ── Project Details ──
     addSection('PROJECT DETAILS');
-    
+
     const details = [
-        { label: 'Location:', value: project.location || 'N/A' },
+        { label: 'Location:',       value: project.location || 'N/A' },
         { label: 'Date Completed:', value: project.date ? this.formatDate(project.date) : 'N/A' },
-        { label: 'Duration:', value: project.duration || 'N/A' },
-        { label: 'Project Value:', value: project.value ? this.formatValue(project.value) : 'N/A' },
-        { label: 'Client:', value: project.client || 'N/A' },
-        { label: 'Status:', value: project.status || 'N/A' }
+        { label: 'Duration:',       value: project.duration || 'N/A' },
+        { label: 'Project Value:',  value: project.value ? this.formatValue(project.value) : 'N/A' },
+        { label: 'Client:',         value: project.client || 'N/A' },
+        { label: 'Status:',         value: project.status || 'N/A' }
     ];
-    
-    details.forEach(function(detail) {
+
+    details.forEach(detail => {
         if (yPosition > doc.internal.pageSize.height - 40) {
             doc.addPage();
             yPosition = 20;
         }
-        
+
+        // Alternating row tint
+        if (details.indexOf(detail) % 2 === 0) {
+            doc.setFillColor(cream[0], cream[1], cream[2]);
+            doc.rect(leftMargin - 2, yPosition - 4, pageWidth - 36, 8, 'F');
+        }
+
         doc.setFont('helvetica', 'bold');
-        doc.setTextColor(textColor[0], textColor[1], textColor[2]);
+        doc.setFontSize(10);
+        doc.setTextColor(darkBrown[0], darkBrown[1], darkBrown[2]);
         doc.text(detail.label, leftMargin, yPosition);
-        
+
         doc.setFont('helvetica', 'normal');
-        doc.setTextColor(lightGray[0], lightGray[1], lightGray[2]);
+        doc.setTextColor(secondaryTx[0], secondaryTx[1], secondaryTx[2]);
         const cleanValue = (detail.value || '').replace(/[^\x00-\x7F]/g, '').trim();
         doc.text(cleanValue, leftMargin + 50, yPosition);
-        yPosition += 7;
+        yPosition += 8;
     });
-    
-    // Contact Information
+
+    // ── Contact Information ──
     addSection('CONTACT INFORMATION');
-    
+
     const contacts = [
-        { label: 'Phone:', value: '+250 725 502 317' },
-        { label: 'Email:', value: 'amizerorealestate@gmail.com' },
+        { label: 'Phone:',  value: '+250 725 502 317' },
+        { label: 'Email:',  value: 'amizerorealestate@gmail.com' },
         { label: 'Office:', value: 'Kigali, Rwanda' }
     ];
-    
-    contacts.forEach(function(contact) {
+
+    contacts.forEach(contact => {
         if (yPosition > doc.internal.pageSize.height - 40) {
             doc.addPage();
             yPosition = 20;
         }
-        
+
         doc.setFont('helvetica', 'bold');
-        doc.setTextColor(textColor[0], textColor[1], textColor[2]);
+        doc.setFontSize(10);
+        doc.setTextColor(darkBrown[0], darkBrown[1], darkBrown[2]);
         doc.text(contact.label, leftMargin, yPosition);
-        
+
         doc.setFont('helvetica', 'normal');
-        doc.setTextColor(lightGray[0], lightGray[1], lightGray[2]);
+        doc.setTextColor(gold[0], gold[1], gold[2]);   // gold for contact values
         doc.text(contact.value, leftMargin + 30, yPosition);
         yPosition += 7;
     });
-    
-    // Footer
-    const footerY = doc.internal.pageSize.height - 20;
-    doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-    doc.rect(0, footerY - 5, pageWidth, 25, 'F');
-    
+
+    // ── Footer ──
+    const footerY = doc.internal.pageSize.height - 18;
+
+    doc.setFillColor(nearBlack[0], nearBlack[1], nearBlack[2]);
+    doc.rect(0, footerY - 6, pageWidth, 25, 'F');
+
+    // Gold top line on footer
+    doc.setFillColor(gold[0], gold[1], gold[2]);
+    doc.rect(0, footerY - 6, pageWidth, 1.5, 'F');
+
     doc.setFontSize(8);
-    doc.setTextColor(255, 255, 255);
+    doc.setTextColor(secondaryTx[0], secondaryTx[1], secondaryTx[2]);
     doc.setFont(undefined, 'normal');
-    doc.text('Generated on ' + new Date().toLocaleDateString(), leftMargin, footerY + 5);
-    doc.text('Amizero Real Estate - Your Trusted Property Partner', pageWidth - 100, footerY + 5);
-    
-    // Show preview
+    doc.text('Generated on ' + new Date().toLocaleDateString(), leftMargin, footerY + 4);
+
+    doc.setTextColor(gold[0], gold[1], gold[2]);
+    doc.text('AMIZERO Real Estate — Build Your Legacy, Invest wisely', pageWidth / 2, footerY + 4, { align: 'center' });
+
     this.showBrochurePreview(doc, project);
 }
 
-// ✅ HELPER METHOD TO LOAD IMAGES AS BASE64
+// ✅ HELPER — Load image as Base64
 loadImageAsBase64(url) {
     return new Promise((resolve, reject) => {
         const img = new Image();
         img.crossOrigin = 'Anonymous';
-        
-        img.onload = function() {
+
+        img.onload = function () {
             const canvas = document.createElement('canvas');
-            canvas.width = img.width;
+            canvas.width  = img.width;
             canvas.height = img.height;
-            
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0);
-            
             try {
-                const dataURL = canvas.toDataURL('image/jpeg', 0.8);
-                resolve(dataURL);
+                resolve(canvas.toDataURL('image/jpeg', 0.8));
             } catch (err) {
                 reject(err);
             }
         };
-        
-        img.onerror = function() {
-            reject(new Error('Failed to load image'));
-        };
-        
+
+        img.onerror = () => reject(new Error('Failed to load image'));
         img.src = url;
     });
 }
 
-// ✅ SHOW BROCHURE PREVIEW METHOD
+// ✅ SHOW BROCHURE PREVIEW
 showBrochurePreview(doc, project) {
     const modal = document.createElement('div');
     modal.className = 'pdf-preview-modal';
     modal.innerHTML = `
         <div class="pdf-preview-content">
             <div class="pdf-preview-header">
-                <h3>Brochure Preview - ${project.title}</h3>
+                <div class="pdf-header-left">
+                    <span class="pdf-header-dot"></span>
+                    <h3>Brochure Preview — ${project.title}</h3>
+                </div>
                 <button class="close-preview" onclick="this.closest('.pdf-preview-modal').remove()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="pdf-preview-body">
-                <iframe id="pdf-preview-frame" width="100%" height="600px"></iframe>
+                <iframe id="pdf-preview-frame" width="100%" height="100%"></iframe>
             </div>
             <div class="pdf-preview-footer">
                 <button class="btn-secondary" onclick="this.closest('.pdf-preview-modal').remove()">
-                    <i class="fas fa-times"></i> Close Preview
+                    <i class="fas fa-times"></i> Close
                 </button>
                 <button class="btn-primary" onclick="window.currentPdfDoc.save('${project.title.replace(/[^a-zA-Z0-9]/g, '_')}_Brochure.pdf'); this.closest('.pdf-preview-modal').remove();">
                     <i class="fas fa-download"></i> Download PDF
@@ -1855,87 +1897,114 @@ showBrochurePreview(doc, project) {
             </div>
         </div>
     `;
-    
+
     const style = document.createElement('style');
     style.textContent = `
         .pdf-preview-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.8); display: flex;
-            justify-content: center; align-items: center; z-index: 10000;
+            background: rgba(0, 0, 0, 0.82);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 10000;
         }
         .pdf-preview-content {
-            background: white; border-radius: 12px; width: 90%;
-            max-width: 900px; height: 90%; display: flex;
-            flex-direction: column; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            background: #faf7f2;
+            border: 1px solid rgba(184, 151, 106, 0.3);
+            border-radius: 14px;
+            width: 90%; max-width: 900px; height: 90%;
+            display: flex; flex-direction: column;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
         }
         .pdf-preview-header {
-            padding: 20px 25px; border-bottom: 2px solid #f0f2f5;
+            padding: 18px 24px;
+            background: #0e0c0a;
+            border-bottom: 2px solid #b8976a;
             display: flex; justify-content: space-between; align-items: center;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white; border-radius: 12px 12px 0 0;
         }
-        .pdf-preview-header h3 { margin: 0; font-size: 1.3em; font-weight: 600; }
+        .pdf-header-left {
+            display: flex; align-items: center; gap: 10px;
+        }
+        .pdf-header-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #b8976a;
+            box-shadow: 0 0 8px rgba(184, 151, 106, 0.8);
+        }
+        .pdf-preview-header h3 {
+            margin: 0; font-size: 1rem; font-weight: 600;
+            color: #e8e0d5; letter-spacing: 0.04em;
+        }
         .close-preview {
-            background: rgba(255, 255, 255, 0.2); border: none;
-            color: white; width: 35px; height: 35px; border-radius: 50%;
-            cursor: pointer; font-size: 16px; transition: background 0.3s;
+            background: rgba(184, 151, 106, 0.15);
+            border: 1px solid rgba(184, 151, 106, 0.3);
+            color: #b8976a; width: 34px; height: 34px;
+            border-radius: 50%; cursor: pointer; font-size: 14px;
+            transition: all 0.25s ease;
         }
-        .close-preview:hover { background: rgba(255, 255, 255, 0.3); }
-        .pdf-preview-body { flex: 1; padding: 20px; overflow: hidden; }
+        .close-preview:hover {
+            background: #b8976a; color: #0e0c0a;
+        }
+        .pdf-preview-body {
+            flex: 1; padding: 16px; overflow: hidden;
+            background: #faf7f2;
+        }
+        .pdf-preview-body iframe {
+            border-radius: 6px;
+            border: 1px solid #e5e0d8;
+        }
         .pdf-preview-footer {
-            padding: 20px 25px; border-top: 2px solid #f0f2f5;
-            display: flex; justify-content: flex-end; gap: 15px;
-            background: #f8f9fa; border-radius: 0 0 12px 12px;
+            padding: 16px 24px;
+            background: #0e0c0a;
+            border-top: 1px solid rgba(184, 151, 106, 0.25);
+            display: flex; justify-content: flex-end; gap: 12px;
         }
         .pdf-preview-footer button {
-            padding: 12px 24px; border: none; border-radius: 8px;
-            cursor: pointer; font-weight: 500; font-size: 14px;
+            padding: 10px 22px; border: none; border-radius: 8px;
+            cursor: pointer; font-weight: 600; font-size: 13px;
             display: flex; align-items: center; gap: 8px;
-            transition: all 0.3s ease;
+            letter-spacing: 0.04em; transition: all 0.25s ease;
         }
-        .btn-secondary { background: #6c757d; color: white; }
-        .btn-secondary:hover { background: #5a6268; transform: translateY(-1px); }
-        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid rgba(184, 151, 106, 0.35) !important;
+            color: #9e9488;
+        }
+        .btn-secondary:hover {
+            border-color: rgba(184, 151, 106, 0.7) !important;
+            color: #b8976a;
+        }
+        .btn-primary {
+            background: #b8976a; color: #0e0c0a;
+        }
         .btn-primary:hover {
-            background: linear-gradient(135deg, #5a6fd8, #6a4190);
-            transform: translateY(-1px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            background: #a0825a;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(184, 151, 106, 0.4);
+        }
+        .related-project-item:hover {
+            background: #f0ebe3 !important;
+            border-left: 3px solid #b8976a !important;
         }
     `;
-    
+
     document.head.appendChild(style);
     document.body.appendChild(modal);
-    
+
     window.currentPdfDoc = doc;
-    
+
     const pdfBlob = doc.output('blob');
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    
-    const iframe = document.getElementById('pdf-preview-frame');
-    iframe.src = pdfUrl;
-    
-    const btn = document.getElementById('download-btn');
-    if (btn) {
-        const originalHTML = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-eye"></i> Preview Generated!';
-        btn.style.background = 'linear-gradient(135deg, #27ae60, #2ecc71)';
-        
-        setTimeout(function() {
-            btn.innerHTML = originalHTML;
-            btn.style.background = '';
-        }, 2000);
-    }
-    
-    modal.addEventListener('DOMNodeRemoved', function() {
-        URL.revokeObjectURL(pdfUrl);
-    });
+    const pdfUrl  = URL.createObjectURL(pdfBlob);
+    document.getElementById('pdf-preview-frame').src = pdfUrl;
+
+    modal.addEventListener('DOMNodeRemoved', () => URL.revokeObjectURL(pdfUrl));
 }
 
+// ✅ HELPER METHODS
 getCategoryDisplayName(category) {
     const categoryNames = {
-        'valuation': 'Property Valuation',
-        'management': 'Property Management', 
-        'brokerage': 'Real Estate Brokerage',
-        'survey': 'Quantity Survey',
+        'valuation':   'Property Valuation',
+        'management':  'Property Management',
+        'brokerage':   'Real Estate Brokerage',
+        'survey':      'Quantity Survey',
         'development': 'Property Development'
     };
     return categoryNames[category] || category;
@@ -1943,10 +2012,10 @@ getCategoryDisplayName(category) {
 
 getCategoryIcon(category) {
     const icons = {
-        'valuation': 'fas fa-calculator',
-        'management': 'fas fa-building',
-        'brokerage': 'fas fa-handshake',
-        'survey': 'fas fa-chart-line',
+        'valuation':   'fas fa-calculator',
+        'management':  'fas fa-building',
+        'brokerage':   'fas fa-handshake',
+        'survey':      'fas fa-chart-line',
         'development': 'fas fa-hammer'
     };
     return icons[category] || 'fas fa-home';
@@ -1956,108 +2025,130 @@ renderHeroStats(project) {
     const statsGrid = document.getElementById('hero-stats-grid');
     const stats = [];
 
-    if (project.value) {
-        stats.push({ icon: 'fas fa-dollar-sign', label: 'Project Value', value: this.formatValue(project.value) });
-    }
-    if (project.location) {
-        stats.push({ icon: 'fas fa-map-marker-alt', label: 'Location', value: project.location });
-    }
-    if (project.duration) {
-        stats.push({ icon: 'fas fa-clock', label: 'Duration', value: project.duration });
-    }
-    if (project.date) {
-        stats.push({ icon: 'fas fa-calendar', label: 'Completed', value: this.formatDate(project.date) });
-    }
+    if (project.value)    stats.push({ icon: 'fas fa-coins',          label: 'Project Value', value: this.formatValue(project.value) });
+    if (project.location) stats.push({ icon: 'fas fa-map-marker-alt', label: 'Location',      value: project.location });
+    if (project.duration) stats.push({ icon: 'fas fa-clock',          label: 'Duration',      value: project.duration });
+    if (project.date)     stats.push({ icon: 'fas fa-calendar-check', label: 'Completed',     value: this.formatDate(project.date) });
 
-    const statsHTML = stats.map(function(stat) {
-        return `
-            <div class="stat-item">
-                <div class="stat-icon"><i class="${stat.icon}"></i></div>
-                <div class="stat-content">
-                    <div class="label">${stat.label}</div>
-                    <div class="value">${stat.value}</div>
+    statsGrid.innerHTML = stats.map(stat => `
+        <div class="stat-item">
+            <div class="stat-icon" style="color:#b8976a;">
+                <i class="${stat.icon}"></i>
+            </div>
+            <div class="stat-content">
+                <div class="label" style="color:#9e9488;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;">
+                    ${stat.label}
+                </div>
+                <div class="value" style="color:#1a1410;font-weight:700;">
+                    ${stat.value}
                 </div>
             </div>
-        `;
-    }).join('');
-
-    statsGrid.innerHTML = statsHTML;
+        </div>
+    `).join('');
 }
 
 renderProjectInfo(project) {
     const overviewDetails = document.getElementById('overview-details');
-    const overviewItems = [];
+    const overviewItems   = [];
 
-    if (project.title) overviewItems.push({ label: 'Project Name', value: project.title });
-    if (project.category) overviewItems.push({ label: 'Category', value: this.getCategoryDisplayName(project.category) });
-    if (project.location) overviewItems.push({ label: 'Location', value: project.location });
-    if (project.date) overviewItems.push({ label: 'Date Completed', value: this.formatDate(project.date) });
-    if (project.duration) overviewItems.push({ label: 'Duration', value: project.duration });
-    if (project.client) overviewItems.push({ label: 'Client', value: project.client });
-    if (project.status) overviewItems.push({ label: 'Status', value: project.status });
+    if (project.title)    overviewItems.push({ label: 'Project Name',   value: project.title });
+    if (project.category) overviewItems.push({ label: 'Category',       value: this.getCategoryDisplayName(project.category) });
+    if (project.location) overviewItems.push({ label: 'Location',       value: project.location });
+    if (project.date)     overviewItems.push({ label: 'Date Completed', value: this.formatDate(project.date) });
+    if (project.duration) overviewItems.push({ label: 'Duration',       value: project.duration });
+    if (project.client)   overviewItems.push({ label: 'Client',         value: project.client });
+    if (project.status)   overviewItems.push({ label: 'Status',         value: project.status });
 
-    overviewDetails.innerHTML = overviewItems.map(function(item) {
-        return `
-            <div class="detail-item">
-                <span class="detail-label">${item.label}</span>
-                <span class="detail-value">${item.value}</span>
-            </div>
-        `;
-    }).join('');
+    overviewDetails.innerHTML = overviewItems.map((item, index) => `
+        <div class="detail-item" style="
+            padding: 0.7rem 1rem;
+            background: ${index % 2 === 0 ? '#faf7f2' : '#ffffff'};
+            border-bottom: 1px solid #e5e0d8;
+            display: flex; gap: 1rem; align-items: center;
+        ">
+            <span class="detail-label" style="
+                color:#9e9488; font-size:0.78rem;
+                text-transform:uppercase; letter-spacing:0.08em;
+                min-width:130px; font-weight:600;
+            ">${item.label}</span>
+            <span class="detail-value" style="color:#1a1410; font-weight:500;">
+                ${item.value}
+            </span>
+        </div>
+    `).join('');
 }
 
-   renderRelatedProjects(project) {
-    const self = this;
+renderRelatedProjects(project) {
     const relatedProjects = this.allProjects
-        .filter(function(item) { return item.category === project.category && item.title !== project.title; })
+        .filter(item => item.category === project.category && item.title !== project.title)
         .slice(0, 3);
 
     if (relatedProjects.length > 0) {
         document.getElementById('related-projects').style.display = 'block';
-        
-        const relatedHTML = relatedProjects.map(function(item) {
-            const imageContent = item.images && item.images.length > 0 
-                ? '<img src="' + item.images[0] + '" alt="' + item.title + '" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">'
-                : '<div style="width: 60px; height: 60px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;"><i class="' + self.getCategoryIcon(item.category) + '"></i></div>';
-            
-            return '<div class="related-project-item" onclick="window.location.href=\'portfolioDetails.html?id=' + (item.id || item._id) + '\'" style="display: flex; gap: 15px; padding: 15px; background: #f8f9fa; border-radius: 10px; margin-bottom: 15px; cursor: pointer; transition: all 0.3s ease;">' + imageContent + '<div style="flex: 1;"><h4 style="margin: 0 0 5px 0; font-size: 14px; color: #2c3e50;">' + item.title + '</h4><p style="margin: 0; font-size: 12px; color: #7f8c8d; line-height: 1.4;">' + item.description.substring(0, 60) + '...</p></div></div>';
+
+        document.getElementById('related-projects-list').innerHTML = relatedProjects.map(item => {
+            const imageContent = item.images && item.images.length > 0
+                ? `<img src="${item.images[0]}" alt="${item.title}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1.5px solid rgba(184,151,106,0.3);">`
+                : `<div style="width:60px;height:60px;background:#0e0c0a;border-radius:8px;border:1.5px solid rgba(184,151,106,0.3);display:flex;align-items:center;justify-content:center;color:#b8976a;">
+                       <i class="${this.getCategoryIcon(item.category)}"></i>
+                   </div>`;
+
+            return `
+                <div class="related-project-item"
+                    onclick="window.location.href='portfolioDetails.html?id=${item.id || item._id}'"
+                    style="
+                        display:flex; gap:15px; padding:14px 16px;
+                        background:#faf7f2;
+                        border:1px solid #e5e0d8;
+                        border-radius:10px; margin-bottom:12px;
+                        cursor:pointer; transition:all 0.25s ease;
+                    ">
+                    ${imageContent}
+                    <div style="flex:1;">
+                        <h4 style="margin:0 0 4px 0;font-size:0.88rem;color:#1a1410;font-weight:700;">
+                            ${item.title}
+                        </h4>
+                        <p style="margin:0;font-size:0.78rem;color:#9e9488;line-height:1.5;">
+                            ${item.description.substring(0, 60)}…
+                        </p>
+                    </div>
+                </div>
+            `;
         }).join('');
-
-        document.getElementById('related-projects-list').innerHTML = relatedHTML;
     }
 }
 
-    formatValue(value) {
-        if (!value) return null;
-        if (value.includes && value.includes('RWF')) return value;
-        
-        const numValue = parseFloat(value.toString().replace(/[^\d.]/g, ''));
-        if (!isNaN(numValue)) {
-            if (numValue >= 1000000000) return 'RWF ' + (numValue / 1000000000).toFixed(1) + 'B';
-            else if (numValue >= 1000000) return 'RWF ' + (numValue / 1000000).toFixed(1) + 'M';
-            else if (numValue >= 1000) return 'RWF ' + (numValue / 1000).toFixed(0) + 'K';
-            return 'RWF ' + numValue.toLocaleString();
-        }
-        return value;
-    }
+formatValue(value) {
+    if (!value) return null;
+    if (value.includes && value.includes('RWF')) return value;
 
-    formatDate(dateString) {
-        try {
-            const date = new Date(dateString);
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            return date.toLocaleDateString('en-US', options);
-        } catch (error) {
-            return dateString;
-        }
+    const numValue = parseFloat(value.toString().replace(/[^\d.]/g, ''));
+    if (!isNaN(numValue)) {
+        if      (numValue >= 1000000000) return 'RWF ' + (numValue / 1000000000).toFixed(1) + 'B';
+        else if (numValue >= 1000000)    return 'RWF ' + (numValue / 1000000).toFixed(1) + 'M';
+        else if (numValue >= 1000)       return 'RWF ' + (numValue / 1000).toFixed(0) + 'K';
+        return 'RWF ' + numValue.toLocaleString();
     }
+    return value;
+}
 
-    showError() {
-        document.getElementById('loading-state').style.display = 'none';
-        document.getElementById('error-state').style.display = 'block';
-        document.getElementById('main-content').style.display = 'none';
+formatDate(dateString) {
+    try {
+        return new Date(dateString).toLocaleDateString('en-US', {
+            year: 'numeric', month: 'long', day: 'numeric'
+        });
+    } catch {
+        return dateString;
     }
 }
 
+showError() {
+    document.getElementById('loading-state').style.display = 'none';
+    document.getElementById('error-state').style.display  = 'block';
+    document.getElementById('main-content').style.display = 'none';
+}
+
+}
 // Initialize
 window.portfolioDetails = new PortfolioDetailsManager();
 
@@ -2065,6 +2156,8 @@ window.portfolioDetails = new PortfolioDetailsManager();
 const style = document.createElement('style');
 style.textContent = '.related-project-item:hover { background: #e9ecef !important; }';
 document.head.appendChild(style);
+
+
     </script>
 </body>
 </html>

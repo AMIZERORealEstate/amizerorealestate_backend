@@ -3,7 +3,6 @@
           
             margin: 0 auto;
             padding: 0 5%;
-            margin-top: 20px;
            
         }
 
@@ -422,7 +421,6 @@
         @media (max-width: 768px) {
             .main-container {
                 padding: 0 3%;
-                margin-top: 120px !important;
                 
             }
 
@@ -1094,7 +1092,7 @@
 
         .steps-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 40px;
             margin-bottom: 60px;
         }
@@ -1433,7 +1431,7 @@
             
 
             .demo-section {
-                padding: 40px 40px;
+                padding: 30px 30px;
             }
         }
 
@@ -1757,3 +1755,5 @@
 @media (max-width: 768px) {
     .skeleton-grid { grid-template-columns: 1fr; }
 }
+
+

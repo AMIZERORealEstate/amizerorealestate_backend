@@ -4,152 +4,153 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AMIZERO Real Estate Ltd - Professional Real Estate Services in Rwanda</title>
-    <link rel="icon" type="image/x-icon" href="images/company_logo_blue_color-removebg-preview.png">
+    <link rel="icon" type="image/x-icon" href="images/logo_with_color__b8976a-removebg-preview.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="nav.css">
     <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="index.fixes.css">
+    <link rel="stylesheet" href="hero-mobile-fixes.css">
     <link rel="stylesheet" href="about.css">
     <link rel="stylesheet" href="listing.css">
     <link rel="stylesheet" href="other.css">
     <link rel="stylesheet" href="listing-colors.css">
     <link rel="stylesheet" href="contact-colors.css">
     <link rel="stylesheet" href="services.css">
-    <link rel="stylesheet" href="nav.css">
     <link rel="stylesheet" href="latest-props.css">
     
-   <style>
-
-/* ── Home page only — transparent nav over hero ── */
-header {
-    background: transparent;
-    box-shadow: none;
-    border-bottom: 1px solid transparent;
-    padding: 0px 10%;
-}
-
-header .nav-menu a {
-    color: rgba(255,255,255,0.8);
-}
-
-header .nav-menu a:hover,
-header .nav-menu a.active {
-    color: #ffffff;
-}
-
-header .nav-login {
-    color: rgba(255,255,255,0.8);
-}
-
-header .nav-login:hover {
-    color: #ffffff;
-}
-
-header .nav-login::after {
-    background: #ffffff;
-}
-
-header .nav-register {
-    background: rgba(184,151,106,0.9);
-    border-color: rgba(184,151,106,0.9);
-}
-
-header .hamburger span {
-    background: #ffffff;
-}
-
-/* ── When scrolled — restore solid white ── */
-header.solid {
-    background: #ffffff;
-    box-shadow: 0 2px 20px rgba(0,0,0,0.08);
-    border-bottom: 1px solid #e5e0d8;
-}
-
-header.solid .nav-menu a { color: #5a5550; }
-header.solid .nav-menu a:hover,
-header.solid .nav-menu a.active { color: #b8976a; }
-header.solid .nav-login { color: #5a5550; }
-header.solid .nav-login:hover { color: #b8976a; }
-header.solid .nav-register { background: #b8976a; border-color: #b8976a; }
-header.solid .hamburger span { background: #1a1410; }
     
-   </style>
 </head>
 <body>
     
-    <!-- Header -->
+     <!-- Header -->
     <header>
-       <nav>
-    <a href="index.html" class="logo">
-        <img src="images/logo_with_color__b8976a-removebg-preview.png" alt="Amizero Real Estate">
-    </a>
+    <nav>
 
-    <ul class="nav-menu">
-        <li><a href="index.html" class="active">Home</a></li>
-        <li><a href="listing.html">Properties</a></li>
-        <li><a href="about.html">About</a></li>
-        <li><a href="services.html">Services</a></li>
-        <li><a href="portfolio.html">Portfolio</a></li>
-        <li><a href="contact.html">Contact</a></li>
+        <!-- LOGO -->
+        <a href="index.html" class="logo">
+            <img src="images/logo_with_color__b8976a-removebg-preview.png" alt="Logo">
+        </a>
 
-        <!-- Mobile only auth — sits inside the mobile menu -->
-        <li class="nav-mobile-auth">
+        <!-- SIDEBAR MENU -->
+        <ul class="nav-menu">
+
+            <!-- CLOSE ICON INSIDE SIDEBAR -->
+            <div class="close-menu">&times;</div>
+
+            <!-- LOGO INSIDE SIDEBAR (for mobile only) -->
+            <li class="sidebar-logo">
+                <img src="images/logo_with_color__b8976a-removebg-preview.png" alt="Logo">
+            </li>
+
+            <li><a href="index.html" class="active">Home</a></li>
+            <li><a href="listing.html">Properties</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="portfolio.html">Portfolio</a></li>
+            <li><a href="contact.html">Contact</a></li>
+
+            <!-- Divider -->
+            <div class="sidebar-divider"></div>
+
+            <!-- Login & Register inside sidebar -->
+            <li class="nav-mobile-auth">
+                <a href="contact.html" class="nav-login">Login</a>
+                <a href="contact.html" class="nav-register"><span>Register</span></a>
+            </li>
+
+        </ul>
+
+        <!-- DESKTOP AUTH -->
+        <div class="nav-auth">
             <a href="contact.html" class="nav-login">Login</a>
             <a href="contact.html" class="nav-register"><span>Register</span></a>
-        </li>
-    </ul>
+        </div>
 
-    <!-- Desktop auth buttons -->
-    <div class="nav-auth">
-        <a href="contact.html" class="nav-login">Login</a>
-        <a href="contact.html" class="nav-register"><span>Register</span></a>
-    </div>
+        <!-- HAMBURGER -->
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
 
-    <div class="close-menu">&times;</div>
-    <div class="hamburger">
-        <span></span>
-        <span></span>
-        <span></span>
-    </div>
-</nav>
-    </header>
+    </nav>
+</header>
+
+<div class="nav-overlay"></div>
+
+
 
     <section id="home" class="hero">
-        <div class="hero-content">
-            <div>
-           <div class="tagline-wrapper">
-  <p class="tagline">
-    Invest Smart<span class="dot">.</span> 
-    Manage Better<span class="dot">.</span> 
-    Grow Faster<span class="dot">.</span>
-  </p>
-</div>
-            <p class="hero-description">From sales and rentals to valuation, management, and advisory — AMIZERO Real Estate is your complete solution for all property needs in Rwanda.</p>
-            </div>
 
-                <!-- ALL 4 CTAs IN ONE FROSTED CONTAINER -->
-           <div class="amz-cta-panel">
-    <div class="amz-cta-header">
-        <span class="amz-cta-dot"></span>
-        What are you looking for?
-    </div>
-    <div class="amz-cta-grid">
-        <a href="listing.html?type=buy" class="amz-btn amz-btn--buy">
-            <i class="fas fa-home"></i> Buy a Property
-        </a>
-        <a href="listing.html?type=rent" class="amz-btn amz-btn--rent">
-            <i class="fas fa-key"></i> Rent a Property
-        </a>
-        <a href="services.html" class="amz-btn amz-btn--services">
-            <i class="fas fa-building"></i> Our Services
-        </a>
-        <a href="contact.html" class="amz-btn amz-btn--contact">
-            <i class="fas fa-phone"></i> Get in Touch
-        </a>
-    </div>
-</div> 
+    <!-- LEFT PANEL: white background, text + CTA -->
+    <div class="hero-left">
+
+        <div class="hero-text">
+            <h1 class="hero-heading">
+                Build Your <span class="hero-heading-gold">Legacy,</span><br>
+                Invest Wisely.
+            </h1>
+            <p class="hero-sub">
+                Your trusted partner for buying, renting, valuation &amp; property management across Rwanda.
+            </p>
         </div>
-    </section>
+
+        <!-- CTA Bar -->
+
+        <div class="amz-cta-panel">
+                   
+     <div class="amz-cta-header">
+    <span class="amz-cta-dot"></span>
+    What are you looking for?
+</div>
+        <div class="amz-cta-grid">
+
+
+            <a href="listing.html?type=buy" class="amz-btn">
+                <span class="amz-btn-value"><i class="fas fa-house-user"></i> Buy Property</span>
+            </a>
+
+            <div class="amz-divider"></div>
+
+            <a href="listing.html?type=rent" class="amz-btn">
+                <span class="amz-btn-value"><i class="fas fa-sign-hanging"></i> Rent Property</span>
+            </a>
+
+            <div class="amz-divider"></div>
+
+            <a href="services.html" class="amz-btn">
+                <span class="amz-btn-value"><i class="fas fa-layer-group"></i> Our Services</span>
+            </a>
+
+            <div class="amz-divider"></div>
+
+            <a href="contact.html" class="amz-btn">
+                <span class="amz-btn-value"><i class="fas fa-envelope-open-text"></i> Get in Touch</span>
+            </a>
+
+            <a href="listing.html" class="amz-btn amz-btn--go">
+                <i class="fas fa-arrow-right"></i>
+            </a>
+
+        </div>
+               
+        </div>
+
+
+    </div>
+
+    <!-- RIGHT PANEL: real estate image -->
+    <div class="hero-right">
+        <div class="hero-img-wrap">
+            <img src="images/home page image 2.jpg" alt="Luxury real estate Rwanda" class="hero-img" />
+        </div>
+    </div>
+
+</section>
+
+<div class="section-divider"></div>
 
 <section class="how-it-works">
         <div class="container">
@@ -755,12 +756,17 @@ header.solid .hamburger span { background: #1a1410; }
                 </div>
             </div>
             <div class="footer-bottom-right">
-                <a href="#services" class="back-to-top" aria-label="Back to top">
+                <a href="index.html" class="back-to-top" aria-label="Back to top">
                     <i class="fa-solid fa-chevron-up"></i>
                 </a>
             </div>
         </div>
     </footer>
+
+    <div id="luxury-side-brand">
+    <span>AMIZERO Real Estate</span>
+</div>
+
 
 
 
@@ -771,73 +777,12 @@ header.solid .hamburger span { background: #1a1410; }
 
 <script src="script.js"></script>
 
-<script>
-    const header = document.querySelector('header');
-const homeSection = document.getElementById('home');
 
-function updateNavbar() {
-    const isHomePage = homeSection !== null;
-
-    if (!isHomePage) {
-        // Not on home page → always solid background
-        header.classList.remove('transparent');
-        header.classList.add('solid');
-        return;
-    }
-
-    // On home page → transparent when at top, solid when scrolled
-    const homeSectionBottom = homeSection.getBoundingClientRect().bottom;
-
-    if (homeSectionBottom <= 600) {
-        header.classList.remove('transparent');
-        header.classList.add('solid');
-    } else {
-        header.classList.remove('solid');
-        header.classList.add('transparent');
-    }
-}
-
-// Run on load and scroll
-updateNavbar();
-window.addEventListener('scroll', updateNavbar);
-</script>
        
         
         <script>
 
 
-// ============================================
-// MOBILE NAVIGATION
-// ============================================
-document.addEventListener("DOMContentLoaded", () => {
-    const hamburger = document.querySelector('.hamburger');
-    const navMenu = document.querySelector('.nav-menu');
-    const closeMenu = document.querySelector('.close-menu');
-
-    if (hamburger && navMenu) {
-        // Toggle menu on hamburger click
-        hamburger.addEventListener('click', () => {
-            hamburger.classList.toggle('active');
-            navMenu.classList.toggle('active');
-        });
-    }
-
-    if (closeMenu) {
-        // Close menu on close icon click
-        closeMenu.addEventListener('click', () => {
-            hamburger.classList.remove('active');
-            navMenu.classList.remove('active');
-        });
-    }
-
-    // Close menu when clicking a nav link
-    document.querySelectorAll('.nav-menu a').forEach(link => {
-        link.addEventListener('click', () => {
-            hamburger.classList.remove('active');
-            navMenu.classList.remove('active');
-        });
-    });
-});
 
 // ============================================
 // CONTACT MODAL
@@ -1147,47 +1092,8 @@ function animateCounter(element, target, duration = 2000) {
     requestAnimationFrame(updateCounter);
 }
 
-// Alternative: Timeout-based animation (starts after page load)
-let achievementsAnimated = false;
 
-function triggerAchievementsAnimation() {
-    if (achievementsAnimated) return;
-    
-    const achievementsGrid = document.querySelector('.achievements-grid');
-    if (!achievementsGrid) return;
-    
-    // Check if element is in viewport
-    const rect = achievementsGrid.getBoundingClientRect();
-    const isInViewport = rect.top < window.innerHeight && rect.bottom > 0;
-    
-    if (isInViewport) {
-        achievementsAnimated = true;
 
-        const achievementNumbers = document.querySelectorAll('.achievement-number');
-        achievementNumbers.forEach((numberElement, index) => {
-            // Read the number that was rendered from the database
-            const target = parseInt(numberElement.textContent.replace(/[^\d]/g, ''), 10);
-
-            setTimeout(() => {
-                numberElement.classList.add('animate');
-                animateCounter(numberElement, target);
-            }, index * 200 + 300);
-        });
-    }
-}
-
-// Initialize after DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    // Wait a bit then check if section is visible
-    setTimeout(triggerAchievementsAnimation, 500);
-    
-    // Also check on scroll with throttling
-    let scrollTimeout;
-    window.addEventListener('scroll', () => {
-        if (scrollTimeout) clearTimeout(scrollTimeout);
-        scrollTimeout = setTimeout(triggerAchievementsAnimation, 100);
-    });
-});
 
 // Add subtle hover effects
 document.querySelectorAll('.achievement-item').forEach(item => {

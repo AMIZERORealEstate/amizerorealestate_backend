@@ -4,53 +4,75 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Property Listings - AMIZERO Real Estate Ltd</title>
-    <link rel="icon" type="image/x-icon" href="images/company_logo_blue_color-removebg-preview.png">
+    <link rel="icon" type="image/x-icon" href="images/logo_with_color__b8976a-removebg-preview.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="nav.css">
     <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="index.fixes.css">
     <link rel="stylesheet" href="listing.css">
     <link rel="stylesheet" href="about.css">
-    <link rel="stylesheet" href="nav.css">
+    
     <link rel="stylesheet" href="other.css">
     <link rel="stylesheet" href="listing-colors.css">
+    <link rel="stylesheet" href="latest-props.css">
+   
 </head>
 <body>
     <!-- Header -->
     <header>
+    <nav>
 
-             <nav>
-    <a href="index.html" class="logo">
-        <img src="images/logo_with_color__b8976a-removebg-preview.png" alt="Amizero Real Estate">
-    </a>
+        <!-- LOGO -->
+        <a href="index.html" class="logo">
+            <img src="images/logo_with_color__b8976a-removebg-preview.png" alt="Amizero Real Estate">
+        </a>
 
-    <ul class="nav-menu">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="listing.html" class="active">Properties</a></li>
-        <li><a href="about.html">About</a></li>
-        <li><a href="services.html">Services</a></li>
-        <li><a href="portfolio.html">Portfolio</a></li>
-        <li><a href="contact.html">Contact</a></li>
+        <!-- SIDEBAR MENU -->
+        <ul class="nav-menu">
 
-        <!-- Mobile only auth — sits inside the mobile menu -->
-        <li class="nav-mobile-auth">
+            <!-- CLOSE ICON INSIDE SIDEBAR -->
+            <div class="close-menu">&times;</div>
+
+            <!-- LOGO INSIDE SIDEBAR (for mobile only) -->
+            <li class="sidebar-logo">
+                <img src="images/logo_with_color__b8976a-removebg-preview.png" alt="Logo">
+            </li>
+
+            <li><a href="index.html">Home</a></li>
+            <li><a href="listing.html"  class="active">Properties</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="portfolio.html">Portfolio</a></li>
+            <li><a href="contact.html">Contact</a></li>
+
+            <!-- Divider -->
+            <div class="sidebar-divider"></div>
+
+            <!-- Login & Register inside sidebar -->
+            <li class="nav-mobile-auth">
+                <a href="contact.html" class="nav-login">Login</a>
+                <a href="contact.html" class="nav-register"><span>Register</span></a>
+            </li>
+
+        </ul>
+
+        <!-- DESKTOP AUTH -->
+        <div class="nav-auth">
             <a href="contact.html" class="nav-login">Login</a>
             <a href="contact.html" class="nav-register"><span>Register</span></a>
-        </li>
-    </ul>
+        </div>
 
-    <!-- Desktop auth buttons -->
-    <div class="nav-auth">
-        <a href="contact.html" class="nav-login">Login</a>
-        <a href="contact.html" class="nav-register"><span>Register</span></a>
-    </div>
+        <!-- HAMBURGER -->
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
 
-    <div class="close-menu">&times;</div>
-    <div class="hamburger">
-        <span></span>
-        <span></span>
-        <span></span>
-    </div>
-</nav>
-    </header>
+    </nav>
+</header>
+
+<div class="nav-overlay"></div>
 
     
        <!-- ── MARKUP ── -->
@@ -159,21 +181,16 @@
         </div>
 
         <div>
-        <!-- Properties Grid -->
-        <div class="properties-grid" id="propertiesGrid">
-            <!-- Properties will be dynamically loaded here -->
-        </div>
 
-        <!-- Loading State -->
-       <div class="loading" id="loadingState" style="display: none;">
-    <div class="skeleton-grid">
-        <div class="sk-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-line sk-line--wide"></div><div class="sk-line sk-line--med"></div><div class="sk-line sk-line--narrow"></div><div class="sk-features"><div class="sk-feat"></div><div class="sk-feat"></div><div class="sk-feat"></div></div><div class="sk-actions"><div class="sk-btn"></div><div class="sk-btn"></div></div></div></div>
-        <div class="sk-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-line sk-line--wide"></div><div class="sk-line sk-line--med"></div><div class="sk-line sk-line--narrow"></div><div class="sk-features"><div class="sk-feat"></div><div class="sk-feat"></div><div class="sk-feat"></div></div><div class="sk-actions"><div class="sk-btn"></div><div class="sk-btn"></div></div></div></div>
-        <div class="sk-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-line sk-line--wide"></div><div class="sk-line sk-line--med"></div><div class="sk-line sk-line--narrow"></div><div class="sk-features"><div class="sk-feat"></div><div class="sk-feat"></div><div class="sk-feat"></div></div><div class="sk-actions"><div class="sk-btn"></div><div class="sk-btn"></div></div></div></div>
-        <div class="sk-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-line sk-line--wide"></div><div class="sk-line sk-line--med"></div><div class="sk-line sk-line--narrow"></div><div class="sk-features"><div class="sk-feat"></div><div class="sk-feat"></div><div class="sk-feat"></div></div><div class="sk-actions"><div class="sk-btn"></div><div class="sk-btn"></div></div></div></div>
-        <div class="sk-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-line sk-line--wide"></div><div class="sk-line sk-line--med"></div><div class="sk-line sk-line--narrow"></div><div class="sk-features"><div class="sk-feat"></div><div class="sk-feat"></div><div class="sk-feat"></div></div><div class="sk-actions"><div class="sk-btn"></div><div class="sk-btn"></div></div></div></div>
-        <div class="sk-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-line sk-line--wide"></div><div class="sk-line sk-line--med"></div><div class="sk-line sk-line--narrow"></div><div class="sk-features"><div class="sk-feat"></div><div class="sk-feat"></div><div class="sk-feat"></div></div><div class="sk-actions"><div class="sk-btn"></div><div class="sk-btn"></div></div></div></div>
-    </div>
+       <div class="skeleton-grid" id="propertiesGrid">
+
+    <div class="lp-skeleton"></div>
+    <div class="lp-skeleton"></div>
+    <div class="lp-skeleton"></div>
+    <div class="lp-skeleton"></div>
+    <div class="lp-skeleton"></div>
+    <div class="lp-skeleton"></div>
+
 </div>
 
         <!-- No Results -->
@@ -282,53 +299,32 @@
                 </div>
             </div>
             <div class="footer-bottom-right">
-                <a href="#services" class="back-to-top" aria-label="Back to top">
+                <a href="listing.html" class="back-to-top" aria-label="Back to top">
                     <i class="fa-solid fa-chevron-up"></i>
                 </a>
             </div>
         </div>
     </footer>
 
+
+
+    <div id="luxury-side-brand">
+    <span>AMIZERO Real Estate</span>
+</div>
+
     <script>
         document.getElementById("year").textContent = new Date().getFullYear();
     </script>
-
+     <script src="script.js"></script>
     <script src="properties.js"></script>
-    <script src="script.js"></script>
+    
 
 
-    <script>
-        // Mobile Navigation Toggle
-document.addEventListener("DOMContentLoaded", () => {
-    const hamburger = document.querySelector('.hamburger');
-    const navMenu = document.querySelector('.nav-menu');
-    const closeMenu = document.querySelector('.close-menu');
 
-    if (hamburger && navMenu) {
-        // Toggle menu on hamburger click
-        hamburger.addEventListener('click', () => {
-            hamburger.classList.toggle('active');
-            navMenu.classList.toggle('active');
-        });
-    }
 
-    if (closeMenu) {
-        // Close menu on close icon click
-        closeMenu.addEventListener('click', () => {
-            hamburger.classList.remove('active');
-            navMenu.classList.remove('active');
-        });
-    }
+   
 
-    // Close menu when clicking a nav link
-    document.querySelectorAll('.nav-menu a').forEach(link => {
-        link.addEventListener('click', () => {
-            hamburger.classList.remove('active');
-            navMenu.classList.remove('active');
-        });
-    });
-});
 
-    </script>
+
 </body>
 </html>

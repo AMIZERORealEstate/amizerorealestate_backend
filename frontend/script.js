@@ -203,13 +203,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Functions that need to run immediately (not waiting for DOM)
 
 // Add parallax effect to hero section
-window.addEventListener('scroll', () => {
-    const scrolled = window.pageYOffset;
-    const hero = document.querySelector('.hero');
-    if (hero) {
-        hero.style.transform = `translateY(${scrolled * 0.3}px)`;
-    }
-});
+
 
 
 
@@ -481,4 +475,66 @@ document.addEventListener("DOMContentLoaded", function () {
 
         lastScroll = currentScroll;
     });
+});
+
+
+
+
+
+
+
+
+
+
+// ============================================
+// MOBILE NAVIGATION
+// ============================================
+// document.addEventListener("DOMContentLoaded", () => {
+//     const hamburger = document.querySelector('.hamburger');
+//     const navMenu   = document.querySelector('.nav-menu');
+//     const header    = document.querySelector('header');
+
+//     if (!hamburger || !navMenu || !header) return;
+
+//     hamburger.addEventListener('click', () => {
+//         hamburger.classList.toggle('active');
+//         navMenu.classList.toggle('active');
+//         header.classList.toggle('menu-open');
+//         document.body.classList.toggle('menu-open');
+//     });
+
+//     document.querySelectorAll('.nav-menu a').forEach(link => {
+//         link.addEventListener('click', () => {
+//             hamburger.classList.remove('active');
+//             navMenu.classList.remove('active');
+//             header.classList.remove('menu-open');
+//             document.body.classList.remove('menu-open');
+//         });
+//     });
+// });
+
+
+
+
+const hamburger = document.querySelector(".hamburger");
+const navMenu = document.querySelector(".nav-menu");
+const closeMenu = document.querySelector(".close-menu");
+const overlay = document.querySelector(".nav-overlay");
+
+// OPEN SIDEBAR
+hamburger.addEventListener("click", () => {
+    navMenu.classList.add("active");
+    overlay.classList.add("active");
+});
+
+// CLOSE WITH X
+closeMenu.addEventListener("click", () => {
+    navMenu.classList.remove("active");
+    overlay.classList.remove("active");
+});
+
+// CLOSE WHEN CLICKING OUTSIDE (OVERLAY)
+overlay.addEventListener("click", () => {
+    navMenu.classList.remove("active");
+    overlay.classList.remove("active");
 });

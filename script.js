@@ -203,13 +203,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Functions that need to run immediately (not waiting for DOM)
 
 // Add parallax effect to hero section
-window.addEventListener('scroll', () => {
-    const scrolled = window.pageYOffset;
-    const hero = document.querySelector('.hero');
-    if (hero) {
-        hero.style.transform = `translateY(${scrolled * 0.3}px)`;
-    }
-});
+
 
 
 
@@ -236,12 +230,7 @@ function addScrollProgress() {
     `;
     document.body.appendChild(progressBar);
 
-    window.addEventListener('scroll', () => {
-        const scrollTop = window.pageYOffset;
-        const docHeight = document.body.scrollHeight - window.innerHeight;
-        const scrollPercent = (scrollTop / docHeight) * 100;
-        progressBar.style.width = scrollPercent + '%';
-    });
+    
 }
 
 // Initialize scroll progress when page loads

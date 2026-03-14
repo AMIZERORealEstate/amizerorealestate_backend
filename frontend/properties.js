@@ -7,7 +7,6 @@ let currentFilters = {
     minPrice: '',
     maxPrice: ''
 };
-const API_BASE_URL = 'https://amizerorealestate.onrender.com';
 // DOM Elements
 const propertiesGrid = document.getElementById('propertiesGrid');
 const resultsCount = document.getElementById('resultsCount');
@@ -34,19 +33,38 @@ function renderProperties(properties) {
     propertiesGrid.innerHTML = properties.map(createPropertyCard).join('');
     setupCardInteractions();
 
+    if (propertyPagination) {
+        propertyPagination.currentPage = 1; // reset to page 1 on re-render
+        propertyPagination.refresh();
+    }
 }
 
 // ------------------- LOAD PROPERTIES -------------------
 async function loadProperties() {
-    showLoading();
+
+    const grid = document.getElementById("propertiesGrid");
+
     try {
+
+        // Show skeleton (DO NOT REMOVE THIS)
+        if (!grid.innerHTML.trim() || !grid.querySelector('.property-card')) {
+            grid.innerHTML = `
+                <div class="lp-skeleton"></div>
+                <div class="lp-skeleton"></div>
+                <div class="lp-skeleton"></div>
+                <div class="lp-skeleton"></div>
+                <div class="lp-skeleton"></div>
+                <div class="lp-skeleton"></div>
+            `;
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 700));
+
         const res = await fetch(API_URL);
-        if (!res.ok) throw new Error("Failed to fetch properties");
         const data = await res.json();
 
-       
         currentProperties = data.map(property => ({
-            id: property.id,  // ← Changed from property._id to property.id
+            id: property.id,
             title: property.title || 'No title',
             price: property.price || 0,
             type: property.type || 'sale',
@@ -55,13 +73,9 @@ async function loadProperties() {
             bathrooms: property.bathrooms ?? 0,
             area: property.area ?? 0,
             propertyType: property.propertyType || 'house',
-            description: property.description != null ? property.description : 'No description available',
-            images: Array.isArray(property.images) && property.images.length > 0 
-        ? property.images 
-        : ['https://via.placeholder.com/400x300?text=No+Image'],
-            image: (Array.isArray(property.images) && property.images.length > 0) 
-                ? property.images[0] 
-                : 'https://via.placeholder.com/400x300?text=No+Image',
+            description: property.description ?? 'No description available',
+            images: property.images?.length ? property.images : ['https://via.placeholder.com/400x300?text=No+Image'],
+            image: property.images?.[0] || 'https://via.placeholder.com/400x300?text=No+Image',
             favorite: false,
             features: {
                 bedrooms: property.bedrooms ?? "N/A",
@@ -69,22 +83,19 @@ async function loadProperties() {
                 area: property.area ? `${property.area} m²` : "N/A"
             }
         }));
-       
 
-       
-        applySavedFavorites();
-        hideLoading();
         renderProperties(currentProperties);
-        
-
 
     } catch (err) {
-        console.error("Error loading properties:", err);
-        hideLoading();
-        noResults.style.display = 'block';
+        console.error(err);
+
+        grid.innerHTML = `
+            <p style="grid-column:1/-1;text-align:center;color:#9e9488;padding:40px">
+                Unable to load properties
+            </p>
+        `;
     }
 }
-
 
 // 2. GLOBAL VARIABLES FOR CAROUSEL
 // ===============================================
@@ -313,23 +324,40 @@ function formatPrice(price, type) {
 
 
 
-
 // ------------------- LOADING STATES -------------------
-function showLoading() {
-    propertiesGrid.style.display = 'none';
-    loadingState.style.display = 'block';
-    noResults.style.display = 'none';
-}
+// function showLoading() {
+//     propertiesGrid.style.display = 'none';
+//     loadingState.style.display = 'block';
+//     noResults.style.display = 'none';
+// }
 
-function hideLoading() {
-    loadingState.style.display = 'none';
-}
+// function hideLoading() {
+//     loadingState.style.display = 'none';
+// }
 
-// ------------------- SETUP -------------------
+
+
 document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
     loadProperties();
+    propertyPagination = new PropertyPagination();
+
+    window.onclick = function(event) {
+        const modal = document.getElementById('propertyModal');
+        if (event.target === modal) closeModal();
+    }
+
+    document.addEventListener('keydown', function(event) {
+        const modal = document.getElementById('propertyModal');
+        if (modal && modal.style.display === 'block') {
+            if (event.key === 'Escape') closeModal();
+            else if (event.key === 'ArrowRight') nextImage();
+            else if (event.key === 'ArrowLeft') previousImage();
+            else if (event.key === ' ') { event.preventDefault(); toggleAutoPlay(); }
+        }
+    });
 });
+
 
 function setupEventListeners() {
     filterTabs.forEach(tab => {
@@ -352,9 +380,7 @@ function setupEventListeners() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    setupEventListeners();
-    loadProperties();
-    
+
     // Modal event listeners
     window.onclick = function(event) {
         const modal = document.getElementById('propertyModal');
@@ -372,7 +398,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 nextImage();
             } else if (event.key === 'ArrowLeft') {
                 previousImage();
-            } else if (event.key === ' ') { // Spacebar to pause/play
+            } else if (event.key === ' ') {
                 event.preventDefault();
                 toggleAutoPlay();
             }
@@ -613,20 +639,17 @@ class PropertyPagination {
         return this.totalPages;
     }
 
-    // Show/hide property cards based on current page
-    displayCardsForPage(page) {
-        const cards = document.querySelectorAll('.property-card');
-        const startIndex = (page - 1) * this.itemsPerPage;
-        const endIndex = startIndex + this.itemsPerPage;
+   
+   displayCardsForPage(page) {
+    const cards = document.querySelectorAll('.property-card');
+    const startIndex = (page - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
 
-        cards.forEach((card, index) => {
-            if (index >= startIndex && index < endIndex) {
-                card.style.display = 'block';
-            } else {
-                card.style.display = 'none';
-            }
-        });
-    }
+    cards.forEach((card, index) => {
+        // ✅ Use '' not 'block' — lets the grid's CSS take over
+        card.style.display = (index >= startIndex && index < endIndex) ? '' : 'none';
+    });
+}
 
     // Go to specific page
     goToPage(pageNumber) {
@@ -763,17 +786,7 @@ class PropertyPagination {
 // Initialize pagination system
 let propertyPagination;
 
-// Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    propertyPagination = new PropertyPagination();
-    
-    // Also try after a short delay to ensure all content is loaded
-    setTimeout(() => {
-        if (propertyPagination) {
-            propertyPagination.refresh();
-        }
-    }, 500);
-});
+
 
 // Also try when window is fully loaded
 window.addEventListener('load', () => {

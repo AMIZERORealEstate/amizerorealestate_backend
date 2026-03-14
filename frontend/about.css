@@ -993,3 +993,121 @@
     .bv-values-section  { padding: 48px 0 0; }
     .bv-pillars-section { padding: 40px 0 0; }
 }
+
+
+
+
+/* ══════════════════════════════════════════
+   FIX: bv-metrics-blurb-card mobile layout
+══════════════════════════════════════════ */
+
+@media (max-width: 1180px) {
+    .bv-metrics-blurb-card {
+        grid-column: 1 / -1;  /* span full width */
+        grid-row: auto;
+        flex-direction: row;   /* text + button side by side */
+        align-items: center;
+        justify-content: space-between;
+        gap: 2rem;
+    }
+
+    .bv-metrics-blurb-card__text {
+        flex: 1;               /* text takes available space */
+    }
+
+    .bv-metrics-blurb-card__cta {
+        flex-shrink: 0;        /* button never shrinks */
+        white-space: nowrap;
+    }
+}
+
+@media (max-width: 768px) {
+    .bv-metrics-blurb-card {
+        grid-column: 1 / -1;
+        grid-row: auto;
+        flex-direction: column;  /* stack text above button */
+        align-items: flex-start;
+        gap: 1.2rem;
+        padding: 20px;
+    }
+
+    .bv-metrics-blurb-card__cta {
+        width: 100%;             /* full width button on mobile */
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .bv-metrics-blurb-card {
+        padding: 16px;
+        border-radius: 10px;
+    }
+
+    .bv-metrics-blurb-card__text {
+        font-size: 0.82rem;
+    }
+}
+
+
+
+/* ══════════════════════════════════════════
+   FIX: bv-metrics-section grid overflow
+══════════════════════════════════════════ */
+
+.bv-metrics-section {
+    width: 100%;
+    overflow: hidden;          /* kill any card bleeding outside */
+}
+
+.bv-metrics-section__grid {
+    width: 100%;
+    box-sizing: border-box;    /* padding included in width */
+}
+
+/* ── Mobile: 2 equal columns, no overflow ── */
+@media (max-width: 768px) {
+    .bv-metrics-section__grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .bv-stat-card {
+        padding: 16px 14px;
+        border-radius: 10px;
+        min-width: 0;          /* prevent cards from forcing their own width */
+        width: 100%;           /* fill column, never overflow */
+        box-sizing: border-box;
+    }
+
+    .bv-stat-card__number {
+        font-size: 1.8rem;
+        letter-spacing: -0.5px;
+    }
+
+    .bv-stat-card__caption {
+        font-size: 0.72rem;
+    }
+
+    /* Blurb card spans both columns */
+    .bv-metrics-blurb-card {
+        grid-column: 1 / -1;
+        min-width: 0;
+        width: 100%;
+        box-sizing: border-box;
+    }
+}
+
+@media (max-width: 480px) {
+    .bv-metrics-section__grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .bv-stat-card {
+        padding: 14px 12px;
+    }
+
+    .bv-stat-card__number {
+        font-size: 1.6rem;
+    }
+}
