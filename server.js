@@ -37,63 +37,62 @@ app.use(express.static('public'));
 let db;
 let mongoClient;
 
-// Nodemailer Configuration
 let transporter;
 
 function createMailTransporter() {
-    // Configure based on your email provider
-    // Example configurations for different providers:
-    
-    // Gmail Configuration
     if (process.env.EMAIL_SERVICE === 'gmail') {
-        transporter = nodemailer.createTransport({
+        return nodemailer.createTransport({
             service: 'gmail',
             auth: {
                 user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS // Use App Password for Gmail
-            }
-        });
-    }
-    // Custom SMTP Configuration (recommended for production)
-    else {
-        transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST || 'smtp.gmail.com',
-            port: process.env.SMTP_PORT || 587,
-            secure: process.env.SMTP_SECURE === 'false', // true for 465, false for other ports
-            auth: {
-                user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS
-            },
-            tls: {
-                rejectUnauthorized: false
             }
         });
     }
 
-    return transporter;
+    // Custom SMTP fallback
+    return nodemailer.createTransport({
+        host: process.env.SMTP_HOST || 'smtp.gmail.com',
+        port: parseInt(process.env.SMTP_PORT) || 587,
+        secure: process.env.SMTP_SECURE === 'true', // ✅ fixed logic
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS
+        },
+        tls: { rejectUnauthorized: false }
+    });
 }
 
-// Verify Nodemailer configuration on startup
+
 (async () => {
+    // ✅ Fix 3: check both possible env var names
+    const emailUser = process.env.EMAIL_USER;
+    const emailPass = process.env.EMAIL_PASS || process.env.EMAIL_PASSWORD;
+
+    if (!emailUser || !emailPass) {
+        console.error('❌ EMAIL_USER or EMAIL_PASS not found in environment variables');
+        console.log('📝 Please add the following to your .env file:');
+        console.log('   EMAIL_SERVICE=gmail  (or omit for custom SMTP)');
+        console.log('   EMAIL_USER=your-email@gmail.com');
+        console.log('   EMAIL_PASS=your-app-password');
+        console.log('   SMTP_HOST=smtp.gmail.com');
+        console.log('   SMTP_PORT=587');
+        console.log('   SMTP_SECURE=false  (true only for port 465)');
+        return; // stop here — no point verifying
+    }
+
     try {
-        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-            console.error('❌ EMAIL_USER or EMAIL_PASSWORD not found in environment variables');
-            console.log('📝 Please add the following to your .env file:');
-            console.log('   EMAIL_SERVICE=gmail (or leave empty for custom SMTP)');
-            console.log('   EMAIL_USER=your-email@gmail.com');
-            console.log('   EMAIL_PASSWORD=your-app-password');
-            console.log('   SMTP_HOST=smtp.gmail.com (if using custom SMTP)');
-            console.log('   SMTP_PORT=587 (if using custom SMTP)');
-        } else {
-            transporter = createMailTransporter();
-            await transporter.verify();
-            console.log('✅ Nodemailer is configured and ready to send emails');
-        }
+        transporter = createMailTransporter();
+        await transporter.verify();
+        console.log('✅ Nodemailer is configured and ready to send emails');
     } catch (error) {
         console.error('❌ Nodemailer configuration error:', error.message);
-        
+        // Optional: exit process if email is critical
+        // process.exit(1);
     }
 })();
+
+module.exports = { transporter };
 
 // Cloudinary Storage Configuration
 const storage = new CloudinaryStorage({
@@ -143,38 +142,29 @@ async function createDefaultAdmin() {
     }
 }
 
+
+
+
+
+
 // Contact Form Submission
 app.post('/api/contact', async (req, res) => {
     try {
         const { name, email, phone, service, message } = req.body;
 
-        // Check database connection
         if (!db) {
-            console.error('❌ Database not connected');
-            return res.status(500).json({
-                success: false,
-                error: 'Database connection not available'
-            });
+            return res.status(500).json({ success: false, error: 'Database connection not available' });
         }
 
-        // Validate required fields
         if (!name || !email || !message) {
-            return res.status(400).json({
-                success: false,
-                error: 'Name, email, and message are required fields'
-            });
+            return res.status(400).json({ success: false, error: 'Name, email, and message are required' });
         }
 
-        // Validate email format
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
-            return res.status(400).json({
-                success: false,
-                error: 'Please provide a valid email address'
-            });
+            return res.status(400).json({ success: false, error: 'Please provide a valid email address' });
         }
 
-        // Create contact document
         const contactData = {
             name: name.trim(),
             email: email.trim().toLowerCase(),
@@ -188,22 +178,17 @@ app.post('/api/contact', async (req, res) => {
             userAgent: req.get('User-Agent')
         };
 
-        // Save to MongoDB
         const collection = db.collection('contacts');
         const result = await collection.insertOne(contactData);
 
-        // Send emails using Nodemailer (don't wait for completion)
-        sendContactEmails(name, email, phone, service, message, result.insertedId)
-            .catch(err => console.error('Email sending error:', err));
+        // ✅ Now properly awaited — errors will be caught below
+        await sendContactEmails(name, email, phone, service, message, result.insertedId);
 
-        res.json({
-            success: true,
-            contactId: result.insertedId
-        });
+        return res.json({ success: true, contactId: result.insertedId });
 
     } catch (error) {
-        console.error('Contact form error:', error);
-        res.status(500).json({
+        console.error('❌ Contact form error:', error.message);
+        return res.status(500).json({
             success: false,
             error: 'Failed to submit contact form. Please try again later.'
         });
