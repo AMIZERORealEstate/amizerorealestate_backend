@@ -25,57 +25,68 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Form submission handler - MAIN CONTACT FORM FUNCTIONALITY
-    const contactForm = document.getElementById('contactForm');
-    if (contactForm) {
-        contactForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Validate form before submission
-            if (!validateForm()) {
-                return;
-            }
-            
-            const formData = new FormData(this);
-            const data = Object.fromEntries(formData.entries());
-            
-            // Send to backend
-            fetch(`${API_BASE_URL}/api/contact`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(result => {
-                if (result.success) {
-                    // Update success modal message
-                    const successMsg = document.getElementById('successModalMessage');
-                    if (successMsg) {
-                        successMsg.textContent = 'Message sent successfully! We will get back to you soon.';
-                    }
-                    showModal('successModalOverlay');
-                    this.reset();
-                } else {
-                    // Update error modal with server error message
-                    const errorMsg = document.getElementById('errorModalMessage');
-                    if (errorMsg) {
-                        errorMsg.textContent = result.error || 'Failed to send message.';
-                    }
-                    showModal('errorModalOverlay');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                // Update error modal with network error message
-                const errorMsg = document.getElementById('errorModalMessage');
-                if (errorMsg) {
-                    errorMsg.textContent = 'Error sending message. Please try again later.';
-                }
-                showModal('errorModalOverlay');
-            });
+  const contactForm = document.getElementById('contactForm');
+if (contactForm) {
+    contactForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Get form values
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const service = document.getElementById('service').value;
+        const message = document.getElementById('message').value.trim();
+
+        // Basic validation
+        if (!name || !email || !message) {
+            const errorMsg = document.getElementById('errorModalMessage');
+            if (errorMsg) errorMsg.textContent = 'Please fill in all required fields.';
+            showModal('errorModalOverlay');
+            return;
+        }
+
+        // Disable button to prevent double submit
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+        // EmailJS template parameters
+        const templateParams = {
+            from_name: name,
+            from_email: email,
+            phone: phone || 'Not provided',
+            service: service || 'General Inquiry',
+            message: message,
+            submitted: new Date().toLocaleString()
+        };
+
+        // Send via EmailJS
+        emailjs.send(
+            'service_zo90v34',  
+            'template_iqkwjxw',  
+            templateParams
+        )
+        .then(() => {
+            // Show success
+            const successMsg = document.getElementById('successModalMessage');
+            if (successMsg) successMsg.textContent = 'Message sent successfully! We will get back to you soon.';
+            showModal('successModalOverlay');
+            contactForm.reset();
+        })
+        .catch((error) => {
+            console.error('EmailJS error:', error);
+            const errorMsg = document.getElementById('errorModalMessage');
+            if (errorMsg) errorMsg.textContent = 'Failed to send message. Please try again.';
+            showModal('errorModalOverlay');
+        })
+        .finally(() => {
+            // Re-enable button
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
         });
-    }
+    });
+}
 
   
 
